@@ -1,5 +1,6 @@
 package polis.polisappen;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +39,7 @@ public class AccountManager {
     }
 
     protected void onResume() {
-        adapter.enableForegroundDispatch(R.id.activity_main, pendingIntent, null, null);
+        adapter.enableForegroundDispatch((Activity) context, pendingIntent, null, null);
     }
 
     protected void onNewIntent(Intent intent) {

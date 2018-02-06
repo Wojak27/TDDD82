@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-    private PendingIntent pendingIntent;
     public static AccountManager AUTHORIZATION;
 
     @Override
@@ -21,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(!AUTHORIZATION.isLoggedIn()){
            setContentView(R.layout.login_screen);
+            AUTHORIZATION.getAuthToken();
         }
     }
 
