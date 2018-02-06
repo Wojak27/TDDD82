@@ -4,9 +4,6 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.content.Context;
 
 import java.util.List;
 
@@ -16,19 +13,21 @@ import java.util.List;
 
 @Dao
 public interface UserDao {
-    @Query("SELECT * FROM user")
-    List<User> getAll();
+    @Query("SELECT * FROM Location")
+    List<Location> getAll();
 
-    @Query("SELECT * FROM user WHERE uid IN (:userIds)")
-    List<User> loadAllByIds(int[] userIds);
+    @Query("SELECT * FROM Location WHERE uid IN (:userIds)")
+    List<Location> loadAllByIds(int[] userIds);
 
-    @Query("SELECT * FROM user WHERE first_name LIKE :first AND "
-            + "last_name LIKE :last LIMIT 1")
-    User findByName(String first, String last);
+    @Query("SELECT * FROM Location WHERE uid IN (:userId)")
+    Location loadById(int userId);
 
     @Insert
-    void insertAll(User... users);
+    void insertAll(Location... locations);
+
+    @Insert
+    void insert(Location location);
 
     @Delete
-    void delete(User user);
+    void delete(Location location);
 }

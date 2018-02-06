@@ -1,5 +1,6 @@
 package polis.polisappen;
 
+import android.arch.persistence.room.Room;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -10,14 +11,28 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import polis.polisappen.LocalDatabase.ApplicationDatabase;
+import polis.polisappen.LocalDatabase.Location;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private ApplicationDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+         db = Room.databaseBuilder(getApplicationContext(),
+                ApplicationDatabase.class, "database-name").build();
+
+        Location location = new Location();
+        location.uid = 1;
+        location.latitude = 2.1;
+        location.longitude = 3.2;
+        db.userDao().insert(location);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -39,7 +54,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        Location location = db.userDao().loadById(1);
+        LatLng sydney = new LatLng(location.latitude, location.longitude);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }

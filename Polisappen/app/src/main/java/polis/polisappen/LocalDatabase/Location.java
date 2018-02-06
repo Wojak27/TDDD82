@@ -11,15 +11,15 @@ import android.content.Context;
  */
 
 @Entity
-public class User {
+public class Location {
     @PrimaryKey
-    private int uid;
+    public int uid;
 
-    @ColumnInfo(name = "first_name")
-    private String firstName;
+    @ColumnInfo(name = "latitude")
+    public double latitude;
 
-    @ColumnInfo(name = "last_name")
-    private String lastName;
+    @ColumnInfo(name = "longitude")
+    public double longitude;
 
     // Getters and setters are ignored for brevity,
     // but they're required for Room to work.
