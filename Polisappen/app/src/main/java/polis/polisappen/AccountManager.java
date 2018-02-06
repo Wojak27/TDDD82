@@ -8,6 +8,10 @@ public class AccountManager {
 
     }
 
+    public boolean isLoggedIn(){
+        return false;
+    }
+
 
 
 }
