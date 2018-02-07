@@ -10,10 +10,11 @@ import android.content.Context;
  * Created by karolwojtulewicz on 2018-02-06.
  */
 
-@Entity
+@Entity(tableName = "Location", primaryKeys =
+        {"latitude","longitude"})
 public class Location {
-    @PrimaryKey
-    public int uid;
+//    @PrimaryKey
+//    public int uid;
 
     @ColumnInfo(name = "latitude")
     public double latitude;

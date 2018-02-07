@@ -41,6 +41,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
         }
@@ -89,7 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMapLongClick(LatLng latLng) {
                 String title = "My marker";
                 mMap.addMarker(new MarkerOptions().position(latLng).title(title));
-                addMarkerToDatabase(latLng,title, 2);
+                addMarkerToDatabase(latLng,title);
             }
         });
 
@@ -136,10 +137,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void addMarkerToDatabase(LatLng latLng, String title, int uid){ // uid for debugging
+    private void addMarkerToDatabase(LatLng latLng, String title){ // uid for debugging
 
         final Location location = new Location();
-        location.uid = uid;
         location.latitude = latLng.latitude;
         location.longitude = latLng.longitude;
         location.title = title;

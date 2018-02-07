@@ -16,11 +16,8 @@ public interface UserDao {
     @Query("SELECT * FROM Location")
     List<Location> getAll();
 
-    @Query("SELECT * FROM Location WHERE uid IN (:userIds)")
-    List<Location> loadAllByIds(int[] userIds);
-
-    @Query("SELECT * FROM Location WHERE uid IN (:userId)")
-    Location loadById(int userId);
+//    @Query("SELECT * FROM Location WHERE uid IN (:userId)")
+//    Location loadById(int userId);
 
     //do this to get uid number
     @Query("SELECT * FROM Location WHERE latitude = :lat AND longitude = :lon")
