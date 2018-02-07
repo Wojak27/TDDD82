@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.LoginFilter;
@@ -48,7 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
         }
 
-         db = Room.databaseBuilder(getApplicationContext(),
+        db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
 
         //adding new marker to the database
@@ -59,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
     private boolean isPermissionGranted() {
         if (checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED || checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -69,6 +71,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.v("log", "Permission not granted");
             return false;
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 1){
+            setMyLocation();
+        }
+    }
+
+    private void setMyLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
     }
 
 
@@ -107,9 +133,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
         setMarkersFromDatabaseOnMap(mMap);
 
-//        mMap.setMyLocationEnabled(true);
-//        mMap.setOnMyLocationButtonClickListener(this);
-//        mMap.setOnMyLocationClickListener(this);
+
     }
 
     private void reportFormPopup(LatLng latLng){
