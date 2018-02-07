@@ -10,69 +10,77 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-
-
-
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import android.content.IntentFilter;
-import android.content.IntentFilter.MalformedMimeTypeException;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-
+import android.widget.Toast;
+import android.nfc.Tag;
 import org.w3c.dom.Text;
 
-
-public class AccountManager {
+public class AccountManager extends AppCompatActivity implements View.OnClickListener{
     private NfcAdapter adapter;
     private Context context;
     private PendingIntent pendingIntent;
+    private Button login;
     private Context context1;
     private Context context2;
 
     public AccountManager(){
-
     }
 
-    public AccountManager(NfcManager manager, Context context){
-        
-        adapter = manager.getDefaultAdapter();
-        this.context = context;
-        if(adapter == null){
-            Toast.makeText(context, "Den här enheten har inte NFC", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(!adapter.isEnabled()){ //Funkade inte
-            Toast.makeText(context, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.login_screen);
+
+        EditText passwordEditText = (EditText) findViewById(R.id.passwordEditText);
+        final Button LogInButton = (Button)findViewById(R.id.logInButton);
+        LogInButton.setEnabled(false);
+
+        passwordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length()==4){//&& isScanned == true
+                    LogInButton.setEnabled(true);
+                }
+                else{
+                    LogInButton.setEnabled(false);
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+
+        LogInButton.setOnClickListener(this);
+
+        NfcManager NFCManager = (NfcManager)this.getSystemService(NFC_SERVICE);
+        adapter = NFCManager.getDefaultAdapter();
+        if(adapter == null)
+            Toast.makeText(this, "Den här enheten har inte NFC", Toast.LENGTH_SHORT).show();
+        else if(!adapter.isEnabled()) //Funkade inte
+           Toast.makeText(this, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
+
+        //pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),0);
     }
 
-
-    /* should return the auth-token, if it has not expired, then it should get a new one.*/
-    public void getAuthToken(){
-        pendingIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, context.getClass())
-                        .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+   @Override
+    public void onClick(View view) {
+        //setContentView(R.layout.menu_screen); //Måste vara byt activity
     }
 
+    @Override
     protected void onResume() {
-        adapter.enableForegroundDispatch((Activity) context, pendingIntent, null, null);
+        super.onResume();
+        //adapter.enableForegroundDispatch(this, pendingIntent, null, null);
     }
 
+    @Override
     protected void onNewIntent(Intent intent) {
         //setIntent(intent);
-        resolveIntent(intent);
-    }
-    private void resolveIntent(Intent intent) {
         String action = intent.getAction();
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action))
             handleIntent(intent);
@@ -80,27 +88,27 @@ public class AccountManager {
 
     private void handleIntent(Intent intent) {
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        String info = "No data";
+        String serial_number = "No data";
 
         if(tag != null) {
             byte [] byteID = tag.getId();
             int i, j, in;
             String [] hex = {"0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"};
-            info = "";
+            serial_number = "";
 
             for(j = 0 ; j < byteID.length ; ++j)
             {
                 in = (int) byteID[j] & 0xff;
                 i = (in >> 4) & 0x0f;
-                info += hex[i];
+                serial_number += hex[i];
                 i = in & 0x0f;
-                info += hex[i];
+                serial_number += hex[i];
             }
         }
 
-        Toast.makeText(context, info, Toast.LENGTH_LONG).show();
-        TextView textview = (TextView)((Activity)context).findViewById(R.id.logInText);
-        textview.setText("NFC-card scanned, write password");
+        Toast.makeText(context, serial_number, Toast.LENGTH_LONG).show();
+        //TextView textview = (TextView)((Activity)context).findViewById(R.id.logInText);
+        //textview.setText("NFC-card scanned, write password");
         //boolean isScanned = false;
         //isScanned = true;
     }
@@ -108,6 +116,5 @@ public class AccountManager {
     public boolean isLoggedIn(){
         return false;
     }
-
 
 }
