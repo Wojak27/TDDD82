@@ -1,6 +1,11 @@
 <resources>
-    <string name="app_name">Polisappen</string>
-    <string name="LoggaInText">Blippa ditt NFC-kort samt <br/> \n skriv in lösenord för att logga in</string>
-    <string name="LoggaInButton">Logga in</string>
-    <string name="Password">Lösenord</string>
+    <string name="app_name">Polisapp</string>
+    <string name="LogInText">Scan your NFC-card <br/> \n and enter your password to log in</string>
+    <string name="LogInButton">Log in</string>
+    <string name="Password">Password</string>
+    <string name="ContactsButton">Contacts</string>
+    <string name="MapsButton">Maps</string>
+    <string name="RapportButton">Rapport</string>
+    <string name="NewsfeedButton">Newsfeed</string>
+    <string name="LogOutButton">Log Out</string>
 </resources>
