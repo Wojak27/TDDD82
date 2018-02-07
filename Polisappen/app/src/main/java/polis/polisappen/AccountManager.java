@@ -101,39 +101,12 @@ public class AccountManager {
         Toast.makeText(context, info, Toast.LENGTH_LONG).show();
         TextView textview = (TextView)((Activity)context).findViewById(R.id.logInText);
         textview.setText("NFC-card scanned, write password");
-        PasswordListener();
+        //boolean isScanned = false;
+        //isScanned = true;
     }
 
     public boolean isLoggedIn(){
         return false;
-    }
-
-    private void PasswordListener(){
-        EditText passswordEditText = (EditText) ((Activity)context).findViewById(R.id.passwordEditText);
-        passswordEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                //if text is 4, sätt knappen till available
-                Button LogInButton = (Button)((Activity)context).findViewById(R.id.logInButton);
-                if(charSequence.length()==4){
-                    LogInButton.setEnabled(true);
-                }
-                else{
-                    LogInButton.setEnabled(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
     }
 
 
