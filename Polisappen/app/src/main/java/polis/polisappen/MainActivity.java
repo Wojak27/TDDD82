@@ -6,11 +6,11 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     public static AccountManager AUTHORIZATION;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         AUTHORIZATION.onNewIntent(intent);
     }
+
+
+
 
     //Daniel was here
     //Robin was here

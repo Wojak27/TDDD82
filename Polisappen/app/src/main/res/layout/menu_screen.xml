@@ -3,7 +3,7 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/ContactsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -13,41 +13,41 @@
         android:text="@string/ContactsButton" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/MapsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/button2"
-        android:layout_below="@+id/button2"
+        android:layout_alignStart="@+id/ContactsButton"
+        android:layout_below="@+id/ContactsButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
         android:text="@string/MapsButton" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/NewsfeedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/button3"
-        android:layout_below="@+id/button3"
+        android:layout_alignStart="@+id/MapsButton"
+        android:layout_below="@+id/MapsButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
         android:text="@string/NewsfeedButton" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/ReportButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/button4"
-        android:layout_below="@+id/button4"
+        android:layout_alignStart="@+id/NewsfeedButton"
+        android:layout_below="@+id/NewsfeedButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="@string/RapportButton" />
+        android:text="@string/ReportButton" />
 
     <Button
-        android:id="@+id/button6"
+        android:id="@+id/LogOutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/button5"
-        android:layout_below="@+id/button5"
+        android:layout_alignStart="@+id/ReportButton"
+        android:layout_below="@+id/ReportButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
         android:text="@string/LogOutButton" />

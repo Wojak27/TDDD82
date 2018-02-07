@@ -5,7 +5,7 @@
     <string name="Password">Password</string>
     <string name="ContactsButton">Contacts</string>
     <string name="MapsButton">Maps</string>
-    <string name="RapportButton">Rapport</string>
+    <string name="ReportButton">Report</string>
     <string name="NewsfeedButton">Newsfeed</string>
     <string name="LogOutButton">Log Out</string>
 </resources>

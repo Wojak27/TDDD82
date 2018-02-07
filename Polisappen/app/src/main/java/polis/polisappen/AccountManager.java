@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 
@@ -24,18 +28,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
 
 
 public class AccountManager {
     private NfcAdapter adapter;
     private Context context;
     private PendingIntent pendingIntent;
+    private Context context1;
+    private Context context2;
 
     public AccountManager(){
 
     }
 
     public AccountManager(NfcManager manager, Context context){
+        
         adapter = manager.getDefaultAdapter();
         this.context = context;
         if(adapter == null){
@@ -91,12 +99,42 @@ public class AccountManager {
         }
 
         Toast.makeText(context, info, Toast.LENGTH_LONG).show();
+        TextView textview = (TextView)((Activity)context).findViewById(R.id.LogInTextView);
+        textview.setText("NFC-card scanned, write password");
+        PasswordListener();
     }
 
     public boolean isLoggedIn(){
         return false;
     }
 
+    private void PasswordListener(){
+        EditText passswordEditText = (EditText) ((Activity)context).findViewById(R.id.passwordEditText);
+        passswordEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //if text is 4, sätt knappen till available
+                Button LogInButton = (Button)((Activity)context).findViewById(R.id.logInButton);
+                if(charSequence.length()==4){
+                    LogInButton.setEnabled(true);
+                }
+                else{
+                    LogInButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+    }
 
 
 }
