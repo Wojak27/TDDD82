@@ -21,6 +21,9 @@ public class Location {
     @ColumnInfo(name = "longitude")
     public double longitude;
 
+    @ColumnInfo(name = "label")
+    public String title;
+
     // Getters and setters are ignored for brevity,
     // but they're required for Room to work.
 }
