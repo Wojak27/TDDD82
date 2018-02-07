@@ -38,7 +38,7 @@ public class VideoAndVoiceChat extends Activity {
     Button button = (Button) findViewById(R.id.button);
 
     button.setOnClickListener(new View.OnClickListener() {
-        @Override
+        //@Override
         CallClient callClient = sinchClient.getCallClient();
         Call call = callClient.callUser("call-recipient-id");
         //sinchClient.getCallClient().callUser("call-recipient-id");

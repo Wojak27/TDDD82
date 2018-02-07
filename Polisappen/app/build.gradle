@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "polis.polisappen"
         minSdkVersion 24
-        targetSdkVersion 25
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -16,16 +17,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
+    packagingOptions {
+        exclude 'lib/x86_64/libsinch-android-rtc.so'
+        exclude 'lib/x86/libsinch-android-rtc.so'
+        exclude 'lib/armeabi-v7a/libsinch-android-rtc.so'
+        exclude 'lib/arm64-v8a/libsinch-android-rtc.so'
+    }
 }
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile fileTree(include: ['*.aar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile(name: 'sinch-android-rtc', version: '+', ext: 'aar')
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:25.0.0'
+    implementation(name: 'sinch-android-rtc', version: '+', ext: 'aar')
+    testImplementation 'junit:junit:4.12'
     implementation project(':sinch-android-rtc-3.12.3')
 }
 
