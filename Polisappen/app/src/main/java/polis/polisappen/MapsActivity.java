@@ -2,6 +2,8 @@ package polis.polisappen;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -79,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -89,8 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapLongClick(LatLng latLng) {
                 String title = "My marker";
-                mMap.addMarker(new MarkerOptions().position(latLng).title(title));
-                addMarkerToDatabase(latLng,title);
+                reportFormPopup(latLng);
             }
         });
 
@@ -108,6 +110,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.setMyLocationEnabled(true);
 //        mMap.setOnMyLocationButtonClickListener(this);
 //        mMap.setOnMyLocationClickListener(this);
+    }
+
+    private void reportFormPopup(LatLng latLng){
+        Bundle data = new Bundle();
+        data.putDouble("latidude", latLng.latitude);
+        data.putDouble("longitude", latLng.longitude);
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        ReportFormFragment reportFormFragment = new ReportFormFragment();
+        reportFormFragment.setArguments(data);
+        fragmentTransaction.add(R.id.fragment_container, reportFormFragment, "COORDINATES");
+        fragmentTransaction.commit();
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -137,12 +151,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void addMarkerToDatabase(LatLng latLng, String title){ // uid for debugging
+    public void addMarkerToDatabase(LatLng latLng, String title, String reportText){ // uid for debugging
 
+        mMap.addMarker(new MarkerOptions().position(latLng).title(title));
         final Location location = new Location();
         location.latitude = latLng.latitude;
         location.longitude = latLng.longitude;
-        location.title = title;
+        location.title = reportText;
+        location.reportText = reportText;
 
         //now I put the location I've created previously into the local database
         //everything needs to be done on a separate thread due to android constraints

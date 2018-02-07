@@ -25,6 +25,14 @@ public class Location {
     @ColumnInfo(name = "label")
     public String title;
 
+    // different integers indicate different type
+    @ColumnInfo(name = "type")
+    public int type = 1; // default value
+
+    // report form text
+    @ColumnInfo(name = "report_text")
+    public String reportText;
+
     // Getters and setters are ignored for brevity,
     // but they're required for Room to work.
 }
