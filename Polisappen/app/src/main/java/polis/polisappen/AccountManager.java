@@ -8,6 +8,24 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.widget.Toast;
 
+
+
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import android.content.IntentFilter;
+import android.content.IntentFilter.MalformedMimeTypeException;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+
+
+
 public class AccountManager {
     private NfcAdapter adapter;
     private Context context;
@@ -24,7 +42,7 @@ public class AccountManager {
             Toast.makeText(context, "Den här enheten har inte NFC", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(!adapter.isEnabled()){
+        if(!adapter.isEnabled()){ //Funkade inte
             Toast.makeText(context, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -47,7 +65,32 @@ public class AccountManager {
         resolveIntent(intent);
     }
     private void resolveIntent(Intent intent) {
-        Toast.makeText(context, "WHATERVER", Toast.LENGTH_SHORT).show();
+        String action = intent.getAction();
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action))
+            handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        String info = "No data";
+
+        if(tag != null) {
+            byte [] byteID = tag.getId();
+            int i, j, in;
+            String [] hex = {"0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"};
+            info = "";
+
+            for(j = 0 ; j < byteID.length ; ++j)
+            {
+                in = (int) byteID[j] & 0xff;
+                i = (in >> 4) & 0x0f;
+                info += hex[i];
+                i = in & 0x0f;
+                info += hex[i];
+            }
+        }
+
+        Toast.makeText(context, info, Toast.LENGTH_LONG).show();
     }
 
     public boolean isLoggedIn(){
