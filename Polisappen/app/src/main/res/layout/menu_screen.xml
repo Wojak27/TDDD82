@@ -3,52 +3,52 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/ContactsButton"
+        android:id="@+id/contactsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="@string/ContactsButton" />
+        android:text="@string/contactsButton" />
 
     <Button
-        android:id="@+id/MapsButton"
+        android:id="@+id/mapsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/ContactsButton"
-        android:layout_below="@+id/ContactsButton"
+        android:layout_alignStart="@+id/contactsButton"
+        android:layout_below="@+id/contactsButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="@string/MapsButton" />
+        android:text="@string/mapsButton" />
 
     <Button
-        android:id="@+id/NewsfeedButton"
+        android:id="@+id/newsfeedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/MapsButton"
-        android:layout_below="@+id/MapsButton"
+        android:layout_alignStart="@+id/mapsButton"
+        android:layout_below="@+id/mapsButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="@string/NewsfeedButton" />
+        android:text="@string/newsfeedButton" />
 
     <Button
-        android:id="@+id/ReportButton"
+        android:id="@+id/reportButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/NewsfeedButton"
-        android:layout_below="@+id/NewsfeedButton"
+        android:layout_alignStart="@+id/newsfeedButton"
+        android:layout_below="@+id/newsfeedButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="@string/ReportButton" />
+        android:text="@string/reportButton" />
 
     <Button
-        android:id="@+id/LogOutButton"
+        android:id="@+id/logOutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/ReportButton"
-        android:layout_below="@+id/ReportButton"
+        android:layout_alignStart="@+id/reportButton"
+        android:layout_below="@+id/reportButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="@string/LogOutButton" />
+        android:text="@string/logOutButton" />
 </RelativeLayout>

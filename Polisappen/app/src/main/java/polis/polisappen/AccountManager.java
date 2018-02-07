@@ -99,7 +99,7 @@ public class AccountManager {
         }
 
         Toast.makeText(context, info, Toast.LENGTH_LONG).show();
-        TextView textview = (TextView)((Activity)context).findViewById(R.id.LogInTextView);
+        TextView textview = (TextView)((Activity)context).findViewById(R.id.logInText);
         textview.setText("NFC-card scanned, write password");
         PasswordListener();
     }
