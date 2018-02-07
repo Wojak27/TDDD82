@@ -22,6 +22,10 @@ public interface UserDao {
     @Query("SELECT * FROM Location WHERE uid IN (:userId)")
     Location loadById(int userId);
 
+    //do this to get uid number
+    @Query("SELECT * FROM Location WHERE latitude = :lat AND longitude = :lon")
+    Location selectSpecificMarker(double lat, double lon);
+
     @Insert
     void insertAll(Location... locations);
 
@@ -30,4 +34,8 @@ public interface UserDao {
 
     @Delete
     void delete(Location location);
+
+//    Doesn't work in Room, needs to create custom solution
+//    @Query("DELETE FROM Location WHERE latitude = :lat AND longitude = :lon AND label = :title")
+//    void deleteSpecificMarker(double lat, double lon, String title);
 }

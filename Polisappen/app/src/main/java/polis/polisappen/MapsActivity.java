@@ -98,6 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onMarkerClick(Marker marker) {
                 marker.remove();
+                deleteMarkerFromDatabase(marker);
                 return false;
             }
         });
@@ -158,6 +159,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (locationCount>0){
                     Log.w("Location","successl");
                 }
+            }
+        }.execute();
+    }
+
+    /**
+     * Todo: Database primary keys for marker adding and retrievial
+     * @param
+     */
+
+    @SuppressLint("StaticFieldLeak")
+    private void deleteMarkerFromDatabase(final Marker marker){ // location for debugging, needs fixing
+        final double lat = marker.getPosition().latitude;
+        final double lon = marker.getPosition().longitude;
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(Void... voids) {
+
+                Location location = db.userDao().selectSpecificMarker(lat, lon);
+                if(location != null) db.userDao().delete(location);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Integer integer) {
+                super.onPostExecute(integer);
             }
         }.execute();
     }
