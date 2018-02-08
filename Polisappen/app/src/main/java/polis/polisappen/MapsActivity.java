@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -170,16 +171,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                marker.remove();
-                deleteMarkerFromDatabase(marker);
+//                marker.remove();
+//                deleteMarkerFromDatabase(marker);
+//                openReportWindow(marker);  // need to be done in async
                 return false;
             }
         });
         setMarkersFromDatabaseOnMap(mMap);
-
-
     }
 
+    @SuppressLint("StaticFieldLeak")
+    private void openReportWindow(final Marker marker){
+        final Intent intent = new Intent(this, ReportWindowActivity.class);
+
+        new AsyncTask<Void, Void, Integer>() {
+            Location location;
+            @Override
+            protected Integer doInBackground(Void... params) {
+//                location = db.userDao().loadById(1); //using query I created in UserDau.java
+                location = db.userDao().selectSpecificMarker(marker.getPosition().latitude, marker.getPosition().longitude);
+                return 1;
+            }
+
+            @Override
+            protected void onPostExecute(Integer numOfLocations) {
+                intent.putExtra("reportText", location.reportText);
+                startReportIntent(intent);
+            }
+        }.execute();
+    }
+
+    private void startReportIntent(Intent intent){
+        startActivity(intent);
+    }
     private void reportFormPopup(LatLng latLng){
         Bundle data = new Bundle();
         data.putDouble("latidude", latLng.latitude);
