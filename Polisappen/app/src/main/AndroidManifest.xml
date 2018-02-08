@@ -47,8 +47,7 @@
         </activity>
         <activity
             android:name=".ReportWindowActivity"
-            android:label="@string/title_activity_report_window"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:label="@string/title_activity_report_window"></activity>
     </application>
 
 </manifest>

@@ -173,7 +173,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public boolean onMarkerClick(Marker marker) {
 //                marker.remove();
 //                deleteMarkerFromDatabase(marker);
-//                openReportWindow(marker);  // need to be done in async
+                openReportWindow(new LatLng(marker.getPosition().latitude,marker.getPosition().longitude));  // need to be done in async
                 return false;
             }
         });
@@ -181,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void openReportWindow(final Marker marker){
+    private void openReportWindow(final LatLng marker){
         final Intent intent = new Intent(this, ReportWindowActivity.class);
 
         new AsyncTask<Void, Void, Integer>() {
@@ -189,13 +189,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             protected Integer doInBackground(Void... params) {
 //                location = db.userDao().loadById(1); //using query I created in UserDau.java
-                location = db.userDao().selectSpecificMarker(marker.getPosition().latitude, marker.getPosition().longitude);
+                location = db.userDao().selectSpecificMarker(marker.latitude, marker.longitude);
                 return 1;
             }
 
             @Override
             protected void onPostExecute(Integer numOfLocations) {
                 intent.putExtra("reportText", location.reportText);
+                System.out.println("location text " + location.reportText.toString());
                 startReportIntent(intent);
             }
         }.execute();
@@ -248,7 +249,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final Location location = new Location();
         location.latitude = latLng.latitude;
         location.longitude = latLng.longitude;
-        location.title = reportText;
+        location.title = title;
+        Log.v("text to databse: ", reportText);
         location.reportText = reportText;
 
         //put the location we've created previously into the local database

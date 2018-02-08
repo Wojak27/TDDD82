@@ -6,6 +6,7 @@ package polis.polisappen;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,14 +40,15 @@ public class ReportFormFragment extends Fragment {
             }
         });
 
-        EditText editText = (EditText) getActivity().findViewById(R.id.reportText);
-        final String reportText = editText.getText().toString();
+        final EditText editText = (EditText) getActivity().findViewById(R.id.reportText);
 
         Button commitButton = (Button) this.getActivity().findViewById(R.id.commitButton);
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"my marker",reportText);
+                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"my marker",editText.getText().toString());
+                Log.v("edittext", editText.getText().toString());
+                Log.v("edittext", "text");
                 getActivity().getFragmentManager().beginTransaction().remove(myFragment).commit();
             }
         });
