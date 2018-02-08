@@ -108,6 +108,9 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         isScanned = true;
     }
 
+    @Override
+    public void onBackPressed(){}
+
     public boolean isLoggedIn(){
         return false;
     }
