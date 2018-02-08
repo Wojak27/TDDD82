@@ -16,6 +16,8 @@ import android.text.LoginFilter;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,6 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int PERMISSION_REQUEST_CODE = 1;
     final static String[] PERMISSIONS = {android.Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION};
+    private FusedLocationProviderClient mFusedLocationClient;
 
     private ApplicationDatabase db;
 
@@ -76,7 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 1){
+        if (requestCode == 1) {
             setMyLocation();
         }
     }
@@ -95,7 +99,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(mFusedLocationClient.getLastLocation().));
     }
+
+    private LatLng getLastKnownLocation() {
+
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                        }
+                    }
+                });
+    }
+
+
 
 
     /**
@@ -117,7 +140,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                String title = "My marker";
                 reportFormPopup(latLng);
             }
         });
@@ -153,7 +175,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //gets location from the database
         new AsyncTask<Void, Void, Integer>() {
 //            Location location;
-            List<Location> locations = new ArrayList<Location>(); // hashset to store all locations from the database
+            List<Location> locations = new ArrayList<>(); // hashset to store all locations from the database
             @Override
             protected Integer doInBackground(Void... params) {
 //                location = db.userDao().loadById(1); //using query I created in UserDau.java
@@ -165,9 +187,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             protected void onPostExecute(Integer numOfLocations) {
                 if(numOfLocations > 0){ // loops through all of the locations in the database (if locations.size > 0)
                     for(Location location : locations){
-                        LatLng sydney = new LatLng(location.latitude,location.longitude);
-                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                        LatLng latLng = new LatLng(location.latitude,location.longitude);
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
                     }
                 }
             }
@@ -184,7 +205,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         location.title = reportText;
         location.reportText = reportText;
 
-        //now I put the location I've created previously into the local database
+        //put the location we've created previously into the local database
         //everything needs to be done on a separate thread due to android constraints
         new AsyncTask<Void, Void, Integer>() {
             @Override
@@ -197,16 +218,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             protected void onPostExecute(Integer locationCount) {
                 if (locationCount>0){
-                    Log.w("Location","successl");
+                    Log.w("Location","successful");
                 }
             }
         }.execute();
     }
-
-    /**
-     * Todo: Database primary keys for marker adding and retrievial
-     * @param
-     */
 
     @SuppressLint("StaticFieldLeak")
     private void deleteMarkerFromDatabase(final Marker marker){ // location for debugging, needs fixing
