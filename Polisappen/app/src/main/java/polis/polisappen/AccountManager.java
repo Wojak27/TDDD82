@@ -19,6 +19,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private NfcAdapter adapter;
     private PendingIntent pendingIntent;
     private boolean isScanned = false;
+    public static String USER_INFO = "USER_INFO";
+    public static String USER_INFO_AUTH = "USER_INFO_AUTH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
