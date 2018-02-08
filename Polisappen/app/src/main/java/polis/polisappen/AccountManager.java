@@ -50,7 +50,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         adapter = manager.getDefaultAdapter();
         if(adapter == null)
             Toast.makeText(this, "Den här enheten har inte NFC", Toast.LENGTH_SHORT).show();
-        else if(!adapter.isEnabled()) //Funkade inte
+        else if(!adapter.isEnabled())
            Toast.makeText(this, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
     }
 
@@ -103,7 +103,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
         Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
         TextView textview = (TextView)(this).findViewById(R.id.logInText);
-        textview.setText("NFC-card scanned, write password");
+        textview.setText(getResources().getString(R.string.scannedText));
 
         isScanned = true;
     }
