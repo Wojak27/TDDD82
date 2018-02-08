@@ -45,10 +45,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
-            requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
-        }
-
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
 
@@ -90,13 +86,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            return;
+            requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
         }
+        Log.w("mMap", mMap.toString());
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
     }
 
+    
 
     /**
      * Manipulates the map once available.
@@ -111,7 +109,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
         mMap = googleMap;
+        if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
+            requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
+        }else {
+            setMyLocation();
+        }
 
         //adds marker on the selected position (after long click)
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
