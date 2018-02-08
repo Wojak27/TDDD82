@@ -18,6 +18,7 @@ import android.nfc.Tag;
 public class AccountManager extends AppCompatActivity implements View.OnClickListener{
     private NfcAdapter adapter;
     private PendingIntent pendingIntent;
+    private boolean isScanned = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length()==4){//&& isScanned == true
+                if(charSequence.length()==4 && isScanned){
                     LogInButton.setEnabled(true);
                 }
                 else{
@@ -103,8 +104,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
         TextView textview = (TextView)(this).findViewById(R.id.logInText);
         textview.setText("NFC-card scanned, write password");
-        //boolean isScanned = false;
-        //isScanned = true;
+
+        isScanned = true;
     }
 
     public boolean isLoggedIn(){
