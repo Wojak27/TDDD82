@@ -19,21 +19,17 @@ import android.widget.Toast;
 import static android.R.attr.editable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    public static AccountManager AUTHORIZATION;
-    private Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Toast.makeText(this, "skapades typ inte en intent, dunno", Toast.LENGTH_LONG).show();
         setContentView(R.layout.menu_screen);
-        logout = (Button)findViewById(R.id.logOutButton);
+        Button logout = (Button)findViewById(R.id.logOutButton);
         logout.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view){
-        Toast.makeText(this, "onClick called", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this,AccountManager.class);
         startActivity(intent);
     }

@@ -1,8 +1,6 @@
 package polis.polisappen;
 
-import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
@@ -13,11 +11,9 @@ import android.widget.EditText;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.nfc.Tag;
-import org.w3c.dom.Text;
 
 public class AccountManager extends AppCompatActivity implements View.OnClickListener{
     private NfcAdapter adapter;
