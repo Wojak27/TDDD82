@@ -3,6 +3,8 @@ package polis.polisappen;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -23,14 +25,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toast.makeText(this, "skapades typ inte en intent, dunno", Toast.LENGTH_LONG).show();
         setContentView(R.layout.menu_screen);
-        AUTHORIZATION = new AccountManager();
         logout = (Button)findViewById(R.id.logOutButton);
         logout.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view){
+        Toast.makeText(this, "onClick called", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(this,AccountManager.class);
         startActivity(intent);
     }

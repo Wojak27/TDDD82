@@ -13,21 +13,16 @@
         <activity android:name=".MainActivity">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
-
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
         </activity>
 
-        <activity android:name=".AccountManager">
+        <activity android:name=".AccountManager"
+                    android:label="@string/logInText">
             <intent-filter>
+            <action android:name="android.nfc.action.TAG_DISCOVERED" />
             <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.nfc.action.TECH_DISCOVERED"></action>
-            </intent-filter>
-            <meta-data
-                android:name="android.nfc.action.NDEF_DISCOVERED"
-                android:resource="@xml/nfc_tech_filter"/>
         </activity>
 
     </application>

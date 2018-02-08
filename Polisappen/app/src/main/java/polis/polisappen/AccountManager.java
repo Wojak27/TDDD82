@@ -21,14 +21,7 @@ import org.w3c.dom.Text;
 
 public class AccountManager extends AppCompatActivity implements View.OnClickListener{
     private NfcAdapter adapter;
-    private Context context;
     private PendingIntent pendingIntent;
-    private Button login;
-    private Context context1;
-    private Context context2;
-
-    public AccountManager(){
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +49,12 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         });
 
         LogInButton.setOnClickListener(this);
-
-        NfcManager NFCManager = (NfcManager)this.getSystemService(NFC_SERVICE);
-        adapter = NFCManager.getDefaultAdapter();
+        NfcManager manager = (NfcManager)this.getSystemService(NFC_SERVICE);
+        adapter = manager.getDefaultAdapter();
         if(adapter == null)
             Toast.makeText(this, "Den här enheten har inte NFC", Toast.LENGTH_SHORT).show();
         else if(!adapter.isEnabled()) //Funkade inte
            Toast.makeText(this, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
-
-        //pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),0);
     }
 
    @Override
@@ -75,12 +65,20 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        //adapter.enableForegroundDispatch(this, pendingIntent, null, null);
+        pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, this.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        adapter.enableForegroundDispatch(this, pendingIntent, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (adapter != null) {
+            adapter.disableForegroundDispatch(this);
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        //setIntent(intent);
         String action = intent.getAction();
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action))
             handleIntent(intent);
@@ -106,9 +104,9 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             }
         }
 
-        Toast.makeText(context, serial_number, Toast.LENGTH_LONG).show();
-        //TextView textview = (TextView)((Activity)context).findViewById(R.id.logInText);
-        //textview.setText("NFC-card scanned, write password");
+        Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
+        TextView textview = (TextView)(this).findViewById(R.id.logInText);
+        textview.setText("NFC-card scanned, write password");
         //boolean isScanned = false;
         //isScanned = true;
     }
