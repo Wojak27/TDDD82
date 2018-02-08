@@ -19,14 +19,18 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private NfcAdapter adapter;
     private PendingIntent pendingIntent;
     private boolean isScanned = false;
+    private Button LogInButton;
+    private EditText passwordEditText;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
 
-        EditText passwordEditText = (EditText) findViewById(R.id.passwordEditText);
-        final Button LogInButton = (Button)findViewById(R.id.logInButton);
+        passwordEditText = (EditText) findViewById(R.id.passwordEditText);
+        LogInButton = (Button)findViewById(R.id.logInButton);
+        textView = (TextView)(this).findViewById(R.id.logInText);
         LogInButton.setEnabled(false);
 
         passwordEditText.addTextChangedListener(new TextWatcher() {
@@ -34,12 +38,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length()==4 && isScanned){
-                    LogInButton.setEnabled(true);
-                }
-                else{
-                    LogInButton.setEnabled(false);
-                }
+                checkLoginStatus();
             }
             @Override
             public void afterTextChanged(Editable editable) {}
@@ -47,7 +46,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
         LogInButton.setOnClickListener(this);
         NfcManager manager = (NfcManager)this.getSystemService(NFC_SERVICE);
-        adapter = manager.getDefaultAdapter();
+        adapter = manager.getDefaultAdapter(); // throw exception?
         if(adapter == null)
             Toast.makeText(this, "Den här enheten har inte NFC", Toast.LENGTH_SHORT).show();
         else if(!adapter.isEnabled())
@@ -102,14 +101,33 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         }
 
         Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
-        TextView textview = (TextView)(this).findViewById(R.id.logInText);
-        textview.setText(getResources().getString(R.string.scannedText));
-
         isScanned = true;
+        checkLoginStatus();
+
+
+
     }
 
     public boolean isLoggedIn(){
         return false;
+    }
+
+    public void checkLoginStatus(){//Kolla vilken info som matats in
+        if(passwordEditText.getText().length()==4 && isScanned){
+            LogInButton.setEnabled(true);
+            textView.setText(getResources().getString(R.string.loginReady));
+        }
+        else if (passwordEditText.getText().length() ==4)
+            textView.setText(getResources().getString(R.string.loginPasswordReady));
+
+        else if (isScanned){
+            LogInButton.setEnabled(false);
+            textView.setText(getResources().getString(R.string.loginScannedCard));
+        }
+        else{
+            LogInButton.setEnabled(false);
+            textView.setText(getResources().getString(R.string.logInText));
+        }
     }
 
 }
