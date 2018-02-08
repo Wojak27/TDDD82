@@ -98,27 +98,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationClickListener(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(mFusedLocationClient.getLastLocation().));
+        getLastKnownLocation();
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(getLastKnownLocation()));
     }
 
-    private LatLng getLastKnownLocation() {
+    private void moveCameraToCurrentPostition(LatLng location){
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 12.0f));
+    }
 
+    private void getLastKnownLocation() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+        }
         mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                .addOnSuccessListener(this, new OnSuccessListener<android.location.Location>() {
                     @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            // Logic to handle location object
-                        }
+                    public void onSuccess(android.location.Location location) {
+                        Log.w("success", "successful");
+                        setMyCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
+                        moveCameraToCurrentPostition(new LatLng(location.getLatitude(), location.getLongitude()));
                     }
                 });
     }
 
-    
+    LatLng myLocation;
 
+    private void setMyCoordinates(LatLng latLng){
+        myLocation = latLng;
+    }
 
-
+    private LatLng getMyCoordinates(){
+        return myLocation;
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
