@@ -2,8 +2,10 @@ package polis.polisappen;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
@@ -22,8 +24,12 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private Button LogInButton;
     private EditText passwordEditText;
     private TextView textView;
-    public static String USER_INFO = "USER_INFO";
-    public static String USER_INFO_AUTH = "USER_INFO_AUTH";
+    private final int AUTH_EXPIRY_TIME = 10; //In seconds
+    public static String USER_AUTH_TIMESTAMP = "USER_AUTH_TIMESTAMP";
+    public static String USER_AUTH_STATUS = "USER_AUTH_STATUS";
+    public static String USER_AUTHENTICATED = "USER_AUTHENTICATED";
+    public static String USER_NOT_AUTHENTICATED = "USER_NOT_AUTHENTICATED";
+    private String tmpNfcCardNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +62,30 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     }
 
    @Override
+   /*This method can only be called when checkLoginStatus has already been called.*/
     public void onClick(View view) {
-        //setContentView(R.layout.menu_screen); //Måste vara byt activity
+       String pin = passwordEditText.getText().toString();
+       if(validRequest(tmpNfcCardNumber,pin)){
+           SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+           SharedPreferences.Editor editor = preferences.edit();
+           editor.putString(AccountManager.USER_AUTH_STATUS,USER_AUTHENTICATED);
+           editor.putString(AccountManager.USER_AUTH_TIMESTAMP, getAuthTokenExpiry());
+           editor.apply();
+           finish();
+       }
+       else{
+           Toast.makeText(this, "Felaktig PIN!", Toast.LENGTH_SHORT).show();
+       }
+    }
+
+    private String getAuthTokenExpiry(){
+        long currentTime = System.currentTimeMillis(); //the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
+        currentTime = currentTime + 1000*AUTH_EXPIRY_TIME; //10 sekunder
+        return String.valueOf(currentTime);
+    }
+
+    private boolean validRequest(String nfcCardNumber, String pin){
+        return true;
     }
 
     @Override
@@ -79,6 +107,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     protected void onNewIntent(Intent intent) {
         String action = intent.getAction();
         if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action))
+            tmpNfcCardNumber = null;
             handleIntent(intent);
     }
 

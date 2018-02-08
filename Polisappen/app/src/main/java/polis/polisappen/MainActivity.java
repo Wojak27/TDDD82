@@ -13,12 +13,20 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu_screen);
         Button logout = (Button)findViewById(R.id.logOutButton);
+        Button newsfeed = (Button)findViewById(R.id.newsfeedButton);
+        newsfeed.setOnClickListener(this);
         logout.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view){
-        Intent intent = new Intent(this,AccountManager.class);
-        startActivity(intent);
+        if(view.getId() == R.id.newsfeedButton){
+            Intent intent = new Intent(this,NewsfeedActivity.class);
+            startActivity(intent);
+        }
+        else if(view.getId() == R.id.logOutButton){
+            Intent intent = new Intent(this,AccountManager.class);
+            startActivity(intent);
+        }
     }
 }
