@@ -2,6 +2,7 @@ package polis.polisappen;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
@@ -19,8 +20,11 @@ import com.sinch.android.rtc.calling.CallClient;
 
 public class VideoAndVoiceChat extends Activity {
 
-    public void initSinch ()
+    @Override
+    protected void onCreate  (Bundle savedInstanceState)
     {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.call);
 
     // Instantiate a SinchClient using the SinchClientBuilder.
     Context context = this.getApplicationContext();
@@ -33,7 +37,6 @@ public class VideoAndVoiceChat extends Activity {
 
     sinchClient.setSupportCalling(true);
     sinchClient.start();
-
 
     Button button = (Button) findViewById(R.id.button);
 
