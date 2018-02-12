@@ -24,7 +24,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private Button LogInButton;
     private EditText passwordEditText;
     private TextView textView;
-    private final int AUTH_EXPIRY_TIME = 30; //In seconds
+    private final int AUTH_EXPIRY_TIME = 5; //In seconds
     public static String USER_AUTH_TIMESTAMP = "USER_AUTH_TIMESTAMP";
     public static String USER_AUTH_STATUS = "USER_AUTH_STATUS";
     public static String USER_AUTHENTICATED = "USER_AUTHENTICATED";
@@ -133,7 +133,9 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         }
 
         Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
-        isScanned = true;
+        if(!serial_number.equals("No data")){
+            isScanned = true;
+        }
         checkLoginStatus();
 
 

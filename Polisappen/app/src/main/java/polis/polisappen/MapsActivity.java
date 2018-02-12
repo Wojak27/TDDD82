@@ -36,7 +36,7 @@ import java.util.List;
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 import polis.polisappen.LocalDatabase.Location;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
+public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
