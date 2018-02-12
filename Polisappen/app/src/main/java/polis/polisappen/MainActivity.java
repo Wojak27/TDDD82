@@ -20,18 +20,6 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         Button newsfeed = (Button)findViewById(R.id.newsfeedButton);
         newsfeed.setOnClickListener(this);
         logout.setOnClickListener(this);
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            public void onReceive(final Context context, final Intent intent) {
-                //check if the broadcast is our desired one
-                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
-                    MainActivity.super.invalidateAuth();
-                }
-
-            }};
-        IntentFilter regFilter = new IntentFilter();
-        // get device sleep evernt
-        regFilter .addAction(Intent.ACTION_SCREEN_OFF);
-        registerReceiver(receiver, regFilter );
     }
 
     @Override

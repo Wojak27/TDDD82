@@ -16,6 +16,18 @@ public class AuthAppCompatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            public void onReceive(final Context context, final Intent intent) {
+                //check if the broadcast is our desired one
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+                    invalidateAuth();
+                }
+
+            }};
+        IntentFilter regFilter = new IntentFilter();
+        // get device sleep evernt
+        regFilter .addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(receiver, regFilter );
         checkAuth();
     }
 
