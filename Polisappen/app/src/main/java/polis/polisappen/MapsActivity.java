@@ -19,6 +19,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,8 +46,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     final static String[] PERMISSIONS = {android.Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION};
     private FusedLocationProviderClient mFusedLocationClient;
-
+    private boolean mRequestingLocationUpdates = false;
     private ApplicationDatabase db;
+    private LocationCallback mLocationCallback;
+    LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +66,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        setupLocationCallback();
+        createLocationRequest();
+    }
+
+    private void setupLocationCallback(){
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                for (android.location.Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    // ...
+                    Log.w("Location", "update");
+                    // laying markers for debugging
+//                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),location.getLongitude())));
+                }
+
+            }
+        };
     }
 
     private boolean isPermissionGranted() {
@@ -104,6 +127,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(getLastKnownLocation()));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+    private void startLocationUpdates() {
+        try{
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest,
+                    mLocationCallback,
+                    null /* Looper */);
+        }catch (SecurityException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    private void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(100);
+        mLocationRequest.setFastestInterval(10);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        Log.w("createLocationRequest", "locationrequest");
+    }
+
     private void moveCameraToCurrentPostition(LatLng location){
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 12.0f));
     }
@@ -128,6 +188,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         moveCameraToCurrentPostition(new LatLng(location.getLatitude(), location.getLongitude()));
                     }
                 });
+        mRequestingLocationUpdates = true;
+        startLocationUpdates(); //fro debugging
     }
 
     LatLng myLocation;
