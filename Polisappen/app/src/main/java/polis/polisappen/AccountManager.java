@@ -113,6 +113,9 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     }
 
     private void handleIntent(Intent intent) {
+        if(!NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){ //The app was started or some other random intent
+            return;
+        }
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         String serial_number = "No data";
 
