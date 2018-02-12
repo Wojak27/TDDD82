@@ -65,8 +65,6 @@ public class AuthAppCompatActivity extends AppCompatActivity {
             forceLogin();
         }
         //else it was a valid auth token
-
-
     }
 
     private void forceLogin(){
