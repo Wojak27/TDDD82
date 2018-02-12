@@ -1,5 +1,17 @@
 <resources>
-    <string name="app_name">Polisappen</string>
+    <string name="app_name">Polisapp</string>
+    <string name="logInText">Scan your NFC-card <br/> \n and enter your pin-password to log in</string>
+    <string name="loginScannedCard">NFC-card scanned, write password <br/> \n</string>
+    <string name="loginPasswordReady">Password written, scan NFC-card</string>
+    <string name="loginReady">Press login</string>
+    <string name="logInButton">Log in</string>
+    <string name="authentication">Authentication</string>
+    <string name="passwordEditText">Password</string>
+    <string name="contactsButton">Contacts</string>
+    <string name="mapsButton">Maps</string>
+    <string name="reportButton">Report</string>
+    <string name="newsfeedButton">Newsfeed</string>
+    <string name="logOutButton">Log Out</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_report_window">ReportWindowActivity</string>
 </resources>
