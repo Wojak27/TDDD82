@@ -40,6 +40,7 @@ public class VideoAndVoiceChat extends AppCompatActivity {
         //button.setText("här");
 
         android.content.Context context = this.getApplicationContext();
+        //mSinchClient.checkManifest();/*
     if (mSinchClient == null) {
         mSinchClient = Sinch.getSinchClientBuilder().context(context)
                 .applicationKey(APP_KEY)
