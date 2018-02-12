@@ -3,6 +3,7 @@ package polis.polisappen;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
@@ -14,31 +15,43 @@ import com.sinch.android.rtc.SinchError;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by linnea on 2018-02-07.
  */
 
-public class VideoAndVoiceChat extends Activity {
-
+public class VideoAndVoiceChat extends AppCompatActivity {
+    private static final String APP_KEY = "955e2079-38f0-43d5-af9e-80e4f3ade26d";
+    private static final String APP_SECRET = "TZOvC9lH6k2wmJzWHEXh2Q==";
+    private static final String ENVIRONMENT = "sandbox.sinch.com";
+    private SinchClient mSinchClient;
     @Override
-    protected void onCreate  (Bundle savedInstanceState)
-    {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call);
-
+        init("a");
+    }
+    protected void init (String username){
     // Instantiate a SinchClient using the SinchClientBuilder.
-    Context context = this.getApplicationContext();
-    final SinchClient sinchClient = Sinch.getSinchClientBuilder().context(context)
-            .applicationKey("955e2079-38f0-43d5-af9e-80e4f3ade26d")
-            .applicationSecret("TZOvC9lH6k2wmJzWHEXh2Q==")
-            .environmentHost("sandbox.sinch.com")
-            .userId("<user id>")
-            .build();
 
+        //Button button = (Button) findViewById(R.id.button);
+        //testing();
+        //button.setText("här");
+
+        android.content.Context context = this.getApplicationContext();
+    if (mSinchClient == null) {
+        mSinchClient = Sinch.getSinchClientBuilder().context(context)
+                .applicationKey(APP_KEY)
+                .applicationSecret(APP_SECRET)
+                .environmentHost(ENVIRONMENT)
+                .userId(username)
+                .build();
+       // mSinchClient.start();
+    }
+/*
     sinchClient.setSupportCalling(true);
     sinchClient.start();
-
-    Button button = (Button) findViewById(R.id.button);
 
     button.setOnClickListener(new View.OnClickListener() {
         //@Override
@@ -61,6 +74,17 @@ public class VideoAndVoiceChat extends Activity {
 
     sinchClient.stopListeningOnActiveConnection();
     sinchClient.terminate();
+*/
+    }
 
+    public void testing (){
+        try
+        {
+            Thread.sleep(5000);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 }

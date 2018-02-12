@@ -6,10 +6,11 @@
 
     <Button
         android:id="@+id/button"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="Call" />
+        android:text="Call"
+        android:visibility="visible" />
 
 </LinearLayout>
