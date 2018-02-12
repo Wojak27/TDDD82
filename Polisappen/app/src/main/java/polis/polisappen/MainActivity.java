@@ -1,10 +1,14 @@
 package polis.polisappen;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends AuthAppCompatActivity implements View.OnClickListener{
 
@@ -16,6 +20,18 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         Button newsfeed = (Button)findViewById(R.id.newsfeedButton);
         newsfeed.setOnClickListener(this);
         logout.setOnClickListener(this);
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            public void onReceive(final Context context, final Intent intent) {
+                //check if the broadcast is our desired one
+                if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+                    MainActivity.super.invalidateAuth();
+                }
+
+            }};
+        IntentFilter regFilter = new IntentFilter();
+        // get device sleep evernt
+        regFilter .addAction(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(receiver, regFilter );
     }
 
     @Override

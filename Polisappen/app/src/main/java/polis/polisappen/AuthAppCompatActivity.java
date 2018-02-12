@@ -1,7 +1,9 @@
 package polis.polisappen;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,6 +17,15 @@ public class AuthAppCompatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkAuth();
+    }
+
+    protected void invalidateAuth(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AccountManager.USER_AUTH_STATUS,AccountManager.USER_NOT_AUTHENTICATED);
+        editor.putString(AccountManager.USER_AUTH_TIMESTAMP, null);
+        editor.apply();
+        forceLogin();
     }
 
     private void checkAuth(){
@@ -47,11 +58,6 @@ public class AuthAppCompatActivity extends AppCompatActivity {
     }
 
     private void forceLogin(){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(AccountManager.USER_AUTH_STATUS,AccountManager.USER_NOT_AUTHENTICATED);
-        editor.putString(AccountManager.USER_AUTH_TIMESTAMP, null);
-        editor.apply();
         Intent intent = new Intent(this,AccountManager.class);
         startActivity(intent);
     }
