@@ -138,6 +138,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
         if(!serial_number.equals("No data")){
             isScanned = true;
+            tmpNfcCardNumber = serial_number;
         }
         checkLoginStatus();
 
@@ -147,10 +148,6 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onBackPressed(){}
-
-    public boolean isLoggedIn(){
-        return false;
-    }
 
     public void checkLoginStatus(){//Kolla vilken info som matats in
         if(passwordEditText.getText().length()==4 && isScanned){
