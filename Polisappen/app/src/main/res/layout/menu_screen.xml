@@ -43,11 +43,21 @@
         android:text="@string/reportButton" />
 
     <Button
-        android:id="@+id/logOutButton"
+        android:id="@+id/searchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/reportButton"
         android:layout_below="@+id/reportButton"
+        android:layout_marginTop="40dp"
+        android:minWidth="200dp"
+        android:text="Search" />
+
+    <Button
+        android:id="@+id/logOutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/searchButton"
+        android:layout_below="@+id/searchButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
         android:text="@string/logOutButton" />

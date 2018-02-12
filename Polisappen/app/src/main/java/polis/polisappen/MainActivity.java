@@ -41,5 +41,9 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             Intent intent = new Intent(this,MapsActivity.class);
             startActivity(intent);
         }
+        else if(view.getId() == R.id.searchButton){
+            Intent intent = new Intent(this,MapsActivity.class);
+            startActivity(intent);
+        }
     }
 }
