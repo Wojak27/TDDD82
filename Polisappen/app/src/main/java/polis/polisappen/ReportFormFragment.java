@@ -4,6 +4,7 @@ package polis.polisappen;
  * Created by karolwojtulewicz on 2018-02-07.
  */
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -27,6 +28,7 @@ public class ReportFormFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Bundle extras = getArguments();
+        view.setBackgroundColor(Color.WHITE);
         final LatLng latLng = new LatLng(extras.getDouble("latidude"), extras.getDouble("longitude"));
 
         Button dismissButton = (Button) this.getActivity().findViewById(R.id.dismissButton);
