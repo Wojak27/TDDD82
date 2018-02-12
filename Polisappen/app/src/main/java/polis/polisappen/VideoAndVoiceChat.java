@@ -26,21 +26,39 @@ public class VideoAndVoiceChat extends AppCompatActivity {
     private static final String APP_SECRET = "TZOvC9lH6k2wmJzWHEXh2Q==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
     private SinchClient mSinchClient;
+    private Call call;
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.call);
         init("a");
+        final Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+
+            //@Override
+            //CallClient callClient = mSinchClient.getCallClient();
+            //Call call = callClient.callUser("call-recipient-id");
+            //sinchClient.getCallClient().callUser("call-recipient-id");
+            public void onClick(View view) {
+
+                if (call == null){
+                    call = mSinchClient.getCallClient().callUser("call-recipient-id");
+                    button.setText("Hang up");
+                }else {
+                    call.hangup();
+                    call = null;
+                    button.setText("Call");
+                }
+                // make a call!
+            }
+        });
+
     }
     protected void init (String username){
     // Instantiate a SinchClient using the SinchClientBuilder.
 
-        //Button button = (Button) findViewById(R.id.button);
-        //testing();
-        //button.setText("här");
-
         android.content.Context context = this.getApplicationContext();
-        //mSinchClient.checkManifest();/*
+
     if (mSinchClient == null) {
         mSinchClient = Sinch.getSinchClientBuilder().context(context)
                 .applicationKey(APP_KEY)
@@ -48,24 +66,13 @@ public class VideoAndVoiceChat extends AppCompatActivity {
                 .environmentHost(ENVIRONMENT)
                 .userId(username)
                 .build();
-       // mSinchClient.start();
+        //mSinchClient.checkManifest();
+
     }
-/*
-    sinchClient.setSupportCalling(true);
-    sinchClient.start();
+    mSinchClient.setSupportCalling(true);
+    mSinchClient.startListeningOnActiveConnection();
 
-    button.setOnClickListener(new View.OnClickListener() {
-        //@Override
-        CallClient callClient = sinchClient.getCallClient();
-        Call call = callClient.callUser("call-recipient-id");
-        //sinchClient.getCallClient().callUser("call-recipient-id");
-        public void onClick(View view) {
-
-            // make a call!
-        }
-    });
-
-    sinchClient.addSinchClientListener(new SinchClientListener() {
+    mSinchClient.addSinchClientListener(new SinchClientListener() {
         public void onClientStarted(SinchClient client) { }
         public void onClientStopped(SinchClient client) { }
         public void onClientFailed(SinchClient client, SinchError error) { }
@@ -73,9 +80,11 @@ public class VideoAndVoiceChat extends AppCompatActivity {
         public void onLogMessage(int level, String area, String message) { }
     });
 
-    sinchClient.stopListeningOnActiveConnection();
-    sinchClient.terminate();
-*/
+        mSinchClient.start();
+
+    //mSinchClient.stopListeningOnActiveConnection();
+    //mSinchClient.terminate();
+
     }
 
     public void testing (){
