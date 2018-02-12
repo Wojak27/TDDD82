@@ -20,18 +20,11 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu_screen);
         Button logout = (Button)findViewById(R.id.logOutButton);
+        logout.setOnClickListener(this);
         Button newsfeed = (Button)findViewById(R.id.newsfeedButton);
         newsfeed.setOnClickListener(this);
-        logout.setOnClickListener(this);
-        setContentView(R.layout.activity_main);
-        Button mapButton = (Button)findViewById(R.id.button2);
-        final Intent mapIntent = new Intent(this, MapsActivity.class);
-        mapButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(mapIntent);
-            }
-        });
+        Button mapButton = (Button)findViewById(R.id.mapsButton);
+        mapButton.setOnClickListener(this) ;
     }
 
     @Override
@@ -42,6 +35,10 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         }
         else if(view.getId() == R.id.logOutButton){
             Intent intent = new Intent(this,AccountManager.class);
+            startActivity(intent);
+        }
+        else if(view.getId() == R.id.mapsButton){
+            Intent intent = new Intent(this,MapsActivity.class);
             startActivity(intent);
         }
     }

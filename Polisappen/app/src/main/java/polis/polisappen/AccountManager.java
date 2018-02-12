@@ -164,5 +164,4 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             textView.setText(getResources().getString(R.string.logInText));
         }
     }
-
 }
