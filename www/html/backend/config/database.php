@@ -52,19 +52,17 @@ return [
             'prefix' => '',
         ],
 
-        'mysql' => [
-            'driver' => 'mysql',
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix' => '',
-            'strict' => false,
-            'engine' => null,
-        ],
+	'mysql' => [
+        	'driver'    => 'mysql',
+        	'host'      => 'db-und.ida.liu.se',
+        	'database'  => 'itkand_2018_1_1',
+        	'username'  => 'itkand_2018_1_1',
+        	'password'  => 'itkand_2018_1_1_a132',
+        	'charset'   => 'utf8',
+        	'collation' => 'utf8_unicode_ci',
+        	'prefix'    => '',
+        	'strict'    => false,
+    	],
 
         'pgsql' => [
             'driver' => 'pgsql',
