@@ -24,7 +24,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private Button LogInButton;
     private EditText passwordEditText;
     private TextView textView;
-    private final int AUTH_EXPIRY_TIME = 30; //In seconds
+    private final int AUTH_EXPIRY_TIME = 5; //In seconds
     public static String USER_AUTH_TIMESTAMP = "USER_AUTH_TIMESTAMP";
     public static String USER_AUTH_STATUS = "USER_AUTH_STATUS";
     public static String USER_AUTHENTICATED = "USER_AUTHENTICATED";
@@ -113,6 +113,9 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     }
 
     private void handleIntent(Intent intent) {
+        if(!NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){ //The app was started or some other random intent
+            return;
+        }
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         String serial_number = "No data";
 
@@ -133,7 +136,10 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         }
 
         Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
-        isScanned = true;
+        if(!serial_number.equals("No data")){
+            isScanned = true;
+            tmpNfcCardNumber = serial_number;
+        }
         checkLoginStatus();
 
 
@@ -142,10 +148,6 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onBackPressed(){}
-
-    public boolean isLoggedIn(){
-        return false;
-    }
 
     public void checkLoginStatus(){//Kolla vilken info som matats in
         if(passwordEditText.getText().length()==4 && isScanned){
