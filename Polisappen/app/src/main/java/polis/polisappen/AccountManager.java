@@ -17,7 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.nfc.Tag;
 
-public class AccountManager extends AppCompatActivity implements View.OnClickListener{
+import com.loopj.android.http.RequestParams;
+
+public class AccountManager extends AppCompatActivity implements View.OnClickListener, HttpResponseNotifyable {
     private NfcAdapter adapter;
     private PendingIntent pendingIntent;
     private boolean isScanned = false;
@@ -65,17 +67,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
    /*This method can only be called when checkLoginStatus has already been called.*/
     public void onClick(View view) {
        String pin = passwordEditText.getText().toString();
-       if(validRequest(tmpNfcCardNumber,pin)){
-           SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-           SharedPreferences.Editor editor = preferences.edit();
-           editor.putString(AccountManager.USER_AUTH_STATUS,USER_AUTHENTICATED);
-           editor.putString(AccountManager.USER_AUTH_TIMESTAMP, getAuthTokenExpiry());
-           editor.apply();
-           finish();
-       }
-       else{
-           Toast.makeText(this, "Felaktig PIN!", Toast.LENGTH_SHORT).show();
-       }
+       validateRequest(tmpNfcCardNumber,pin);
     }
 
     private String getAuthTokenExpiry(){
@@ -84,7 +76,30 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         return String.valueOf(currentTime);
     }
 
-    private boolean validRequest(String nfcCardNumber, String pin){
+    private void validateRequest(String nfcCardNumber, String pin){
+        RequestParams params = new RequestParams();
+        params.put("nfcID",nfcCardNumber);
+        params.put("pin", pin);
+        RESTApiServer.get("/users/1",params, RESTApiServer.getDefaultHandler(this));
+    }
+
+    public void notifyAboutResponse(String response){
+        if(responseOK(response)) { //if response was successfull....
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(AccountManager.USER_AUTH_STATUS, USER_AUTHENTICATED);
+            editor.putString(AccountManager.USER_AUTH_TIMESTAMP, getAuthTokenExpiry());
+            editor.apply();
+            finish();
+        }
+        else{
+            Toast.makeText(this, "Felaktig PIN!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean responseOK(String response){
+        //determine weither the response was OK, and if so return true or else return false.
+        Toast.makeText(this, "Testing response.. Response was: " + response, Toast.LENGTH_SHORT).show();
         return true;
     }
 
