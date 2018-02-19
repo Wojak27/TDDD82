@@ -161,8 +161,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLocationRequest.setInterval(100);
         mLocationRequest.setFastestInterval(10);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        Log.w("createLocationRequest", "locationrequest");
     }
+
+//    protected void createLocationRequestBestForBattery() {
+//        mLocationRequest = new LocationRequest();
+//        mLocationRequest.setInterval(10000);
+//        mLocationRequest.setFastestInterval(5000);
+//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//    }
 
     private void moveCameraToCurrentPostition(LatLng location){
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 12.0f));
