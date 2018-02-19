@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('/users', function () {
-    return 'Users!';
+    return 'Sebson';
 });
 
 Route::get('/database', 'DatabaseController@show');
