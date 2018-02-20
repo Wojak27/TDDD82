@@ -19,6 +19,12 @@ import android.nfc.Tag;
 
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.entity.StringEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.protocol.HTTP;
+
 public class AccountManager extends AppCompatActivity implements View.OnClickListener, HttpResponseNotifyable {
     private NfcAdapter adapter;
     private PendingIntent pendingIntent;
@@ -77,10 +83,21 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     }
 
     private void validateRequest(String nfcCardNumber, String pin){
-        RequestParams params = new RequestParams();
-        params.put("nfcID",nfcCardNumber);
-        params.put("pin", pin);
-        RESTApiServer.get("/users/1",params, RESTApiServer.getDefaultHandler(this));
+        try {
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("id", nfcCardNumber);
+            jsonParams.put("password", pin);
+            RESTApiServer.get(this,"/users",jsonParams, RESTApiServer.getDefaultHandler(this));
+            /*
+            RequestParams params = new RequestParams();
+            params.put("nfcID", nfcCardNumber);
+            params.put("pin", pin);
+            */
+        }
+        catch (Exception e){
+            Toast.makeText(this, "Exception..", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
     public void notifyAboutResponse(String response){
