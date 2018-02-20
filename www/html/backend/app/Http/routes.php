@@ -14,13 +14,10 @@
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/users', function () {
-    return 'Tjosan';
-});
-
-Route.get('/asd', function (){
-   return 'rövballe';
+Route::group(['prefix' => '', 'middleware' => 'auth:api'], function(){
+    Route::get('/users', function () {
+        return 'Tjosan';
+    });
 });
 
 Route::get('/database', 'DatabaseController@show');
