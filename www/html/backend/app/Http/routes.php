@@ -20,6 +20,8 @@ Route::group(['prefix' => '', 'middleware' => 'auth:api'], function(){
     });
 });
 
-Route::get('/authen', 'AuthenController@show');
+Route::get('/map', funciton () {
+	return 'testet';
+});
 
 Route::get('/database', 'DatabaseController@show');
