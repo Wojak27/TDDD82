@@ -14,9 +14,10 @@
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/users', function () {
-    return 'Sebson';
+Route::group(['prefix' => '', 'middleware' => 'auth:api'], function(){
+    Route::get('/users', function () {
+        return 'Tjosan';
+    });
 });
 
 Route::get('/authen', 'AuthenController@show');
