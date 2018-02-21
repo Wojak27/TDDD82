@@ -15,6 +15,9 @@
         "symfony/css-selector": "2.8.*|3.0.*",
         "symfony/dom-crawler": "2.8.*|3.0.*"
     },
+	"require": {
+		"tymon/jwt-auth": "0.5.*",
+	},
     "autoload": {
         "classmap": [
             "database"
