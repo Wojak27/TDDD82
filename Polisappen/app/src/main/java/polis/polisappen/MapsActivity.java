@@ -5,10 +5,14 @@ import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -39,7 +43,7 @@ import java.util.List;
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 import polis.polisappen.LocalDatabase.Location;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
+public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -50,12 +54,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ApplicationDatabase db;
     private LocationCallback mLocationCallback;
     LocationRequest mLocationRequest;
+    BroadcastReceiver mBroadcastReciever;
+    boolean isBatteryLow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+//Debugging
+        mBroadcastReciever = new BatteryBroadcastReceiver();
+///////////////
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
 
@@ -133,6 +141,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
+
     }
 
     private void startLocationUpdates() {
@@ -156,19 +165,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
-    protected void createLocationRequest() {
+    public void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(100);
         mLocationRequest.setFastestInterval(10);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-//    protected void createLocationRequestBestForBattery() {
-//        mLocationRequest = new LocationRequest();
-//        mLocationRequest.setInterval(10000);
-//        mLocationRequest.setFastestInterval(5000);
-//        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//    }
+    public void createLocationRequestBestForBattery() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
 
     private void moveCameraToCurrentPostition(LatLng location){
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 12.0f));
@@ -290,7 +299,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void setMarkersFromDatabaseOnMap(final GoogleMap mMap){
         //gets location from the database
         new AsyncTask<Void, Void, Integer>() {
-//            Location location;
+            //            Location location;
             List<Location> locations = new ArrayList<>(); // hashset to store all locations from the database
             @Override
             protected Integer doInBackground(Void... params) {
@@ -368,6 +377,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMyLocationClick(@NonNull android.location.Location location) {
+
+    }
+
+    @Override
+    protected void onStart() {
+        registerReceiver(mBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        super.onStart();
+    }
+    @Override
+    protected void onStop() {
+        unregisterReceiver(mBroadcastReciever);
+        super.onStop();
+    }
+
+    // checks for changes in battery
+    private class BatteryBroadcastReceiver extends BroadcastReceiver {
+        private final static String BATTERY_LEVEL = "level";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int level = intent.getIntExtra(BATTERY_LEVEL, 0);
+            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
+
+            if(level < 21 && !isBatteryLow){
+                createLocationRequestBestForBattery();
+                isBatteryLow = true;
+            }else if(level > 20 && isBatteryLow){
+                createLocationRequest();
+                isBatteryLow = false;
+            }
+        }
 
     }
 }
