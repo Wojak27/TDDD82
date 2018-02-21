@@ -21,7 +21,7 @@ Route::group(['prefix' => '', 'middleware' => 'auth:api'], function(){
 });
 
 Route::get('/map', funciton () {
-	return 'testet';
+	return 'test';
 });
 
 Route::get('/database', 'DatabaseController@show');
