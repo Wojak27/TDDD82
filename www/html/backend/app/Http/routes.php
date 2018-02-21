@@ -19,4 +19,6 @@ Route::get('/users', function () {
     return 'Sebson';
 });
 
+Route::get('/authen', 'AuthenController@show');
+
 Route::get('/database', 'DatabaseController@show');
