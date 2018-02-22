@@ -5,6 +5,8 @@ use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use DB;
+use App\User;
 
 class AuthenticateController extends Controller
 {
@@ -25,5 +27,25 @@ class AuthenticateController extends Controller
 
         // all good so return the token
         return response()->json(compact('token'));
+    }
+
+    public function show()
+    {
+        return DB::table('users')->get();
+    }
+
+    public function logout(Request $request){
+      $token = $request->get('token');
+      JWTAuth::invalidate($token);
+      return response()->json(['status'=>true, 'message'=>'invalidated token']);
+    }
+
+     public function register(Request $request)
+     {
+        $user = User::create([
+           'id' => $request->get('id'),
+           'password' => bcrypt($request->get('password')) 
+        ]);
+        return response()->json(['status'=>true, 'message' => 'created user']);
     }
 }

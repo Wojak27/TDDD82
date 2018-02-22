@@ -12,7 +12,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'id', 'name'
+        'id', 'password'
     ];
     public $incrementing = false;
     protected $keyType = 'string';
@@ -24,7 +24,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'pw_checksum'
+        'password'
     ];
 
 }

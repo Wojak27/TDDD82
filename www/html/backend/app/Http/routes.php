@@ -15,12 +15,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::group(['prefix' => '', 'middleware' => 'jwt.auth'], function(){
-    Route::get('/users', function () {
+    Route::get('/secret', function () {
         return 'Tjosan';
     });
+    Route::post('/logout', 'AuthenticateController@logout');
 });
 
 Route::post('/login', 'AuthenticateController@authenticate');
-Route::get('/login', 'AuthenticateController@show');
-
+Route::post('/register', 'AuthenticateController@register');
 Route::get('/database', 'DatabaseController@show');
