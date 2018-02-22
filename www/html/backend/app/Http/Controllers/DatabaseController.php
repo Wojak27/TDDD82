@@ -9,6 +9,6 @@ class DatabaseController extends Controller
 {
     public function show()
     {
-    	return DB::table('user')->get();
+    	return DB::table('users')->get();
     }
 }

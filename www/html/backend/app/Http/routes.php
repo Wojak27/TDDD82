@@ -14,10 +14,13 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::group(['prefix' => '', 'middleware' => 'auth:api'], function(){
+Route::group(['prefix' => '', 'middleware' => 'jwt.auth'], function(){
     Route::get('/users', function () {
         return 'Tjosan';
     });
 });
+
+Route::post('/login', 'AuthenticateController@authenticate');
+Route::get('/login', 'AuthenticateController@show');
 
 Route::get('/database', 'DatabaseController@show');
