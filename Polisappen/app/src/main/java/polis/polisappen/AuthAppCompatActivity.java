@@ -11,7 +11,11 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-public class AuthAppCompatActivity extends AppCompatActivity {
+import org.json.JSONObject;
+
+import java.util.HashMap;
+
+public abstract class AuthAppCompatActivity extends AppCompatActivity implements HttpResponseNotifyable {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,30 @@ public class AuthAppCompatActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(AccountManager.USER_AUTH_STATUS,AccountManager.USER_NOT_AUTHENTICATED);
         editor.putString(AccountManager.USER_AUTH_TIMESTAMP, null);
+        invalidateTokenAtServer();
         editor.apply();
+    }
+
+    private void invalidateTokenAtServer(){
+        try {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            String token = preferences.getString(AccountManager.USER_AUTH_TOKEN, null);
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("token", token);
+            RESTApiServer.post(this, "/logout", jsonParams, RESTApiServer.getDefaultHandler(this));
+        }
+        catch (Exception e){
+            System.out.println("fuuuuck exception");
+        }
+    }
+
+    public void notifyAboutResponse(HashMap<String,String> response){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AccountManager.USER_AUTH_TOKEN, null);
+        editor.apply();
+        //we dont care...
+
     }
 
     private boolean validAuth(){
@@ -54,7 +81,11 @@ public class AuthAppCompatActivity extends AppCompatActivity {
         String userAuthStatus = preferences.getString(AccountManager.USER_AUTH_STATUS,null);
         if(userAuthStatus != null){
             if(userAuthStatus.equals(AccountManager.USER_AUTHENTICATED)){
-                return !authExpired();
+                if(authExpired()){
+                    Toast.makeText(this,"Your token has expired, please log in again",Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                return true;
             }
             return false;
         }
@@ -77,6 +108,7 @@ public class AuthAppCompatActivity extends AppCompatActivity {
     }
 
     private void forceLogin(){
+        invalidateAuth();
         Intent intent = new Intent(this,AccountManager.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
