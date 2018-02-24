@@ -15,9 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::group(['prefix' => '', 'middleware' => 'jwt.auth'], function(){
-    Route::get('/secret', function () {
-        return 'Tjosan';
-    });
+    Route::get('/secret', 'DatabaseController@secret');
     Route::post('/logout', 'AuthenticateController@logout');
 });
 

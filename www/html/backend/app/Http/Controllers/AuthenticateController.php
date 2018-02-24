@@ -18,15 +18,16 @@ class AuthenticateController extends Controller
         try {
             // attempt to verify the credentials and create a token for the user
             if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 401);
+                return response()->json(['USER_AUTH_STATUS' => 'USER_NOT_AUTHENTICATED'], 401);
             }
         } catch (JWTException $e) {
             // something went wrong whilst attempting to encode the token
-            return response()->json(['error' => 'could_not_create_token'], 500);
+            return response()->json(['USER_AUTH_STATUS' => 'USER_NOT_AUTHENTICATED'], 500);
         }
 
         // all good so return the token
-        return response()->json(compact('token'));
+	$USER_AUTH_STATUS = "USER_AUTHENTICATED";
+        return response()->json(compact('token', 'USER_AUTH_STATUS'));
     }
 
     public function show()
