@@ -34,7 +34,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private Button LogInButton;
     private EditText passwordEditText;
     private TextView textView;
-    private final int AUTH_EXPIRY_TIME = 5; //In seconds
+    private final int AUTH_EXPIRY_TIME = 5000; //In seconds
     public static String USER_AUTH_TIMESTAMP = "USER_AUTH_TIMESTAMP";
     public static String USER_AUTH_STATUS = "USER_AUTH_STATUS";
     public static String USER_AUTHENTICATED = "USER_AUTHENTICATED";
@@ -87,23 +87,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     }
 
     private void validateRequest(String nfcCardNumber, String pin){
-        try {
-            JSONObject jsonParams = new JSONObject();
-            //jsonParams.put("id", "robin");
-            //jsonParams.put("password", "12345");
-            jsonParams.put("id", nfcCardNumber);
-            jsonParams.put("password", pin);
-            RESTApiServer.post(this,"/login",jsonParams, RESTApiServer.getDefaultHandler(this));
-            /*
-            RequestParams params = new RequestParams();
-            params.put("nfcID", nfcCardNumber);
-            params.put("pin", pin);
-            */
-        }
-        catch (Exception e){
-            Toast.makeText(this, "Exception..", Toast.LENGTH_LONG).show();
-            return;
-        }
+        RESTApiServer.login(this,this,nfcCardNumber,pin);
     }
 
     public void notifyAboutResponse(HashMap<String,String> response){

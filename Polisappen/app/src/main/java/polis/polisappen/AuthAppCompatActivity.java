@@ -55,16 +55,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
     }
 
     private void invalidateTokenAtServer(){
-        try {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            String token = preferences.getString(AccountManager.USER_AUTH_TOKEN, null);
-            JSONObject jsonParams = new JSONObject();
-            jsonParams.put("token", token);
-            RESTApiServer.post(this, "/logout", jsonParams, RESTApiServer.getDefaultHandler(this));
-        }
-        catch (Exception e){
-            System.out.println("fuuuuck exception");
-        }
+        RESTApiServer.logout(this,this);
     }
 
     public void notifyAboutResponse(HashMap<String,String> response){
@@ -72,8 +63,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(AccountManager.USER_AUTH_TOKEN, null);
         editor.apply();
-        //we dont care...
-
+        System.out.println("server responded from logout");
     }
 
     private boolean validAuth(){

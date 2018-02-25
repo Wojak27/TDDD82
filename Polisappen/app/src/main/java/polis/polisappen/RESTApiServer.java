@@ -1,5 +1,7 @@
 package polis.polisappen;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.loopj.android.http.*;
@@ -18,30 +20,19 @@ import cz.msebera.android.httpclient.protocol.HTTP;
 
 public class RESTApiServer {
     private static final String API_URL = "http://itkand-1-1.tddd82-2018.ida.liu.se/";
+    private static final String LOGIN_URL = "/login";
+    private static final String LOGOUT_URL = "/logout";
+    private static final String SECRET_URL = "/secret";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
-    public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.get(getAbsoluteUrl(url), params, responseHandler);
-    }
-    public static void get(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler) {
+    private static void get(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler) {
         StringEntity entity = new StringEntity(params.toString(), "UTF-8");
-        client.addHeader("Accept", "application/json");
-        client.addHeader("Content-type", "application/json");
-        try{
-            if(params.get("token") != null){
-                client.addHeader("Authorization", "Bearer" + params.get("token"));
-            }
-        }catch (Exception e){
-            //do nothing
-        }
-        //adda auth?
+        addAuthHeadersToClient(params);
         client.get(context, getAbsoluteUrl(url), entity, "application/json", responseHandler);
     }
 
-
-    public static void post(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler) {
-        StringEntity entity = new StringEntity(params.toString(), "UTF-8");
+    private static void addAuthHeadersToClient(JSONObject params){
         client.addHeader("Accept", "application/json");
         client.addHeader("Content-type", "application/json");
         try{
@@ -51,6 +42,48 @@ public class RESTApiServer {
         }catch (Exception e){
             //do nothing
         }
+    }
+
+    public static void login(Context context, HttpResponseNotifyable listener,String nfcCardNumber, String pin){
+        try {
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("id", nfcCardNumber);
+            jsonParams.put("password", pin);
+            post(context,LOGIN_URL,jsonParams, RESTApiServer.getDefaultHandler(listener));
+        }
+        catch (Exception e){
+            Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
+            return;
+        }
+    }
+    public static void logout(Context context, HttpResponseNotifyable listener){
+        JSONObject params = getAuthParams(context);
+        post(context,LOGOUT_URL,params, RESTApiServer.getDefaultHandler(listener));
+    }
+
+    public static void getSecret(Context context, HttpResponseNotifyable listener){
+        JSONObject params = getAuthParams(context);
+        get(context,SECRET_URL,params, RESTApiServer.getDefaultHandler(listener));
+    }
+
+    private static JSONObject getAuthParams(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String token = preferences.getString(AccountManager.USER_AUTH_TOKEN, null);
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("token", token);
+            System.out.println("token: " + token);
+            return jsonParams;
+        }
+        catch (Exception e){
+            return null;
+        }
+    }
+
+
+    private static void post(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler) {
+        StringEntity entity = new StringEntity(params.toString(), "UTF-8");
+        addAuthHeadersToClient(params);
         client.post(context, getAbsoluteUrl(url), entity, "application/json", responseHandler);
     }
 
@@ -58,7 +91,7 @@ public class RESTApiServer {
         return API_URL + relativeUrl;
     }
 
-    public static AsyncHttpResponseHandler getDefaultHandler(final HttpResponseNotifyable listener){
+    private static AsyncHttpResponseHandler getDefaultHandler(final HttpResponseNotifyable listener){
         return new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -104,7 +137,7 @@ public class RESTApiServer {
         };
     }
 
-    public static HashMap<String,String> parseJSON(JSONObject object) {
+    private static HashMap<String,String> parseJSON(JSONObject object) {
         Iterator<String> jsonItr = object.keys();
         HashMap<String, String> result = new HashMap<String,String>();
         while(jsonItr.hasNext()){
