@@ -21,6 +21,8 @@ import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.message.BasicHeader;
 import cz.msebera.android.httpclient.protocol.HTTP;
@@ -32,11 +34,12 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private Button LogInButton;
     private EditText passwordEditText;
     private TextView textView;
-    private final int AUTH_EXPIRY_TIME = 5; //In seconds
+    private final int AUTH_EXPIRY_TIME = 5000; //In seconds
     public static String USER_AUTH_TIMESTAMP = "USER_AUTH_TIMESTAMP";
     public static String USER_AUTH_STATUS = "USER_AUTH_STATUS";
     public static String USER_AUTHENTICATED = "USER_AUTHENTICATED";
     public static String USER_NOT_AUTHENTICATED = "USER_NOT_AUTHENTICATED";
+    public static String USER_AUTH_TOKEN = "USER_AUTH_TOKEN";
     private String tmpNfcCardNumber;
 
     @Override
@@ -69,6 +72,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
            Toast.makeText(this, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
     }
 
+
    @Override
    /*This method can only be called when checkLoginStatus has already been called.*/
     public void onClick(View view) {
@@ -78,34 +82,22 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
     private String getAuthTokenExpiry(){
         long currentTime = System.currentTimeMillis(); //the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
-        currentTime = currentTime + 1000*AUTH_EXPIRY_TIME; //10 sekunder
+        currentTime = currentTime + 1000*AUTH_EXPIRY_TIME; //
         return String.valueOf(currentTime);
     }
 
     private void validateRequest(String nfcCardNumber, String pin){
-        try {
-            JSONObject jsonParams = new JSONObject();
-            jsonParams.put("id", nfcCardNumber);
-            jsonParams.put("password", pin);
-            RESTApiServer.get(this,"/users",jsonParams, RESTApiServer.getDefaultHandler(this));
-            /*
-            RequestParams params = new RequestParams();
-            params.put("nfcID", nfcCardNumber);
-            params.put("pin", pin);
-            */
-        }
-        catch (Exception e){
-            Toast.makeText(this, "Exception..", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        RESTApiServer.login(this,this,nfcCardNumber,pin);
     }
 
-    public void notifyAboutResponse(String response){
+    public void notifyAboutResponse(HashMap<String,String> response){
         if(responseOK(response)) { //if response was successfull....
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(AccountManager.USER_AUTH_STATUS, USER_AUTHENTICATED);
             editor.putString(AccountManager.USER_AUTH_TIMESTAMP, getAuthTokenExpiry());
+            editor.putString(AccountManager.USER_AUTH_TOKEN, response.get("token"));
+            System.out.println(response.get("token"));
             editor.apply();
             finish();
         }
@@ -114,10 +106,10 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    private boolean responseOK(String response){
+
+    private boolean responseOK(HashMap<String,String> response){
         //determine weither the response was OK, and if so return true or else return false.
-        Toast.makeText(this, "Testing response.. Response was: " + response, Toast.LENGTH_SHORT).show();
-        return true;
+        return response.get(USER_AUTH_STATUS).equals(USER_AUTHENTICATED);
     }
 
     @Override

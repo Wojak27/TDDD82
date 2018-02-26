@@ -34,6 +34,7 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             startActivity(intent);
         }
         else if(view.getId() == R.id.logOutButton){
+            super.invalidateAuth();
             Intent intent = new Intent(this,AccountManager.class);
             startActivity(intent);
         }
