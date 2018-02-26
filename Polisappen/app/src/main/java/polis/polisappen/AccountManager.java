@@ -17,7 +17,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.nfc.Tag;
 
-public class AccountManager extends AppCompatActivity implements View.OnClickListener{
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+
+import cz.msebera.android.httpclient.entity.StringEntity;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import cz.msebera.android.httpclient.protocol.HTTP;
+
+public class AccountManager extends AppCompatActivity implements View.OnClickListener, HttpResponseNotifyable {
     private NfcAdapter adapter;
     private PendingIntent pendingIntent;
     private boolean isScanned = false;
@@ -29,6 +39,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     public static String USER_AUTH_STATUS = "USER_AUTH_STATUS";
     public static String USER_AUTHENTICATED = "USER_AUTHENTICATED";
     public static String USER_NOT_AUTHENTICATED = "USER_NOT_AUTHENTICATED";
+    public static String USER_AUTH_TOKEN = "USER_AUTH_TOKEN";
     private String tmpNfcCardNumber;
 
     @Override
@@ -61,31 +72,49 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
            Toast.makeText(this, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
     }
 
+
    @Override
    /*This method can only be called when checkLoginStatus has already been called.*/
     public void onClick(View view) {
        String pin = passwordEditText.getText().toString();
-       if(validRequest(tmpNfcCardNumber,pin)){
-           SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-           SharedPreferences.Editor editor = preferences.edit();
-           editor.putString(AccountManager.USER_AUTH_STATUS,USER_AUTHENTICATED);
-           editor.putString(AccountManager.USER_AUTH_TIMESTAMP, getAuthTokenExpiry());
-           editor.apply();
-           finish();
-       }
-       else{
-           Toast.makeText(this, "Felaktig PIN!", Toast.LENGTH_SHORT).show();
-       }
+       validateRequest(tmpNfcCardNumber,pin);
     }
 
     private String getAuthTokenExpiry(){
         long currentTime = System.currentTimeMillis(); //the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
-        currentTime = currentTime + 1000*AUTH_EXPIRY_TIME; //10 sekunder
+        currentTime = currentTime + 1000*AUTH_EXPIRY_TIME; //
         return String.valueOf(currentTime);
     }
 
-    private boolean validRequest(String nfcCardNumber, String pin){
-        return true;
+    private void validateRequest(String nfcCardNumber, String pin){
+        RESTApiServer.login(this,this,nfcCardNumber,pin);
+    }
+
+    public void notifyAboutResponse(HashMap<String,String> response){
+        if(responseOK(response)) { //if response was successfull....
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(AccountManager.USER_AUTH_STATUS, USER_AUTHENTICATED);
+            editor.putString(AccountManager.USER_AUTH_TIMESTAMP, getAuthTokenExpiry());
+            editor.putString(AccountManager.USER_AUTH_TOKEN, response.get("token"));
+            System.out.println(response.get("token"));
+            editor.apply();
+            finish();
+        }
+        else{
+            Toast.makeText(this, "Felaktig PIN!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
+
+    }
+
+
+    private boolean responseOK(HashMap<String,String> response){
+        //determine weither the response was OK, and if so return true or else return false.
+        return response.get(USER_AUTH_STATUS).equals(USER_AUTHENTICATED);
     }
 
     @Override
@@ -113,6 +142,9 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     }
 
     private void handleIntent(Intent intent) {
+        if(!NfcAdapter.ACTION_TAG_DISCOVERED.equals(intent.getAction())){ //The app was started or some other random intent
+            return;
+        }
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         String serial_number = "No data";
 
@@ -133,7 +165,10 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         }
 
         Toast.makeText(this, serial_number, Toast.LENGTH_LONG).show();
-        isScanned = true;
+        if(!serial_number.equals("No data")){
+            isScanned = true;
+            tmpNfcCardNumber = serial_number;
+        }
         checkLoginStatus();
 
 
@@ -142,10 +177,6 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onBackPressed(){}
-
-    public boolean isLoggedIn(){
-        return false;
-    }
 
     public void checkLoginStatus(){//Kolla vilken info som matats in
         if(passwordEditText.getText().length()==4 && isScanned){

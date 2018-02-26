@@ -11,7 +11,11 @@ import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-public class AuthAppCompatActivity extends AppCompatActivity {
+import org.json.JSONObject;
+
+import java.util.HashMap;
+
+public abstract class AuthAppCompatActivity extends AppCompatActivity implements HttpResponseNotifyable {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +32,17 @@ public class AuthAppCompatActivity extends AppCompatActivity {
         // get device sleep evernt
         regFilter .addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(receiver, regFilter );
-        checkAuth();
+        if(!validAuth()){
+            forceLogin();
+        }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(!validAuth()){
+            forceLogin();
+        }
     }
 
     protected void invalidateAuth(){
@@ -36,39 +50,57 @@ public class AuthAppCompatActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(AccountManager.USER_AUTH_STATUS,AccountManager.USER_NOT_AUTHENTICATED);
         editor.putString(AccountManager.USER_AUTH_TIMESTAMP, null);
+        invalidateTokenAtServer();
         editor.apply();
-        forceLogin();
     }
 
-    private void checkAuth(){
+    private void invalidateTokenAtServer(){
+        RESTApiServer.logout(this,this);
+    }
+
+    public void notifyAboutResponse(HashMap<String,String> response){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AccountManager.USER_AUTH_TOKEN, null);
+        editor.apply();
+        System.out.println("server responded from logout");
+    }
+
+    private boolean validAuth(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userAuthStatus = preferences.getString(AccountManager.USER_AUTH_STATUS,null);
         if(userAuthStatus != null){
             if(userAuthStatus.equals(AccountManager.USER_AUTHENTICATED)){
-                checkExpiry();
-                return;
+                if(authExpired()){
+                    Toast.makeText(this,"Your token has expired, please log in again",Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                return true;
             }
+            return false;
         }
-        forceLogin();
+        return false;
     }
     /* This method assumes the auth-token was valid, and checks only the validity of time*/
-    private void checkExpiry(){
+    private boolean authExpired(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String authExpiryDate = preferences.getString(AccountManager.USER_AUTH_TIMESTAMP, null);
         if(authExpiryDate == null){
-            forceLogin();
-            return;
+            return true;
         }
         long authExpiryDateNumber = Long.valueOf(authExpiryDate);
         long currentTimeNumber = System.currentTimeMillis();
         if((authExpiryDateNumber-currentTimeNumber)<=0) { //Auth has expired
-            forceLogin();
+            return true;
         }
+        return false;
         //else it was a valid auth token
     }
 
     private void forceLogin(){
+        invalidateAuth();
         Intent intent = new Intent(this,AccountManager.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
     }
 }

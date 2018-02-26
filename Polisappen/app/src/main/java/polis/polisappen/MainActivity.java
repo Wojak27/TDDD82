@@ -13,6 +13,8 @@ import android.widget.Toast;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.HashMap;
+
 public class MainActivity extends AuthAppCompatActivity implements View.OnClickListener{
 
     @Override
@@ -34,6 +36,7 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             startActivity(intent);
         }
         else if(view.getId() == R.id.logOutButton){
+            super.invalidateAuth();
             Intent intent = new Intent(this,AccountManager.class);
             startActivity(intent);
         }
@@ -45,5 +48,10 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             Intent intent = new Intent(this,MapsActivity.class);
             startActivity(intent);
         }
+    }
+
+    @Override
+    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
+
     }
 }
