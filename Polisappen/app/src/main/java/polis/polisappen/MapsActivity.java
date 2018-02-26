@@ -30,13 +30,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 import polis.polisappen.LocalDatabase.Location;
 
-public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener {
+public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -50,7 +51,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        RESTApiServer.getCoord(this,this);
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
 
@@ -61,6 +62,19 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void notifyAboutResponse(HashMap<String, String> response) {
+        System.out.println("databasen svarade");
+    }
+
+    @Override
+    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
+        System.out.println("databasen svarade 2");
+        for(String key : response.keySet()){
+            Log.w("lat", response.get(key).get("latitude"));
+        }
     }
 
     private boolean isPermissionGranted() {
@@ -152,7 +166,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
+        RESTApiServer.getCoord(this,this);
         mMap = googleMap;
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
@@ -222,7 +236,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private void setMarkersFromDatabaseOnMap(final GoogleMap mMap){
         //gets location from the database
         new AsyncTask<Void, Void, Integer>() {
-//            Location location;
+            //            Location location;
             List<Location> locations = new ArrayList<>(); // hashset to store all locations from the database
             @Override
             protected Integer doInBackground(Void... params) {
@@ -303,3 +317,4 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     }
 }
+

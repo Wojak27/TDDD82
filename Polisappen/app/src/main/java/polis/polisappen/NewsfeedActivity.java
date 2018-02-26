@@ -29,5 +29,10 @@ public class NewsfeedActivity extends AuthAppCompatActivity {
 
     }
 
+    @Override
+    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
+
+    }
+
 
 }

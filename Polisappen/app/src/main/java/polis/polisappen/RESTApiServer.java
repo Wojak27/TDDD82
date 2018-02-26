@@ -1,5 +1,6 @@
 package polis.polisappen;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ public class RESTApiServer {
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_URL = "/logout";
     private static final String SECRET_URL = "/secret";
+    private static final String COORD_URL = "/coord";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -59,6 +61,11 @@ public class RESTApiServer {
     public static void logout(Context context, HttpResponseNotifyable listener){
         JSONObject params = getAuthParams(context);
         post(context,LOGOUT_URL,params, RESTApiServer.getDefaultHandler(listener));
+    }
+
+    public static void getCoord(Context context, HttpResponseNotifyable listener){
+        JSONObject params = getAuthParams(context);
+        get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener));
     }
 
     public static void getSecret(Context context, HttpResponseNotifyable listener){
@@ -99,13 +106,24 @@ public class RESTApiServer {
 
                 listener.notifyAboutResponse(RESTApiServer.parseJSON(response));
             }
-            /*@Override
+            @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 // Do something with the response
+                System.out.println("databas");
+                try{
+                    HashMap<String, HashMap<String, String>> yttreHashMap = new HashMap<>();
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject jsonobject = response.getJSONObject(i);
+                        HashMap hashMap = parseJSON(jsonobject);
+                        yttreHashMap.put(Integer.toString(i), hashMap);
+                    }
+                    listener.notifyAboutResponseJSONArray(yttreHashMap);
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
 
-                listener.notifyAboutResponse(response.toString());
             }
-            */
+
             @Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
                 // Called if statuscode was 40x
                 listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
@@ -151,3 +169,4 @@ public class RESTApiServer {
         return result;
     }
 }
+
