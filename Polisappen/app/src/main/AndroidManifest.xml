@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:allowBackup="true"
@@ -25,6 +26,18 @@
             </intent-filter>
         </activity>
         <activity android:name=".CallActivity">
+            android:screenOrientation="portrait"
+        </activity>
+        <activity android:name=".IncomingVoice">
+            android:screenOrientation="portrait"
+        </activity>
+        <activity android:name=".IncomingVideo">
+            android:screenOrientation="portrait"
+        </activity>
+        <activity android:name=".IncomingCall">
+            android:screenOrientation="portrait"
+        </activity>
+        <activity android:name=".VideoActivity">
             android:screenOrientation="portrait"
         </activity>
         <activity android:name=".VideoAndVoiceChat">

@@ -20,7 +20,7 @@ android {
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "polis.polisappen"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -34,13 +34,7 @@ android {
         }
     }
     productFlavors {
-    }/*
-    packagingOptions {
-        exclude 'lib/x86_64/libsinch-android-rtc.so'
-        exclude 'lib/x86/libsinch-android-rtc.so'
-        exclude 'lib/armeabi-v7a/libsinch-android-rtc.so'
-        exclude 'lib/arm64-v8a/libsinch-android-rtc.so'
-    }*/
+    }
 }
 
 
