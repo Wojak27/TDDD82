@@ -26,7 +26,9 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         Button newsfeed = (Button)findViewById(R.id.newsfeedButton);
         newsfeed.setOnClickListener(this);
         Button mapButton = (Button)findViewById(R.id.mapsButton);
-        mapButton.setOnClickListener(this) ;
+        mapButton.setOnClickListener(this);
+        Button contactsButton = (Button)findViewById(R.id.contactsButton);
+        contactsButton.setOnClickListener(this);
     }
 
     @Override
@@ -46,6 +48,11 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         }
         else if(view.getId() == R.id.searchButton){
             Intent intent = new Intent(this,MapsActivity.class);
+            startActivity(intent);
+        }
+        else if(view.getId() == R.id.contactsButton){
+            Toast.makeText(this,"Created intent",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, VideoAndVoiceChat.class);
             startActivity(intent);
         }
     }
