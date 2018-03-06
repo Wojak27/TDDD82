@@ -7,12 +7,16 @@ import android.widget.Toast;
 
 import com.loopj.android.http.*;
 
+import org.apache.commons.codec.binary.Hex;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
@@ -69,23 +73,64 @@ public class RESTApiServer {
         get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener));
     }
 
+
+
     public static void setCoord(Context context, HttpResponseNotifyable listener, HashMap<String, String> coordData){
+
         double latitude = Double.parseDouble(coordData.get("latitude"));
         double longitude = Double.parseDouble(coordData.get("longitude"));
         int type = Integer.parseInt(coordData.get("type"));
         String reportText = coordData.get("report_text");
+        String sign_key = getUsername(context) + getUserAuthToken(context);
         try {
             JSONObject jsonParams = new JSONObject();
             jsonParams.put("latitude", latitude);
             jsonParams.put("longitude", longitude);
             jsonParams.put("type", type);
             jsonParams.put("report_text", reportText);
+            jsonParams.put("checksum",hashSHA256(getJSONToString(jsonParams),sign_key));
             post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener));
         }
         catch (Exception e){
             Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
             return;
         }
+    }
+
+    protected static String getUsername(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(AccountManager.USER_AUTH_NAME,"");
+    }
+    protected static String getUserAuthToken(Context context){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(AccountManager.USER_AUTH_TOKEN,null);
+    }
+
+    private static String hashSHA256(String toEncrypt, String key){
+        try {
+            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
+            sha256_HMAC.init(secret_key);
+            return Hex.encodeHexString(sha256_HMAC.doFinal(toEncrypt.getBytes("UTF-8")));
+        }
+        catch (Exception e){
+            return null;
+        }
+    }
+    private static String getJSONToString(JSONObject object){
+        String finalString = "";
+        Iterator<String> keys = object.keys();
+        while(keys.hasNext()){
+            try{
+                String key = keys.next();
+                String value = object.getString(key);
+                finalString = finalString + value;
+            }
+            catch (Exception e){
+                return null;
+            }
+        }
+        return finalString;
     }
 
     public static void getSecret(Context context, HttpResponseNotifyable listener){
