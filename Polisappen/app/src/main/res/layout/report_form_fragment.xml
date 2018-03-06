@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_margin="25dp"
+    android:layout_height="match_parent">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dismissButton"
+        android:text="Cancel" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/commitButton"
+        android:text="Send" />
+
+    <EditText
+        android:id="@+id/reportText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Write what happened here"
+        android:ems="10"
+        android:inputType="textMultiLine" />
+
+</LinearLayout>
