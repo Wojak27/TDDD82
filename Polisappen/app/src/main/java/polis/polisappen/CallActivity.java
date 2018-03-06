@@ -1,5 +1,6 @@
 package polis.polisappen;
 
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -33,7 +34,6 @@ public class CallActivity extends VideoAndVoiceChat{
         });
         Bundle bundle = getIntent().getExtras();
         String callId = bundle.getString("CALL_ID");
-
         call = mSinchClient.getCallClient().getCall(callId);
         call.addCallListener(new SinchCallListener());
         recipient = call.getRemoteUserId();
@@ -56,6 +56,7 @@ public class CallActivity extends VideoAndVoiceChat{
         public void onCallEstablished(Call call) {
             progress.setText("In call with "+recipient);
             endCall.setText("End call");
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         }
 
         @Override

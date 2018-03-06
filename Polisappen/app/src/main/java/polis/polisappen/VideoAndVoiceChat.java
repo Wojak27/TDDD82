@@ -118,6 +118,7 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
         mSinchClient.start();
         mSinchClient.getCallClient().addCallClientListener(new SinchCallClientListener());
 
+
     }
 
     public void requestPermissions(){

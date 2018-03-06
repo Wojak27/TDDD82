@@ -1,5 +1,6 @@
 package polis.polisappen;
 
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -48,11 +49,11 @@ public class IncomingVoice extends VideoAndVoiceChat{
 
         @Override
         public void onCallProgressing(Call call) {
-
         }
 
         @Override
         public void onCallEstablished(Call call) {
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
             progress.setText("In call with "+caller);
             endCall.setText("End call");
         }
