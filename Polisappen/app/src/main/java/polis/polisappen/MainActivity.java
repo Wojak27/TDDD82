@@ -51,7 +51,6 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             startActivity(intent);
         }
         else if(view.getId() == R.id.contactsButton){
-            Toast.makeText(this,"Created intent",Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, VideoAndVoiceChat.class);
             startActivity(intent);
         }
