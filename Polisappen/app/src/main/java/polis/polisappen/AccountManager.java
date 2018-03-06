@@ -50,6 +50,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         passwordEditText = (EditText) findViewById(R.id.passwordEditText);
         LogInButton = (Button)findViewById(R.id.logInButton);
         textView = (TextView)(this).findViewById(R.id.logInText);
+        Button startCallActivity = (Button)findViewById(R.id.startCallActivity);
+        startCallActivity.setOnClickListener(this);
         LogInButton.setEnabled(false);
 
         passwordEditText.addTextChangedListener(new TextWatcher() {
@@ -76,8 +78,14 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
    @Override
    /*This method can only be called when checkLoginStatus has already been called.*/
     public void onClick(View view) {
-       String pin = passwordEditText.getText().toString();
-       validateRequest(tmpNfcCardNumber,pin);
+        if(view.getId() == R.id.logInButton) {
+            String pin = passwordEditText.getText().toString();
+            validateRequest(tmpNfcCardNumber, pin);
+        }
+        else if(view.getId() == R.id.startCallActivity){
+            Intent intent = new Intent(this, VideoAndVoiceChat.class);
+            startActivity(intent);
+        }
     }
 
     private String getAuthTokenExpiry(){

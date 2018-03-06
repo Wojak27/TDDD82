@@ -33,6 +33,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         regFilter .addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(receiver, regFilter );
         if(!validAuth()){
+            Toast.makeText(this,"You need to be authenticated", Toast.LENGTH_SHORT).show();
             forceLogin();
         }
     }
