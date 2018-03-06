@@ -32,6 +32,9 @@ public interface UserDao {
     @Delete
     void delete(Location location);
 
+    @Query("DELETE FROM Location")
+    void deleteAll();
+
 //    Doesn't work in Room, needs to create custom solution
 //    @Query("DELETE FROM Location WHERE latitude = :lat AND longitude = :lon AND label = :title")
 //    void deleteSpecificMarker(double lat, double lon, String title);

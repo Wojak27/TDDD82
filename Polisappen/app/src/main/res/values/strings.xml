@@ -11,6 +11,7 @@
     <string name="mapsButton">Maps</string>
     <string name="reportButton">Report</string>
     <string name="newsfeedButton">Newsfeed</string>
+    <string name="updateButton">Update</string>
     <string name="logOutButton">Log Out</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_report_window">ReportWindowActivity</string>

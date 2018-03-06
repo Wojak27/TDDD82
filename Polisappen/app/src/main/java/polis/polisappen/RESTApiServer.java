@@ -25,6 +25,7 @@ public class RESTApiServer {
     private static final String LOGOUT_URL = "/logout";
     private static final String SECRET_URL = "/secret";
     private static final String COORD_URL = "/coord";
+    private static final String SETCOORD_URL = "/setCoord";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -68,9 +69,43 @@ public class RESTApiServer {
         get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener));
     }
 
+    public static void setCoord(Context context, HttpResponseNotifyable listener, HashMap<String, String> coordData){
+        double latitude = Double.parseDouble(coordData.get("latitude"));
+        double longitude = Double.parseDouble(coordData.get("longitude"));
+        int type = Integer.parseInt(coordData.get("type"));
+        String reportText = coordData.get("report_text");
+        try {
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("latitude", latitude);
+            jsonParams.put("longitude", longitude);
+            jsonParams.put("type", type);
+            jsonParams.put("report_text", reportText);
+            post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener));
+        }
+        catch (Exception e){
+            Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
+            return;
+        }
+    }
+
     public static void getSecret(Context context, HttpResponseNotifyable listener){
         JSONObject params = getAuthParams(context);
         get(context,SECRET_URL,params, RESTApiServer.getDefaultHandler(listener));
+    }
+
+    private static JSONObject addAuthParams(Context context, JSONObject params){
+        JSONObject authParams = getAuthParams(context);
+        Iterator<String> authKeys = authParams.keys();
+        while (authKeys.hasNext()){
+            try{
+                String key = authKeys.next();
+                String value = authParams.getString(key);
+                params.put(key,value);
+            }catch (Exception e){
+                return null;
+            }
+        }
+        return params;
     }
 
     private static JSONObject getAuthParams(Context context){

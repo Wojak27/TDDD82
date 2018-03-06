@@ -10,18 +10,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.text.LoginFilter;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -38,37 +36,37 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 import polis.polisappen.LocalDatabase.Location;
 
-public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable {
+public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable, View.OnClickListener {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
-    final static String[] PERMISSIONS = {android.Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION};
+    private final static String[] PERMISSIONS = {android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
     private FusedLocationProviderClient mFusedLocationClient;
     private boolean mRequestingLocationUpdates = false;
     private ApplicationDatabase db;
     private LocationCallback mLocationCallback;
-    LocationRequest mLocationRequest;
-    BroadcastReceiver mBroadcastReciever;
-    boolean isBatteryLow = false;
+    private LocationRequest mLocationRequest;
+    private BroadcastReceiver mBroadcastReciever;
+    private boolean isBatteryLow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         RESTApiServer.getCoord(this,this);
+        Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
+        updateButton.setOnClickListener(this);
 //Debugging
         mBroadcastReciever = new BatteryBroadcastReceiver();
 ///////////////
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
-
+        deleteMarkerFromDatabase();
         //adding new marker to the database
 //        addMarkerToDatabase(new LatLng(2.1,3.2),"new Marker");
 
@@ -88,7 +86,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                     // Update UI with location data
                     // ...
                     Log.w("Location", "update");
-                    // laying markers for debugging
+//                    laying markers for debugging
 //                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),location.getLongitude())));
                 }
 
@@ -105,7 +103,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
         System.out.println("databasen svarade 2");
         for(String key : response.keySet()){
-            Log.w("lat", response.get(key).get("latitude"));
+            addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"));
         }
     }
 
@@ -173,11 +171,11 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     protected void onPause() {
         super.onPause();
-        stopLocationUpdates();
+//        stopLocationUpdates();
     }
 
     private void stopLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+//        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
     public void createLocationRequest() {
@@ -244,8 +242,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        RESTApiServer.getCoord(this,this);
         mMap = googleMap;
+        Log.w("mMap", mMap.toString());
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
         }else {
@@ -312,6 +310,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     @SuppressLint("StaticFieldLeak")
     private void setMarkersFromDatabaseOnMap(final GoogleMap mMap){
+        mMap.clear();
         //gets location from the database
         new AsyncTask<Void, Void, Integer>() {
             //            Location location;
@@ -335,9 +334,22 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         }.execute();
     }
 
-    @SuppressLint("StaticFieldLeak")
-    public void addMarkerToDatabase(LatLng latLng, String title, String reportText){ // uid for debugging
+    private HashMap<String, String> createMapWithCoordinates(double latitude, double longitude, String type, String reportText){
+        HashMap<String,String> hashMapCoordinates = new HashMap<>();
+        hashMapCoordinates.put("latitude", Double.toString(latitude));
+        hashMapCoordinates.put("longitude", Double.toString(longitude));
+        hashMapCoordinates.put("type", type);
+        hashMapCoordinates.put("report_text", reportText);
+        return hashMapCoordinates;
+    }
 
+    @SuppressLint("StaticFieldLeak")
+    private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText){
+        Log.w("latitude", Double.toString(latLng.latitude));
+        Log.w("longitude", Double.toString(latLng.longitude));
+        RESTApiServer.setCoord(this,this,createMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
+    }
+    private void addMarkerToLocalDB(LatLng latLng, String title, String reportText){
         mMap.addMarker(new MarkerOptions().position(latLng).title(title));
         final Location location = new Location();
         location.latitude = latLng.latitude;
@@ -345,7 +357,6 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         location.title = title;
         Log.v("text to databse: ", reportText);
         location.reportText = reportText;
-
         //put the location we've created previously into the local database
         //everything needs to be done on a separate thread due to android constraints
         new AsyncTask<Void, Void, Integer>() {
@@ -364,17 +375,22 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             }
         }.execute();
     }
+    public void addMarkerToDatabase(LatLng latLng, String title, String reportText){ // uid for debugging
+        addMarkerToLocalDB(latLng,title,reportText);
+        addMarkerToOnlineDB(latLng,title,reportText);
+
+    }
 
     @SuppressLint("StaticFieldLeak")
-    private void deleteMarkerFromDatabase(final Marker marker){ // location for debugging, needs fixing
-        final double lat = marker.getPosition().latitude;
-        final double lon = marker.getPosition().longitude;
+    private void deleteMarkerFromDatabase(){ // location for debugging, needs fixing
+//        final double lat = marker.getPosition().latitude;
+//        final double lon = marker.getPosition().longitude;
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
-
-                Location location = db.userDao().selectSpecificMarker(lat, lon);
-                if(location != null) db.userDao().delete(location);
+                db.userDao().deleteAll();
+//                Location location = db.userDao().selectSpecificMarker(lat, lon);
+//                if(location != null) db.userDao().delete(location);
                 return null;
             }
 
@@ -406,6 +422,13 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         super.onStop();
     }
 
+    @Override
+    public void onClick(View v) {
+        deleteMarkerFromDatabase();
+        RESTApiServer.getCoord(this,this);
+        setMarkersFromDatabaseOnMap(mMap);
+    }
+
     // checks for changes in battery
     private class BatteryBroadcastReceiver extends BroadcastReceiver {
         private final static String BATTERY_LEVEL = "level";
@@ -424,5 +447,6 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         }
 
     }
+
 }
 
