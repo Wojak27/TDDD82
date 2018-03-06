@@ -25,12 +25,13 @@ import com.sinch.android.rtc.calling.CallListener;
 import com.sinch.android.rtc.video.VideoCallListener;
 import com.sinch.android.rtc.video.VideoController;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * For making voice or video calls between users.
  */
-public class VideoAndVoiceChat extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
+public class VideoAndVoiceChat extends AuthAppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
     private static final String APP_KEY = "955e2079-38f0-43d5-af9e-80e4f3ade26d";
     private static final String APP_SECRET = "TZOvC9lH6k2wmJzWHEXh2Q==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
@@ -150,6 +151,11 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
             requestResults.setText("Permission to camera granted");
             requestResults.show();
         }
+    }
+
+    @Override
+    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
+        //do nothing, its intended.
     }
 
     /**
