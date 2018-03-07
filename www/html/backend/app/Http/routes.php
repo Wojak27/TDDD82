@@ -17,6 +17,9 @@ Route::get('/', function () {
 Route::group(['prefix' => '', 'middleware' => 'jwt.auth'], function(){
     Route::get('/secret', 'DatabaseController@secret');
     Route::post('/logout', 'AuthenticateController@logout');
+    Route::get('/coord', 'MapsController@getCoord');
+    Route::post('/setCoord', 'MapsController@setCoord');
+    Route::post('/delCoords', 'MapsController@delCoords');
 });
 
 Route::post('/login', 'AuthenticateController@authenticate');
