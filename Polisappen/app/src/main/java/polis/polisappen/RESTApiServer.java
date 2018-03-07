@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 import com.loopj.android.http.*;
 
-import org.apache.commons.codec.binary.Hex;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -76,19 +75,21 @@ public class RESTApiServer {
 
 
     public static void setCoord(Context context, HttpResponseNotifyable listener, HashMap<String, String> coordData){
-
-        double latitude = Double.parseDouble(coordData.get("latitude"));
-        double longitude = Double.parseDouble(coordData.get("longitude"));
-        int type = Integer.parseInt(coordData.get("type"));
         String reportText = coordData.get("report_text");
         String sign_key = getUsername(context) + getUserAuthToken(context);
         try {
             JSONObject jsonParams = new JSONObject();
-            jsonParams.put("latitude", latitude);
-            jsonParams.put("longitude", longitude);
-            jsonParams.put("type", type);
+            System.out.println("Sending to server...");
+            jsonParams.put("latitude", coordData.get("latitude"));
+            jsonParams.put("longitude", coordData.get("longitude"));
+            jsonParams.put("type", coordData.get("type"));
             jsonParams.put("report_text", reportText);
-            jsonParams.put("checksum",hashSHA256(getJSONToString(jsonParams),sign_key));
+            System.out.println("checksum: " + hashSHA256(getJSONToStringSetCoord(jsonParams),sign_key));
+            jsonParams.put("checksum",hashSHA256(getJSONToStringSetCoord(jsonParams),sign_key));
+            System.out.println("latitude: " + coordData.get("latitude"));
+            System.out.println("longitude: " + coordData.get("longitude"));
+            System.out.println("type: " + coordData.get("type"));
+            System.out.println("report_text: " + reportText);
             post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener));
         }
         catch (Exception e){
@@ -111,12 +112,28 @@ public class RESTApiServer {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256");
             sha256_HMAC.init(secret_key);
-            return Hex.encodeHexString(sha256_HMAC.doFinal(toEncrypt.getBytes("UTF-8")));
+            return encodeHexString(sha256_HMAC.doFinal(toEncrypt.getBytes("UTF-8")));
         }
         catch (Exception e){
             return null;
         }
     }
+    //Egentligen vill vi använda Hex.encodeHexString men det fungerar inte pga
+    //apache kan inte döpa sina paket (nån namn krock)....
+    //OBS: DENNA KOD SNODD FRÅN (684 upvotes):
+    // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
+    private static String encodeHexString(byte[] bytes){
+        final char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
+
     private static String getJSONToString(JSONObject object){
         String finalString = "";
         Iterator<String> keys = object.keys();
@@ -131,6 +148,21 @@ public class RESTApiServer {
             }
         }
         return finalString;
+    }
+    //This method sucks, we need another way....
+    private static String getJSONToStringSetCoord(JSONObject object){
+        String result = "";
+        try {
+            result += object.getString("latitude");
+            result += object.getString("longitude");
+            result += object.getString("type");
+            result += object.getString("report_text");
+            return result;
+        }
+        catch (Exception e){
+            return null;
+        }
+
     }
 
     public static void getSecret(Context context, HttpResponseNotifyable listener){

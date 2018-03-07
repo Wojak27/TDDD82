@@ -96,7 +96,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     @Override
     public void notifyAboutResponse(HashMap<String, String> response) {
-        System.out.println("databasen svarade");
+        System.out.println("Server sa:" + "\n");
+        for(String key: response.keySet()){
+            System.out.println(key + " : " + response.get(key));
+        }
     }
 
     @Override
