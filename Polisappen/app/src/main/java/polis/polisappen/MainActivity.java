@@ -1,15 +1,7 @@
 package polis.polisappen;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 import android.view.View;
 import android.widget.Button;
 
@@ -17,6 +9,7 @@ import java.util.HashMap;
 
 public class MainActivity extends AuthAppCompatActivity implements View.OnClickListener{
 
+    Intent qoSIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +22,8 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         mapButton.setOnClickListener(this);
         Button contactsButton = (Button)findViewById(R.id.contactsButton);
         contactsButton.setOnClickListener(this);
+        Button startQoS = (Button)findViewById(R.id.startQoS);
+        startQoS.setOnClickListener(this);
     }
 
     @Override
@@ -53,6 +48,18 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         else if(view.getId() == R.id.contactsButton){
             Intent intent = new Intent(this, VideoAndVoiceChat.class);
             startActivity(intent);
+        }
+        else if(view.getId() == R.id.startQoS){
+            qoSIntent = new Intent(this, QoSManager.class);
+            startService(qoSIntent);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(qoSIntent != null){
+            stopService(qoSIntent);
         }
     }
 

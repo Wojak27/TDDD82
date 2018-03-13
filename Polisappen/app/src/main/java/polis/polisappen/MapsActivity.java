@@ -62,7 +62,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
         updateButton.setOnClickListener(this);
 //Debugging
-        mBroadcastReciever = new BatteryBroadcastReceiver();
+//        mBroadcastReciever = new BatteryBroadcastReceiver();
 ///////////////
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
@@ -352,6 +352,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         Log.w("longitude", Double.toString(latLng.longitude));
         RESTApiServer.setCoord(this,this,createMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
     }
+    @SuppressLint("StaticFieldLeak")
     private void addMarkerToLocalDB(LatLng latLng, String title, String reportText){
         mMap.addMarker(new MarkerOptions().position(latLng).title(title));
         final Location location = new Location();
@@ -432,24 +433,24 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         setMarkersFromDatabaseOnMap(mMap);
     }
 
-    // checks for changes in battery
-    private class BatteryBroadcastReceiver extends BroadcastReceiver {
-        private final static String BATTERY_LEVEL = "level";
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int level = intent.getIntExtra(BATTERY_LEVEL, 0);
-            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
-
-            if(level < 21 && !isBatteryLow){
-                createLocationRequestBestForBattery();
-                isBatteryLow = true;
-            }else if(level > 20 && isBatteryLow){
-                createLocationRequest();
-                isBatteryLow = false;
-            }
-        }
-
-    }
+//    // checks for changes in battery
+//    private class BatteryBroadcastReceiver extends BroadcastReceiver {
+//        private final static String BATTERY_LEVEL = "level";
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            int level = intent.getIntExtra(BATTERY_LEVEL, 0);
+//            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
+//
+//            if(level < 21 && !isBatteryLow){
+//                createLocationRequestBestForBattery();
+//                isBatteryLow = true;
+//            }else if(level > 20 && isBatteryLow){
+//                createLocationRequest();
+//                isBatteryLow = false;
+//            }
+//        }
+//
+//    }
 
 }
 
