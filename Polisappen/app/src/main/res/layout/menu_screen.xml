@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="45dp"
         android:minWidth="200dp"
         android:text="@string/contactsButton" />
 
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/contactsButton"
         android:layout_below="@+id/contactsButton"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:minWidth="200dp"
         android:text="@string/mapsButton" />
 
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/mapsButton"
         android:layout_below="@+id/mapsButton"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:minWidth="200dp"
         android:text="@string/newsfeedButton" />
 
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/newsfeedButton"
         android:layout_below="@+id/newsfeedButton"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:minWidth="200dp"
         android:text="@string/reportButton" />
 
@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/reportButton"
         android:layout_below="@+id/reportButton"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:minWidth="200dp"
         android:text="Search" />
 
@@ -56,9 +56,19 @@
         android:id="@+id/logOutButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/searchButton"
-        android:layout_below="@+id/searchButton"
-        android:layout_marginTop="40dp"
+        android:layout_alignStart="@+id/logInButton"
+        android:layout_below="@+id/logInButton"
+        android:layout_marginTop="20dp"
         android:minWidth="200dp"
         android:text="@string/logOutButton" />
+
+    <Button
+        android:id="@+id/logInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/searchButton"
+        android:layout_alignStart="@+id/searchButton"
+        android:layout_below="@+id/searchButton"
+        android:layout_marginTop="20dp"
+        android:text="Log in/change user" />
 </RelativeLayout>

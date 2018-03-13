@@ -29,6 +29,8 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         mapButton.setOnClickListener(this);
         Button contactsButton = (Button)findViewById(R.id.contactsButton);
         contactsButton.setOnClickListener(this);
+        Button loginButton = (Button)findViewById(R.id.logInButton);
+        loginButton.setOnClickListener(this);
     }
 
     @Override
@@ -52,6 +54,10 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         }
         else if(view.getId() == R.id.contactsButton){
             Intent intent = new Intent(this, VideoAndVoiceChat.class);
+            startActivity(intent);
+        }
+        else if(view.getId() == R.id.logInButton){
+            Intent intent = new Intent(this, AccountManager.class);
             startActivity(intent);
         }
     }

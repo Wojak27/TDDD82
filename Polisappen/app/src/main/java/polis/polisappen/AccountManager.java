@@ -32,6 +32,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private PendingIntent pendingIntent;
     private boolean isScanned = false;
     private Button LogInButton;
+    private Button skipLoginButton;
     private EditText passwordEditText;
     private TextView textView;
     private final int AUTH_EXPIRY_TIME = 1000000; //In seconds
@@ -51,10 +52,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         passwordEditText = (EditText) findViewById(R.id.passwordEditText);
         LogInButton = (Button)findViewById(R.id.logInButton);
         textView = (TextView)(this).findViewById(R.id.logInText);
-        Button startCallActivity = (Button)findViewById(R.id.startCallActivity);
-        startCallActivity.setOnClickListener(this);
         LogInButton.setEnabled(false);
-
+        skipLoginButton = (Button) findViewById(R.id.skiplogin);
         passwordEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -83,8 +82,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             String pin = passwordEditText.getText().toString();
             validateRequest(tmpNfcCardNumber, pin);
         }
-        else if(view.getId() == R.id.startCallActivity){
-            Intent intent = new Intent(this, VideoAndVoiceChat.class);
+        else if(view.getId() == R.id.skiplogin){
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
     }
