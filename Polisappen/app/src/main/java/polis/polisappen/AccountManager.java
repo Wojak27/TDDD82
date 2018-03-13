@@ -54,6 +54,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         textView = (TextView)(this).findViewById(R.id.logInText);
         LogInButton.setEnabled(false);
         skipLoginButton = (Button) findViewById(R.id.skiplogin);
+        skipLoginButton.setOnClickListener(this);
         passwordEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -83,8 +84,9 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             validateRequest(tmpNfcCardNumber, pin);
         }
         else if(view.getId() == R.id.skiplogin){
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, PublicMainActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 
@@ -180,12 +182,12 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         }
         checkLoginStatus();
 
-
-
     }
 
     @Override
-    public void onBackPressed(){}
+    public void onBackPressed(){
+        finish();
+    }
 
     public void checkLoginStatus(){//Kolla vilken info som matats in
         if(passwordEditText.getText().length()==4 && isScanned){

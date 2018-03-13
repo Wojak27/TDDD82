@@ -61,7 +61,6 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             startActivity(intent);
         }
     }
-
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
 

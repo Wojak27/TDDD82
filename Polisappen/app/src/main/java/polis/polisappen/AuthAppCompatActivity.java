@@ -29,7 +29,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
 
             }};
         IntentFilter regFilter = new IntentFilter();
-        // get device sleep evernt
+        // get device sleep event
         regFilter .addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(receiver, regFilter );
         if(!validAuth()){

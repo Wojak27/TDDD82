@@ -140,15 +140,15 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Toast requestResults = Toast.makeText(this, "Permission to record audio granted", Toast.LENGTH_LONG);
         if(requestCode == RECORD_PERMISSION_CODE){
-            requestResults.show();
+            //requestResults.show();
         }
         if (requestCode == READ_STATE_PERMISSION_CODE){
             requestResults.setText("Permission to read state granted");
-            requestResults.show();
+            //requestResults.show();
         }
         if (requestCode == OPEN_CAMERA_CODE){
             requestResults.setText("Permission to camera granted");
-            requestResults.show();
+            //requestResults.show();
         }
     }
 

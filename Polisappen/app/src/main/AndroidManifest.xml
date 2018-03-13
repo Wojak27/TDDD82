@@ -49,6 +49,9 @@
         <activity android:name=".IncomingCall">
             android:screenOrientation="portrait"
         </activity>
+        <activity android:name=".PublicMainActivity">
+            android:screenOrientation="portrait"
+        </activity>
         <activity android:name=".VideoActivity">
             android:screenOrientation="portrait"
         </activity>
