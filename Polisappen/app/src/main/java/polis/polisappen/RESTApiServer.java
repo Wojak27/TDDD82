@@ -29,6 +29,7 @@ public class RESTApiServer {
     private static final String SECRET_URL = "/secret";
     private static final String COORD_URL = "/coord";
     private static final String SETCOORD_URL = "/setCoord";
+    private static final String GET_CONTACTS_URL = "/users";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -70,6 +71,11 @@ public class RESTApiServer {
     public static void getCoord(Context context, HttpResponseNotifyable listener){
         JSONObject params = getAuthParams(context);
         get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener));
+    }
+
+    public static void getContacts(Context context, HttpResponseNotifyable listener){
+        JSONObject params = getAuthParams(context);
+        get(context,GET_CONTACTS_URL,params, RESTApiServer.getDefaultHandler(listener));
     }
 
 

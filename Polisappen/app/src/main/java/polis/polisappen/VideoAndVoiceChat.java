@@ -56,6 +56,10 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
         final Button videoButton = (Button) findViewById(R.id.videoButton);
         voiceButton.setVisibility(View.INVISIBLE);
         videoButton.setVisibility(View.INVISIBLE);
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null){
+            remoteName.setText(bundle.getString("calling_to_name"));
+        }
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
