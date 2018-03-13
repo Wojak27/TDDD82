@@ -1,5 +1,7 @@
 package polis.polisappen;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -27,6 +29,22 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(!isServiceRunning(QoSManager.class)){
+            if(validAuth()){
+                if (qoSIntent == null){
+                    qoSIntent = new Intent(this, QoSManager.class);
+                    startService(qoSIntent);
+                }else{
+                    startService(qoSIntent);
+                }
+            }
+        }
+
+    }
+
+    @Override
     public void onClick(View view){
         if(view.getId() == R.id.newsfeedButton){
             Intent intent = new Intent(this,NewsfeedActivity.class);
@@ -36,6 +54,9 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             super.invalidateAuth();
             Intent intent = new Intent(this,AccountManager.class);
             startActivity(intent);
+            if(qoSIntent != null){
+                stopService(qoSIntent);
+            }
         }
         else if(view.getId() == R.id.mapsButton){
             Intent intent = new Intent(this,MapsActivity.class);
@@ -53,6 +74,15 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             qoSIntent = new Intent(this, QoSManager.class);
             startService(qoSIntent);
         }
+    }
+    private boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
