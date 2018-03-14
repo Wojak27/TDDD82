@@ -1,15 +1,7 @@
 package polis.polisappen;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 import android.view.View;
 import android.widget.Button;
 
@@ -29,8 +21,8 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         mapButton.setOnClickListener(this);
         Button contactsButton = (Button)findViewById(R.id.contactsButton);
         contactsButton.setOnClickListener(this);
-        Button reportButton = (Button)findViewById(R.id.reportButton);
-        reportButton.setOnClickListener(this);
+        Button callButton = (Button)findViewById(R.id.callButton);
+        callButton.setOnClickListener(this);
     }
 
     @Override
@@ -53,11 +45,11 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             startActivity(intent);
         }
         else if(view.getId() == R.id.contactsButton){
-            Intent intent = new Intent(this, VideoAndVoiceChat.class);
+            Intent intent = new Intent(this, ContactsActivity.class);
             startActivity(intent);
         }
-        else if(view.getId() == R.id.reportButton){
-            Intent intent = new Intent(this, ContactsActivity.class);
+        else if(view.getId() == R.id.callButton){
+            Intent intent = new Intent(this, VideoAndVoiceChat.class);
             startActivity(intent);
         }
     }

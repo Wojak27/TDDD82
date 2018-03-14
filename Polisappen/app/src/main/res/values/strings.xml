@@ -9,9 +9,10 @@
     <string name="passwordEditText">Password</string>
     <string name="contactsButton">Contacts</string>
     <string name="mapsButton">Maps</string>
-    <string name="reportButton">Report</string>
+    <string name="callButton">Call</string>
     <string name="newsfeedButton">Newsfeed</string>
     <string name="updateButton">Update</string>
+    <string name="reportButton">Report</string>
     <string name="logOutButton">Log Out</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_report_window">ReportWindowActivity</string>
