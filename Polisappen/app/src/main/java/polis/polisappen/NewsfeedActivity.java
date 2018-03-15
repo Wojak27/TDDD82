@@ -16,16 +16,7 @@ public class NewsfeedActivity extends AuthAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String token = preferences.getString(AccountManager.USER_AUTH_TOKEN, null);
-        JSONObject jsonParams = new JSONObject();
-        try{
-            jsonParams.put("token", token);
-            RESTApiServer.get(this,"/secret",jsonParams, RESTApiServer.getDefaultHandler(this));
-        }
-        catch (Exception e){
-            //do nothing
-        }
+        RESTApiServer.getSecret(this,this);
     }
 
     @Override
