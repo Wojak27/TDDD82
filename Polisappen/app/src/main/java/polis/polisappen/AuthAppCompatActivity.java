@@ -37,6 +37,10 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
             forceLogin();
         }
     }
+    @Override
+    public void notifyAboutFailedRequest(){
+       //default is to do nothing, override to handle yourself...
+    }
 
     @Override
     protected void onResume(){
