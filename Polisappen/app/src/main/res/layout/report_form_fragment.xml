@@ -15,6 +15,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/commitButton"
         android:text="Send" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/manipulatedButton"
+        android:text="Send manipulated data" />
 
     <EditText
         android:id="@+id/reportText"

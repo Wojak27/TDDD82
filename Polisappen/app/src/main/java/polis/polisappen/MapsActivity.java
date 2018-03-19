@@ -97,8 +97,14 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     public void notifyAboutResponse(HashMap<String, String> response) {
         System.out.println("Server sa:" + "\n");
-        for(String key: response.keySet()){
-            System.out.println(key + " : " + response.get(key));
+        if (response.containsKey("latitude")){
+            System.out.println("Latitide fanns");
+            for(String key: response.keySet()){
+                System.out.println(key + " : " + response.get(key));
+            }
+        }
+        else{
+            Toast.makeText(this, "Meddelande blev manipulerat, inget lades till i databasen", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -379,8 +385,14 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         }.execute();
     }
     public void addMarkerToDatabase(LatLng latLng, String title, String reportText){ // uid for debugging
-        addMarkerToLocalDB(latLng,title,reportText);
-        addMarkerToOnlineDB(latLng,title,reportText);
+        if (!title.equals("manipulated")) {
+            addMarkerToLocalDB(latLng, title, reportText);
+            addMarkerToOnlineDB(latLng, title, reportText);
+        }
+        else{
+            System.out.println("MANIPULATED");
+            RESTApiServer.setManipluatedCoord(this, this, createMapWithCoordinates(latLng.latitude, latLng.longitude, "1", reportText));
+        }
 
     }
 

@@ -73,7 +73,30 @@ public class RESTApiServer {
     }
 
 
-
+    public static void setManipluatedCoord(Context context, HttpResponseNotifyable listener, HashMap<String, String> coordData){
+        String reportText = coordData.get("report_text");
+        String sign_key = getUsername(context) + getUserAuthToken(context);
+        try {
+            JSONObject jsonParams = new JSONObject();
+            System.out.println("Sending to server...");
+            jsonParams.put("latitude", coordData.get("latitude"));
+            jsonParams.put("longitude", coordData.get("longitude"));
+            jsonParams.put("type", coordData.get("type"));
+            jsonParams.put("report_text", reportText);
+            System.out.println("checksum: " + hashSHA256(getJSONToStringSetCoord(jsonParams),sign_key));
+            jsonParams.put("checksum",hashSHA256(getJSONToStringSetCoord(jsonParams),sign_key));
+            jsonParams.put("type", coordData.get("type")+"manipulated");
+            System.out.println("latitude: " + coordData.get("latitude"));
+            System.out.println("longitude: " + coordData.get("longitude"));
+            System.out.println("type: " + coordData.get("type"));
+            System.out.println("report_text: " + reportText);
+            post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener));
+        }
+        catch (Exception e){
+            Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
+            return;
+        }
+    }
     public static void setCoord(Context context, HttpResponseNotifyable listener, HashMap<String, String> coordData){
         String reportText = coordData.get("report_text");
         String sign_key = getUsername(context) + getUserAuthToken(context);

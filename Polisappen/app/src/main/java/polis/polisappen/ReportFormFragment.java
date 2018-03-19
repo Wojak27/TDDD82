@@ -54,5 +54,14 @@ public class ReportFormFragment extends Fragment {
                 getActivity().getFragmentManager().beginTransaction().remove(myFragment).commit();
             }
         });
+
+        Button manipluatedButton = (Button) this.getActivity().findViewById(R.id.manipulatedButton);
+        manipluatedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"manipulated",editText.getText().toString());
+                getActivity().getFragmentManager().beginTransaction().remove(myFragment).commit();
+            }
+        });
     }
 }
