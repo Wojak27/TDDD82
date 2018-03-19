@@ -28,6 +28,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     private Contact chatBuddy;
     private Button sendButton;
     private EditText msgText;
+    private Button updateButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,18 +47,25 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         sendButton = (Button) findViewById(R.id.send_msg_button);
         sendButton.setOnClickListener(this);
         msgText = (EditText) findViewById(R.id.send_msg_text);
+        updateButton = (Button) findViewById(R.id.updateButton);
+        updateButton.setOnClickListener(this);
         getMessagesFromServer();
     }
 
     private void getMessagesFromServer()
     {
         RESTApiServer.getMessages(this,this,chatBuddy);
+
     }
 
     @Override
     public void onClick(View view){
         if(view.getId() == sendButton.getId()){
             sendMessageToServer();
+        }
+        if(view.getId() == updateButton.getId()){
+            getMessagesFromServer();
+            System.out.println("update");
         }
     }
 
@@ -79,6 +87,8 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         }
         Collections.sort(messageList);
         messageAdapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(messageList.size()-1);
+
     }
     //used when sending msges is successfully transmitted and received...
     public void notifyAboutResponse(HashMap<String,String> response){
