@@ -1,11 +1,16 @@
 package polis.polisappen;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +26,8 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     private RecyclerView recyclerView;
     private MessageAdapter messageAdapter;
     private Contact chatBuddy;
+    private Button sendButton;
+    private EditText msgText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +43,9 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(messageAdapter);
+        sendButton = (Button) findViewById(R.id.send_msg_button);
+        sendButton.setOnClickListener(this);
+        msgText = (EditText) findViewById(R.id.send_msg_text);
         getMessagesFromServer();
     }
 
@@ -46,11 +56,21 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View view){
-
+        if(view.getId() == sendButton.getId()){
+            sendMessageToServer();
+        }
     }
 
+    private void sendMessageToServer(){
+        String msg = msgText.getText().toString();
+        String reciever_id = chatBuddy.getId();
+        RESTApiServer.sendChatMsg(this, this, msg,reciever_id);
+
+    }
+    //used when getting msges
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
+        messageList.clear();
         System.out.println("kom vi hit kanske?");
         for(String key: response.keySet()){
             HashMap<String,String> message = response.get(key);
@@ -59,5 +79,11 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         }
         Collections.sort(messageList);
         messageAdapter.notifyDataSetChanged();
+    }
+    //used when sending msges is successfully transmitted and received...
+    public void notifyAboutResponse(HashMap<String,String> response){
+        Toast.makeText(this,"Msg received by server",Toast.LENGTH_SHORT).show();
+        getMessagesFromServer();
+        msgText.setText("");
     }
 }

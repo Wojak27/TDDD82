@@ -13,5 +13,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingLeft="10dp"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/send_msg_text"
+            android:layout_width="0dp"
+            android:minHeight="70dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.7"
+            android:background="#F6FFF6"
+            android:hint="Skriv ditt meddelande..." >
+        </EditText>
+
+        <Button
+            android:id="@+id/send_msg_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="Skicka" >
+        </Button>
+    </LinearLayout>
 
 </RelativeLayout>

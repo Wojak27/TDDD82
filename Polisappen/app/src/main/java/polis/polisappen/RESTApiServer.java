@@ -31,6 +31,7 @@ public class RESTApiServer {
     private static final String SETCOORD_URL = "/setCoord";
     private static final String GET_CONTACTS_URL = "/users";
     private static final String GET_MESSAGES_URL = "/chatMessages";
+    private static final String SEND_CHAT_MSG_URL = "/sendMessage";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -49,6 +50,17 @@ public class RESTApiServer {
             }
         }catch (Exception e){
             //do nothing
+        }
+    }
+
+    public static void sendChatMsg(Context context, HttpResponseNotifyable listener,String msg, String receiver_id){
+        JSONObject params = new JSONObject();
+        try {
+            params.put("receiver_id",receiver_id);
+            params.put("message",msg);
+            post(context,SEND_CHAT_MSG_URL,params,RESTApiServer.getDefaultHandler(listener));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
