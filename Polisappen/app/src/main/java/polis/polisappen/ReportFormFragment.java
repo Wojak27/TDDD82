@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -43,12 +44,16 @@ public class ReportFormFragment extends Fragment {
         });
 
         final EditText editText = (EditText) getActivity().findViewById(R.id.reportText);
-
+        final CheckBox sensitiveBox = (CheckBox) this.getActivity().findViewById(R.id.sensitiveBox);
         Button commitButton = (Button) this.getActivity().findViewById(R.id.commitButton);
+
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"my marker",editText.getText().toString());
+                String type = "1"; //not sensitive
+                if(sensitiveBox.isChecked())
+                    type = "2"; //sensitive
+                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"my marker",editText.getText().toString(), type);
                 Log.v("edittext", editText.getText().toString());
                 Log.v("edittext", "text");
                 getActivity().getFragmentManager().beginTransaction().remove(myFragment).commit();

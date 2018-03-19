@@ -233,7 +233,6 @@ public class RESTApiServer {
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
-
             }
 
             @Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){

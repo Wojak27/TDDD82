@@ -72,7 +72,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+               .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         setupLocationCallback();
         createLocationRequest();
@@ -319,6 +319,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             //            Location location;
             List<Location> locations = new ArrayList<>(); // hashset to store all locations from the database
             @Override
+
             protected Integer doInBackground(Void... params) {
 //                location = db.userDao().loadById(1); //using query I created in UserDau.java
                 locations = db.userDao().getAll();
@@ -335,6 +336,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                 }
             }
         }.execute();
+
     }
 
     private HashMap<String, String> createMapWithCoordinates(double latitude, double longitude, String type, String reportText){
@@ -347,10 +349,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText){
+    private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText, String type){
         Log.w("latitude", Double.toString(latLng.latitude));
         Log.w("longitude", Double.toString(latLng.longitude));
-        RESTApiServer.setCoord(this,this,createMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
+        RESTApiServer.setCoord(this,this,createMapWithCoordinates(latLng.latitude,latLng.longitude,type,reportText));
     }
     private void addMarkerToLocalDB(LatLng latLng, String title, String reportText){
         mMap.addMarker(new MarkerOptions().position(latLng).title(title));
@@ -378,9 +380,9 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             }
         }.execute();
     }
-    public void addMarkerToDatabase(LatLng latLng, String title, String reportText){ // uid for debugging
+    public void addMarkerToDatabase(LatLng latLng, String title, String reportText, String type){ // uid for debugging
         addMarkerToLocalDB(latLng,title,reportText);
-        addMarkerToOnlineDB(latLng,title,reportText);
+        addMarkerToOnlineDB(latLng,title,reportText, type);
 
     }
 
@@ -389,6 +391,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 //        final double lat = marker.getPosition().latitude;
 //        final double lon = marker.getPosition().longitude;
         new AsyncTask<Void, Void, Integer>() {
+
             @Override
             protected Integer doInBackground(Void... voids) {
                 db.userDao().deleteAll();
