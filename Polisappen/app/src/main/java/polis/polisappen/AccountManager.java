@@ -123,6 +123,11 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
     }
 
+    @Override
+    public void notifyAboutFailedRequest() {
+        //do nothing xD
+    }
+
 
     private boolean responseOK(HashMap<String,String> response){
         //determine weither the response was OK, and if so return true or else return false.

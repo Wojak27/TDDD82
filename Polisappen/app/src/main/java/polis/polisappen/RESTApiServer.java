@@ -265,7 +265,11 @@ public class RESTApiServer {
 
             @Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
                 // Called if statuscode was 40x
-                listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
+                if(errorResponse != null){
+                    listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
+                    return;
+                }
+                listener.notifyAboutFailedRequest();
             }
             /*@Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse){
 

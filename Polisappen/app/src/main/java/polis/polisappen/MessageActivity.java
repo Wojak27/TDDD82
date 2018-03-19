@@ -59,6 +59,11 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     }
 
     @Override
+    public void notifyAboutFailedRequest(){
+        Toast.makeText(this,"Meddelandet skickades inte! Prova igen för ngt gick fel...",Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void onClick(View view){
         if(view.getId() == sendButton.getId()){
             sendMessageToServer();
