@@ -70,11 +70,8 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             Intent intent = new Intent(this, VideoAndVoiceChat.class);
             startActivity(intent);
         }
-        else if(view.getId() == R.id.startQoS){
-            qoSIntent = new Intent(this, QoSManager.class);
-            startService(qoSIntent);
-        }
     }
+    //tagen fran stack overflow, svart att skriva egen.............
     private boolean isServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {

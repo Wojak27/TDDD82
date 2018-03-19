@@ -417,12 +417,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     @Override
     protected void onStart() {
-        registerReceiver(mBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         super.onStart();
     }
     @Override
     protected void onStop() {
-        unregisterReceiver(mBroadcastReciever);
         super.onStop();
     }
 

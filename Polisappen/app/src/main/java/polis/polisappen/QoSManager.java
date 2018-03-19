@@ -5,11 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 import android.os.Process;
 import android.widget.Toast;
 
@@ -18,30 +15,11 @@ import android.widget.Toast;
  */
 
 public class QoSManager extends Service {
-    private Looper mServiceLooper;
-    private ServiceHandler mServiceHandler;
     private BroadcastReceiver mBroadcastReciever;
+    private final int batteryRestrictionLimit = 20;
+    private boolean isBatteryLow = false;
 
-    // Handler that receives messages from the thread
-    private final class ServiceHandler extends Handler {
-        public ServiceHandler(Looper looper) {
-            super(looper);
-        }
-        @Override
-        public void handleMessage(Message msg) {
-            // Normally we would do some work here, like download a file.
-            // For our sample, we just sleep for 5 seconds.
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                // Restore interrupt status.
-                Thread.currentThread().interrupt();
-            }
-            // Stop the service using the startId, so that we don't stop
-            // the service in the middle of handling another job
-            stopSelf(msg.arg1);
-        }
-    }
+
 
     @Override
     public void onCreate() {
@@ -54,8 +32,6 @@ public class QoSManager extends Service {
         thread.start();
 
         // Get the HandlerThread's Looper and use it for our Handler
-        mServiceLooper = thread.getLooper();
-        mServiceHandler = new ServiceHandler(mServiceLooper);
         Toast.makeText(getApplicationContext(),"Service Started", Toast.LENGTH_LONG);
 
         Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
@@ -86,10 +62,12 @@ public class QoSManager extends Service {
             int level = intent.getIntExtra(BATTERY_LEVEL, 0);
 //            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
 
-            if(level < 21){
+            if(level <= batteryRestrictionLimit && !isBatteryLow){
                 Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
-            }else if(level > 20){
+                isBatteryLow = true;
+            }else if(level > batteryRestrictionLimit && isBatteryLow){
                 Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
+                isBatteryLow = false;
             }
         }
 
