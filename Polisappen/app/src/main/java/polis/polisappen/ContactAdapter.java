@@ -29,6 +29,12 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         public TextView optionsButton;
         public ViewHolder(View contactView) {
             super(contactView);
+            contactView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
             name = (TextView) contactView.findViewById(R.id.name);
             id = (TextView) contactView.findViewById(R.id.id);
             optionsButton = (TextView) contactView.findViewById(R.id.optionsbutton);
@@ -36,6 +42,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
 
     }
+
+
 
     public ContactAdapter(Context context, List<Contact> contactList) {
         this.contactList = contactList;
@@ -71,10 +79,15 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                                 Intent intent =  new Intent(context,VideoAndVoiceChat.class);
                                 intent.putExtras(bundle);
                                 context.startActivity(intent);
-
                                 break;
                             case R.id.message:
                                 System.out.println("klickade skiten ur message");
+                                Bundle bundle1 = new Bundle();
+                                bundle1.putString("buddy_name",contact.getName());
+                                bundle1.putString("buddy_id",contact.getId());
+                                Intent intent1 =  new Intent(context,MessageActivity.class);
+                                intent1.putExtras(bundle1);
+                                context.startActivity(intent1);
                                 break;
                         }
                         return false;

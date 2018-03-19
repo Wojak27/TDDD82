@@ -43,6 +43,9 @@
         <activity android:name=".ContactsActivity">
             android:screenOrientation="portrait"
         </activity>
+        <activity android:name=".MessageActivity">
+            android:screenOrientation="portrait"
+        </activity>
         <activity android:name=".IncomingVoice">
             android:screenOrientation="portrait"
         </activity>

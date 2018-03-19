@@ -7,7 +7,7 @@
     <string name="logInButton">Log in</string>
     <string name="authentication">Authentication</string>
     <string name="passwordEditText">Password</string>
-    <string name="contactsButton">Contacts</string>
+    <string name="contactsAndMessagesButton">Contacts and Messages</string>
     <string name="mapsButton">Maps</string>
     <string name="callButton">Call</string>
     <string name="newsfeedButton">Newsfeed</string>

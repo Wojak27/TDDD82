@@ -40,7 +40,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="41dp"
         android:minWidth="200dp"
-        android:text="@string/contactsButton" />
+        android:text="@string/contactsAndMessagesButton" />
 
     <Button
         android:id="@+id/searchButton"

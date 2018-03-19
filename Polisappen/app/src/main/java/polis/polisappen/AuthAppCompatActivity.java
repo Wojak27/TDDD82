@@ -46,6 +46,16 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         }
     }
 
+    protected String getUsername(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return preferences.getString(AccountManager.USER_AUTH_REAL_NAME,null);
+    }
+
+    protected String getUserID(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return preferences.getString(AccountManager.USER_AUTH_NAME,null);
+    }
+
     protected void invalidateAuth(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();

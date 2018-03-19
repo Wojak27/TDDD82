@@ -30,6 +30,7 @@ public class RESTApiServer {
     private static final String COORD_URL = "/coord";
     private static final String SETCOORD_URL = "/setCoord";
     private static final String GET_CONTACTS_URL = "/users";
+    private static final String GET_MESSAGES_URL = "/chatMessages";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -69,7 +70,7 @@ public class RESTApiServer {
     }
 
     public static void getCoord(Context context, HttpResponseNotifyable listener){
-        JSONObject params = getAuthParams(context);
+        JSONObject params = getAuthParams(context); //alla dessa calls är onödiga tror robin
         get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener));
     }
 
@@ -77,7 +78,15 @@ public class RESTApiServer {
         JSONObject params = getAuthParams(context);
         get(context,GET_CONTACTS_URL,params, RESTApiServer.getDefaultHandler(listener));
     }
-
+    public static void getMessages(Context context, HttpResponseNotifyable listener, Contact chatbuddy) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put("chat_partner_id",chatbuddy.getId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        get(context, GET_MESSAGES_URL, params, RESTApiServer.getDefaultHandler(listener));
+    }
 
 
     public static void setCoord(Context context, HttpResponseNotifyable listener, HashMap<String, String> coordData){
