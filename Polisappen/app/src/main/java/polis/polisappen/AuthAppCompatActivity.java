@@ -104,4 +104,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
     }
+    public boolean isAuthenticated(){
+        return validAuth();
+    }
 }
