@@ -29,6 +29,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     private Button sendButton;
     private EditText msgText;
     private Button updateButton;
+    private boolean sendOrUpdate = false; //true = send, update=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +53,20 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         getMessagesFromServer();
     }
 
+    private void setUpdating(){
+        sendOrUpdate = false;
+    }
+    private void setSending(){
+        sendOrUpdate = true;
+    }
+    private boolean wasSending(){
+        return sendOrUpdate;
+    }
+
     private void getMessagesFromServer()
     {
         RESTApiServer.getMessages(this,this,chatBuddy);
+        setUpdating();
 
     }
 
@@ -72,6 +84,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     private void sendMessageToServer(){
         String msg = msgText.getText().toString();
         String reciever_id = chatBuddy.getId();
+        setSending();
         RESTApiServer.sendChatMsg(this, this, msg,reciever_id);
 
     }
@@ -93,7 +106,9 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     //used when sending msges is successfully transmitted and received...
     public void notifyAboutResponse(HashMap<String,String> response){
         Toast.makeText(this,"Msg received by server",Toast.LENGTH_SHORT).show();
-        getMessagesFromServer();
+        if(wasSending()) {
+            getMessagesFromServer();
+        }
         msgText.setText("");
     }
 }
