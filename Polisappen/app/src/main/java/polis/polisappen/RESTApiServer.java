@@ -156,7 +156,6 @@ public class RESTApiServer {
         return new String(hexChars);
     }
 
-
     private static String getJSONToString(JSONObject object){
         String finalString = "";
         Iterator<String> keys = object.keys();
@@ -185,7 +184,6 @@ public class RESTApiServer {
         catch (Exception e){
             return null;
         }
-
     }
 
     public static void getSecret(Context context, HttpResponseNotifyable listener){
@@ -304,4 +302,3 @@ public class RESTApiServer {
         return result;
     }
 }
-
