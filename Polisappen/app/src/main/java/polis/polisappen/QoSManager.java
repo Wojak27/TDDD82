@@ -129,6 +129,7 @@ public class QoSManager extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+        
         // We don't provide binding, so return null
         return null;
     }
