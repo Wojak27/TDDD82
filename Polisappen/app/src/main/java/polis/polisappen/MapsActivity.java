@@ -15,6 +15,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -51,6 +52,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private ApplicationDatabase db;
     private LocationCallback mLocationCallback;
     private LocationRequest mLocationRequest;
+    private BroadcastReceiver mMapUpdateBroadcastReciever;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +74,18 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
         createLocationRequest();
         setupLocationCallback();
+        mMapUpdateBroadcastReciever = new MapUpdateBroadcastReciever();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMapUpdateBroadcastReciever,new IntentFilter(QoSManager.UPDATE_MAP));
     }
 
+    private class MapUpdateBroadcastReciever extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getApplicationContext(), "Time to update the map", Toast.LENGTH_SHORT).show();
+            updateMap();
+        }
+    }
     private void setupLocationCallback(){
         mLocationCallback = new LocationCallback() {
             @Override
