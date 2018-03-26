@@ -238,7 +238,12 @@ public class RESTApiServer {
 
             @Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
                 // Called if statuscode was 40x
-                listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
+                //throws exception if internet not available
+                try {
+                    listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
+                }catch (NullPointerException e){
+                    e.printStackTrace();
+                }
             }
             /*@Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse){
 

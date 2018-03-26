@@ -10,6 +10,12 @@
         android:id="@+id/dismissButton"
         android:text="Cancel" />
 
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sensitiveBox"
+        android:text="Sensisive Information" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

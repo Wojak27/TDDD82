@@ -1,5 +1,6 @@
 package polis.polisappen;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Process;
@@ -23,8 +25,9 @@ import polis.polisappen.LocalDatabase.ApplicationDatabase;
 public class QoSManager extends Service {
     private BroadcastReceiver mBroadcastReciever;
     private final int batteryRestrictionLimit = 20;
-    private BatteryState batteryStatus = BatteryState.BATTERY_OKAY;
+    private SystemState batteryStatus = SystemState.BATTERY_OKAY;
     private ApplicationDatabase db;
+    private String LOCAL_TAG = "QoSManager";
 
 
     private boolean isOnline(){
@@ -46,9 +49,9 @@ public class QoSManager extends Service {
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
         // Get the HandlerThread's Looper and use it for our Handler
-        Toast.makeText(getApplicationContext(),"Service Started", Toast.LENGTH_LONG);
+//        Toast.makeText(getApplicationContext(),"Service Started", Toast.LENGTH_LONG);
 
-        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
         mBroadcastReciever = new BatteryBroadcastReceiver();
         registerReceiver(mBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
@@ -82,17 +85,34 @@ public class QoSManager extends Service {
     }
 
     private void networkManager(){
-        if(!isOnline()){
-
+        if(!isOnline() && SystemState.NETWORK_AVAILABLE == SystemStatus.getNetworkStatus()){
+            Toast.makeText(this, "deletes data", Toast.LENGTH_LONG).show();
+            Log.w(LOCAL_TAG, "delete data");
+            SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
+            deleteSensitiveData();
+        }else if(isOnline() && SystemState.NETWORK_DOWN == SystemStatus.getNetworkStatus()){
+            Toast.makeText(this, "Network back online", Toast.LENGTH_LONG).show();
+            SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
         }
     }
+
+    @SuppressLint("StaticFieldLeak")
+    private void deleteSensitiveData(){
+        new AsyncTask<Void,Void,Void>(){
+            @Override
+            protected Void doInBackground(Void... voids) {
+                db.userDao().removeSensitiveData();
+                return null;
+            }
+        }.execute();
+    }
     private void localBatteryManager(Context context, int currentBatteryLevel){
-        if(currentBatteryLevel <= batteryRestrictionLimit && batteryStatus == BatteryStatus.getBatteryStatus()){
-            Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
-            BatteryStatus.setBatteryStatus(BatteryState.BATTERY_LOW);
-        }else if(currentBatteryLevel > batteryRestrictionLimit && batteryStatus == BatteryStatus.getBatteryStatus()){
-            Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
-            BatteryStatus.setBatteryStatus(BatteryState.BATTERY_OKAY);
+        if(currentBatteryLevel <= batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
+//            Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
+            SystemStatus.setBatteryStatus(SystemState.BATTERY_LOW);
+        }else if(currentBatteryLevel > batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
+//            Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
+            SystemStatus.setBatteryStatus(SystemState.BATTERY_OKAY);
         }
     }
 
@@ -104,7 +124,7 @@ public class QoSManager extends Service {
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
         unregisterReceiver(mBroadcastReciever);
     }
 }

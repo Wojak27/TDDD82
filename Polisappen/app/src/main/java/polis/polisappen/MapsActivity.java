@@ -60,10 +60,6 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         updateButton.setOnClickListener(this);
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
-//Debugging
-//        mBroadcastReciever = new BatteryBroadcastReceiver();
-///////////////
-
 
         deleteMarkerFromDatabase();
         //adding new marker to the database
@@ -105,7 +101,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
         System.out.println("databasen svarade 2");
         for(String key : response.keySet()){
-            addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"));
+            addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"), response.get(key).get("type"));
         }
     }
 
@@ -153,6 +149,9 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     protected void onResume() {
         super.onResume();
+        if(mMap != null) {
+            updateMap();
+        }
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
@@ -216,6 +215,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                         Log.w("success", "successful");
                         setMyCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
                         moveCameraToCurrentPostition(new LatLng(location.getLatitude(), location.getLongitude()));
+
                     }
                 });
         mRequestingLocationUpdates = true;
@@ -245,7 +245,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if(BatteryState.BATTERY_OKAY == BatteryStatus.getBatteryStatus()){
+        if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
             Toast.makeText(this, "BatteryStatus works", Toast.LENGTH_SHORT).show();
         }
         Log.w("mMap", mMap.toString());
@@ -349,18 +349,21 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText){
+    private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText, String type){
         Log.w("latitude", Double.toString(latLng.latitude));
         Log.w("longitude", Double.toString(latLng.longitude));
-        RESTApiServer.setCoord(this,this, createHashMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
+        RESTApiServer.setCoord(this,this, createHashMapWithCoordinates(latLng.latitude,latLng.longitude,type,reportText));
     }
     @SuppressLint("StaticFieldLeak")
-    private void addMarkerToLocalDB(LatLng latLng, String title, String reportText){
+    private void addMarkerToLocalDB(LatLng latLng, String title, String reportText, String type){
         mMap.addMarker(new MarkerOptions().position(latLng).title(title));
         final Location location = new Location();
         location.latitude = latLng.latitude;
         location.longitude = latLng.longitude;
         location.title = title;
+        if(Integer.parseInt(type) == 2){
+            location.type = 2;
+        }
         Log.v("text to databse: ", reportText);
         location.reportText = reportText;
         //put the location we've created previously into the local database
@@ -381,9 +384,9 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             }
         }.execute();
     }
-    public void addMarkerToDatabase(LatLng latLng, String title, String reportText){ // uid for debugging
-        addMarkerToLocalDB(latLng,title,reportText);
-        addMarkerToOnlineDB(latLng,title,reportText);
+    public void addMarkerToDatabase(LatLng latLng, String title, String reportText, String type){ // uid for debugging
+        addMarkerToLocalDB(latLng,title,reportText, type);
+        addMarkerToOnlineDB(latLng,title,reportText, type);
 
     }
 
@@ -391,6 +394,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private void deleteMarkerFromDatabase(){ // location for debugging, needs fixing
 //        final double lat = marker.getPosition().latitude;
 //        final double lon = marker.getPosition().longitude;
+        if(SystemState.NETWORK_DOWN == SystemStatus.getNetworkStatus()) {
+            Toast.makeText(this,"Maps Network down, not deleting all info", Toast.LENGTH_LONG).show();
+            return;
+        }
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
@@ -428,6 +435,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onClick(View v) {
+        updateMap();
+    }
+
+    private void updateMap(){
         deleteMarkerFromDatabase();
         RESTApiServer.getCoord(this,this);
         setMarkersFromDatabaseOnMap(mMap);
