@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -331,12 +332,21 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             protected void onPostExecute(Integer numOfLocations) {
                 if(numOfLocations > 0){ // loops through all of the locations in the database (if locations.size > 0)
                     for(Location location : locations){
-                        LatLng latLng = new LatLng(location.latitude,location.longitude);
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
+                        String type = Integer.toString(location.type);
+                        addMarkerToMap(location, type);
+
                     }
                 }
             }
         }.execute();
+    }
+    private void addMarkerToMap(Location location, String type){
+        LatLng latLng = new LatLng(location.latitude,location.longitude);
+        if(type.equals("1"))
+            mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
+        else
+            mMap.addMarker(new MarkerOptions().position(latLng).title(location.title)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+
     }
 
     private HashMap<String, String> createHashMapWithCoordinates(double latitude, double longitude, String type, String reportText){
@@ -356,7 +366,6 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     }
     @SuppressLint("StaticFieldLeak")
     private void addMarkerToLocalDB(LatLng latLng, String title, String reportText, String type){
-        mMap.addMarker(new MarkerOptions().position(latLng).title(title));
         final Location location = new Location();
         location.latitude = latLng.latitude;
         location.longitude = latLng.longitude;
@@ -366,12 +375,14 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         }
         Log.v("text to databse: ", reportText);
         location.reportText = reportText;
+        addMarkerToMap(location, type);
         //put the location we've created previously into the local database
         //everything needs to be done on a separate thread due to android constraints
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                db.userDao().insert(location);  //using query I created in UserDau.java
+                if(db.userDao().selectSpecificMarker(location.latitude, location.longitude) == null) //safety check for uniqueness
+                    db.userDao().insert(location);  //using query I created in UserDau.java
 
                 return db.userDao().getAll().size();
             }
