@@ -23,6 +23,10 @@ public interface UserDao {
     @Query("SELECT * FROM Location WHERE latitude = :lat AND longitude = :lon")
     Location selectSpecificMarker(double lat, double lon);
 
+    //call this to remove sensitive markers
+    @Query("DELETE FROM Location WHERE type = 2")
+    void removeSensitiveData();
+
     @Insert
     void insertAll(Location... locations);
 

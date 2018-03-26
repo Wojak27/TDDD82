@@ -41,7 +41,9 @@ import java.util.List;
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 import polis.polisappen.LocalDatabase.Location;
 
-public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable, View.OnClickListener {
+public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback,
+        GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener,
+        HttpResponseNotifyable, View.OnClickListener {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -106,7 +108,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
         System.out.println("databasen svarade 2");
         for(String key : response.keySet()){
-            addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"));
+            addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"), response.get(key).get("type"));
         }
     }
 
@@ -354,7 +356,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         Log.w("longitude", Double.toString(latLng.longitude));
         RESTApiServer.setCoord(this,this,createMapWithCoordinates(latLng.latitude,latLng.longitude,type,reportText));
     }
-    private void addMarkerToLocalDB(LatLng latLng, String title, String reportText){
+    private void addMarkerToLocalDB(LatLng latLng, String title, String reportText, String type){
         mMap.addMarker(new MarkerOptions().position(latLng).title(title));
         final Location location = new Location();
         location.latitude = latLng.latitude;
@@ -362,6 +364,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         location.title = title;
         Log.v("text to databse: ", reportText);
         location.reportText = reportText;
+        if (type == "2")
+            location.type = 2;
         //put the location we've created previously into the local database
         //everything needs to be done on a separate thread due to android constraints
         new AsyncTask<Void, Void, Integer>() {
@@ -381,7 +385,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         }.execute();
     }
     public void addMarkerToDatabase(LatLng latLng, String title, String reportText, String type){ // uid for debugging
-        addMarkerToLocalDB(latLng,title,reportText);
+        addMarkerToLocalDB(latLng,title,reportText, type);
         addMarkerToOnlineDB(latLng,title,reportText, type);
 
     }
