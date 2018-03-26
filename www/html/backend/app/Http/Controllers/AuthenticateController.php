@@ -27,7 +27,8 @@ class AuthenticateController extends Controller
 
         // all good so return the token
 	$USER_AUTH_STATUS = "USER_AUTHENTICATED";
-        return response()->json(compact('token', 'USER_AUTH_STATUS'));
+	$user_name = strtoupper(JWTAuth::toUser($token)->name);
+        return response()->json(compact('token', 'USER_AUTH_STATUS','user_name'));
     }
 
     public function show()

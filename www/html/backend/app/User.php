@@ -24,7 +24,13 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password'
+        'password','api_token'
     ];
 
+     public function sentMessages(){
+	return $this->hasMany('App\Message','sender_id');
+     }
+     public function receivedMessages(){
+	return $this->hasMany('App\Message','receiver_id');
+     }
 }

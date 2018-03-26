@@ -12,8 +12,12 @@ class MapsController extends Controller
 {
      public function getCoord()
     {
-        return Coordinate::all();
-
+	if(JWTAuth::getToken()){
+	return Coordinate::all();
+	}
+	else{
+	return Coordinate::where('type', '=', 1)->get();
+	}
     }
 
     public function setCoord(Request $request){
@@ -29,17 +33,20 @@ class MapsController extends Controller
 	$all_data_string .= $request->get('report_text');
 	$hashValue = strtoupper(hash_hmac("sha256",$all_data_string,$secret_key));
 	if(!($checksum===$hashValue)){
+		\Log::error('Korrupt/manipulerad data, inget sattes in i DB');
 		return response()->json([
 		'message'=>'Manipulerad/Korrupt data!'
 		]);
 	}
 	$testing = $request->get('test');
 	if($testing === 'true'){
+	\Log::info('Skulle ha satt in i DB, men testing mode is on');
 	return response()->json([
 	'message'=> 'Skulle ha satt in i DB, men testing mode on, avbryter...'
 	]);
 	}
     // grab coordinates from the request
+	\Log::info('Koordinat lades till');
         return Coordinate::create([
        'latitude' => $request->get('latitude'),
        'longitude' => $request->get('longitude'),
