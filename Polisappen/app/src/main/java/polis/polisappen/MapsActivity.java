@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -57,6 +58,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         RESTApiServer.getCoord(this,this);
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
         updateButton.setOnClickListener(this);
+        db = Room.databaseBuilder(getApplicationContext(),
+                ApplicationDatabase.class, "database-name").build();
 //Debugging
 //        mBroadcastReciever = new BatteryBroadcastReceiver();
 ///////////////
