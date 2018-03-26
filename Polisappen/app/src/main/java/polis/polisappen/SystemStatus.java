@@ -13,7 +13,6 @@ public class SystemStatus {
     public static void setBatteryStatus(SystemState currentBatteryStatus){
         batteryState = currentBatteryStatus;
     }
-
     public static SystemState getBatteryStatus(){
         return batteryState;
     }

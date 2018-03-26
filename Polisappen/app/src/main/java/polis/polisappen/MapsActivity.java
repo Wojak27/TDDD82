@@ -6,7 +6,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -48,8 +51,6 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private ApplicationDatabase db;
     private LocationCallback mLocationCallback;
     private LocationRequest mLocationRequest;
-    private BroadcastReceiver mBroadcastReciever;
-    private boolean isBatteryLow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +70,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        setupLocationCallback();
         createLocationRequest();
+        setupLocationCallback();
     }
 
     private void setupLocationCallback(){
@@ -86,6 +87,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                 }
 
             }
+
         };
     }
 
@@ -181,8 +183,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     public void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(100);
-        mLocationRequest.setFastestInterval(10);
+        mLocationRequest.setInterval(10);
+        mLocationRequest.setFastestInterval(1);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -443,5 +445,6 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         RESTApiServer.getCoord(this,this);
         setMarkersFromDatabaseOnMap(mMap);
     }
+
 }
 
