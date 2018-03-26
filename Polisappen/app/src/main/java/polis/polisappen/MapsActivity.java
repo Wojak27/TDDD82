@@ -4,18 +4,14 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -64,8 +60,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 //Debugging
 //        mBroadcastReciever = new BatteryBroadcastReceiver();
 ///////////////
-        db = Room.databaseBuilder(getApplicationContext(),
-                ApplicationDatabase.class, "database-name").build();
+
+
         deleteMarkerFromDatabase();
         //adding new marker to the database
 //        addMarkerToDatabase(new LatLng(2.1,3.2),"new Marker");
@@ -246,6 +242,9 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if(BatteryState.BATTERY_OKAY == BatteryStatus.getBatteryStatus()){
+            Toast.makeText(this, "BatteryStatus works", Toast.LENGTH_SHORT).show();
+        }
         Log.w("mMap", mMap.toString());
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
@@ -337,7 +336,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         }.execute();
     }
 
-    private HashMap<String, String> createMapWithCoordinates(double latitude, double longitude, String type, String reportText){
+    private HashMap<String, String> createHashMapWithCoordinates(double latitude, double longitude, String type, String reportText){
         HashMap<String,String> hashMapCoordinates = new HashMap<>();
         hashMapCoordinates.put("latitude", Double.toString(latitude));
         hashMapCoordinates.put("longitude", Double.toString(longitude));
@@ -350,7 +349,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText){
         Log.w("latitude", Double.toString(latLng.latitude));
         Log.w("longitude", Double.toString(latLng.longitude));
-        RESTApiServer.setCoord(this,this,createMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
+        RESTApiServer.setCoord(this,this, createHashMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
     }
     @SuppressLint("StaticFieldLeak")
     private void addMarkerToLocalDB(LatLng latLng, String title, String reportText){
@@ -430,25 +429,5 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         RESTApiServer.getCoord(this,this);
         setMarkersFromDatabaseOnMap(mMap);
     }
-
-//    // checks for changes in battery
-//    private class BatteryBroadcastReceiver extends BroadcastReceiver {
-//        private final static String BATTERY_LEVEL = "level";
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            int level = intent.getIntExtra(BATTERY_LEVEL, 0);
-//            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
-//
-//            if(level < 21 && !isBatteryLow){
-//                createLocationRequestBestForBattery();
-//                isBatteryLow = true;
-//            }else if(level > 20 && isBatteryLow){
-//                createLocationRequest();
-//                isBatteryLow = false;
-//            }
-//        }
-//
-//    }
-
 }
 

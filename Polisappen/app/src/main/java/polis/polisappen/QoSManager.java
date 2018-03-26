@@ -1,14 +1,20 @@
 package polis.polisappen;
 
 import android.app.Service;
+import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Process;
+import android.util.Log;
 import android.widget.Toast;
+
+import polis.polisappen.LocalDatabase.ApplicationDatabase;
 
 /**
  * Created by karolwojtulewicz on 2018-03-13.
@@ -17,9 +23,16 @@ import android.widget.Toast;
 public class QoSManager extends Service {
     private BroadcastReceiver mBroadcastReciever;
     private final int batteryRestrictionLimit = 20;
-    private boolean isBatteryLow = false;
+    private BatteryState batteryStatus = BatteryState.BATTERY_OKAY;
+    private ApplicationDatabase db;
 
 
+    private boolean isOnline(){
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
 
     @Override
     public void onCreate() {
@@ -30,7 +43,8 @@ public class QoSManager extends Service {
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 Process.THREAD_PRIORITY_FOREGROUND);
         thread.start();
-
+        db = Room.databaseBuilder(getApplicationContext(),
+                ApplicationDatabase.class, "database-name").build();
         // Get the HandlerThread's Looper and use it for our Handler
         Toast.makeText(getApplicationContext(),"Service Started", Toast.LENGTH_LONG);
 
@@ -61,16 +75,25 @@ public class QoSManager extends Service {
         public void onReceive(Context context, Intent intent) {
             int level = intent.getIntExtra(BATTERY_LEVEL, 0);
 //            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
-
-            if(level <= batteryRestrictionLimit && !isBatteryLow){
-                Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
-                isBatteryLow = true;
-            }else if(level > batteryRestrictionLimit && isBatteryLow){
-                Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
-                isBatteryLow = false;
-            }
+            networkManager();
+            localBatteryManager(context, level);
         }
 
+    }
+
+    private void networkManager(){
+        if(!isOnline()){
+
+        }
+    }
+    private void localBatteryManager(Context context, int currentBatteryLevel){
+        if(currentBatteryLevel <= batteryRestrictionLimit && batteryStatus == BatteryStatus.getBatteryStatus()){
+            Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
+            BatteryStatus.setBatteryStatus(BatteryState.BATTERY_LOW);
+        }else if(currentBatteryLevel > batteryRestrictionLimit && batteryStatus == BatteryStatus.getBatteryStatus()){
+            Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
+            BatteryStatus.setBatteryStatus(BatteryState.BATTERY_OKAY);
+        }
     }
 
     @Override
