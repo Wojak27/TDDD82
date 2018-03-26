@@ -23,7 +23,8 @@ import polis.polisappen.LocalDatabase.ApplicationDatabase;
  */
 
 public class QoSManager extends Service {
-    private BroadcastReceiver mBroadcastReciever;
+    private BroadcastReceiver mBatteryBroadcastReciever;
+    private BroadcastReceiver mNetworkBroadcastReciever;
     private final int batteryRestrictionLimit = 20;
     private SystemState batteryStatus = SystemState.BATTERY_OKAY;
     private ApplicationDatabase db;
@@ -46,21 +47,30 @@ public class QoSManager extends Service {
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 Process.THREAD_PRIORITY_FOREGROUND);
         thread.start();
+        if(isOnline()){
+            SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
+            Toast.makeText(this, "Network available changing state", Toast.LENGTH_LONG).show();
+        }else {
+            SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
+            Toast.makeText(this, "Network down changing state", Toast.LENGTH_LONG).show();
+        }
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
         // Get the HandlerThread's Looper and use it for our Handler
 //        Toast.makeText(getApplicationContext(),"Service Started", Toast.LENGTH_LONG);
 
 //        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-        mBroadcastReciever = new BatteryBroadcastReceiver();
-        registerReceiver(mBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        mBatteryBroadcastReciever = new BatteryBroadcastReceiver();
+        mNetworkBroadcastReciever = new NetworkBroadcastReceiver();
+        registerReceiver(mBatteryBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        registerReceiver(mNetworkBroadcastReciever, new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED));
     }
 
 //    @Override
 //    public int onStartCommand(Intent intent, int flags, int startId) {
 //        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-//        mBroadcastReciever = new BatteryBroadcastReceiver();
-//        registerReceiver(mBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+//        mBatteryBroadcastReciever = new BatteryBroadcastReceiver();
+//        registerReceiver(mBatteryBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 //        // For each start request, send a message to start a job and deliver the
 //        // start ID so we know which request we're stopping when we finish the job
 //        Message msg = mServiceHandler.obtainMessage();
@@ -78,21 +88,25 @@ public class QoSManager extends Service {
         public void onReceive(Context context, Intent intent) {
             int level = intent.getIntExtra(BATTERY_LEVEL, 0);
 //            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
-            networkManager();
             localBatteryManager(context, level);
         }
 
     }
 
-    private void networkManager(){
-        if(!isOnline() && SystemState.NETWORK_AVAILABLE == SystemStatus.getNetworkStatus()){
-            Toast.makeText(this, "deletes data", Toast.LENGTH_LONG).show();
-            Log.w(LOCAL_TAG, "delete data");
-            SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
-            deleteSensitiveData();
-        }else if(isOnline() && SystemState.NETWORK_DOWN == SystemStatus.getNetworkStatus()){
-            Toast.makeText(this, "Network back online", Toast.LENGTH_LONG).show();
-            SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
+    private class NetworkBroadcastReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if(isOnline()){
+                Toast.makeText(getApplicationContext(), "deletes data", Toast.LENGTH_LONG).show();
+                Log.w(LOCAL_TAG, "delete data");
+                SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
+                deleteSensitiveData();
+            }else if(!isOnline()){
+                Toast.makeText(getApplicationContext(), "Network back online", Toast.LENGTH_LONG).show();
+                SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
+            }
         }
     }
 
@@ -125,6 +139,6 @@ public class QoSManager extends Service {
     @Override
     public void onDestroy() {
 //        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
-        unregisterReceiver(mBroadcastReciever);
+        unregisterReceiver(mBatteryBroadcastReciever);
     }
 }
