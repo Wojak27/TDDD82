@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Process;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public class QoSManager extends Service {
     private SystemState batteryStatus = SystemState.BATTERY_OKAY;
     private ApplicationDatabase db;
     private String LOCAL_TAG = "QoSManager";
+    public static final String UPDATE_MAP= "polis.polisappen.UPDATE_MAP";
 
 
     private boolean isOnline(){
@@ -66,21 +68,6 @@ public class QoSManager extends Service {
         registerReceiver(mNetworkBroadcastReciever, new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED));
     }
 
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-//        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
-//        mBatteryBroadcastReciever = new BatteryBroadcastReceiver();
-//        registerReceiver(mBatteryBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-//        // For each start request, send a message to start a job and deliver the
-//        // start ID so we know which request we're stopping when we finish the job
-//        Message msg = mServiceHandler.obtainMessage();
-//        msg.arg1 = startId;
-//        mServiceHandler.sendMessage(msg);
-//
-//        // If we get killed, after returning from here, restart
-//        return START_NOT_STICKY;
-//    }
-
     // checks for changes in battery
     private class BatteryBroadcastReceiver extends BroadcastReceiver {
         private final static String BATTERY_LEVEL = "level";
@@ -97,7 +84,6 @@ public class QoSManager extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             if(isOnline()){
                 Toast.makeText(getApplicationContext(), "deletes data", Toast.LENGTH_LONG).show();
                 Log.w(LOCAL_TAG, "delete data");
@@ -105,11 +91,16 @@ public class QoSManager extends Service {
                 deleteSensitiveData();
             }else if(!isOnline()){
                 Toast.makeText(getApplicationContext(), "Network back online", Toast.LENGTH_LONG).show();
+                sendBroadcastToMapsActivity();
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
             }
         }
     }
 
+    private void sendBroadcastToMapsActivity(){
+        LocalBroadcastManager.getInstance(this)
+                .sendBroadcast(new Intent(UPDATE_MAP));
+    }
     @SuppressLint("StaticFieldLeak")
     private void deleteSensitiveData(){
         new AsyncTask<Void,Void,Void>(){
@@ -117,6 +108,12 @@ public class QoSManager extends Service {
             protected Void doInBackground(Void... voids) {
                 db.userDao().removeSensitiveData();
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                Toast.makeText(getApplicationContext(),"sendBroadcast", Toast.LENGTH_LONG).show();
+                sendBroadcastToMapsActivity();
             }
         }.execute();
     }
