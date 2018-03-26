@@ -1,5 +1,6 @@
 package polis.polisappen;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Process;
@@ -23,7 +25,7 @@ import polis.polisappen.LocalDatabase.ApplicationDatabase;
 public class QoSManager extends Service {
     private BroadcastReceiver mBroadcastReciever;
     private final int batteryRestrictionLimit = 20;
-    private BatteryState batteryStatus = BatteryState.BATTERY_OKAY;
+    private SystemState batteryStatus = SystemState.BATTERY_OKAY;
     private ApplicationDatabase db;
 
 
@@ -75,24 +77,40 @@ public class QoSManager extends Service {
         public void onReceive(Context context, Intent intent) {
             int level = intent.getIntExtra(BATTERY_LEVEL, 0);
 //            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
-            networkManager();
+            //networkManager();
             localBatteryManager(context, level);
         }
 
     }
+   /* @SuppressLint("StaticFieldLeak")
+    private void deleteSensitiveDataFromLocalDatabase(){
+        new AsyncTask<Void, Void, Void>(){
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+
+                db.userDao().removeSensitiveData();
+                SystemStatus.setSensitiveDataStatus(SystemState.DATA_DELETED);
+                return null;
+            }
+        }.execute();
+    }
 
     private void networkManager(){
         if(!isOnline()){
+            deleteSensitiveDataFromLocalDatabase();
+            Toast.makeText(this, "Raderar data", Toast.LENGTH_LONG).show();
+            Log.w("QoS Manager", "Raderar data");
 
         }
-    }
+    }*/
     private void localBatteryManager(Context context, int currentBatteryLevel){
-        if(currentBatteryLevel <= batteryRestrictionLimit && batteryStatus == BatteryStatus.getBatteryStatus()){
+        if(currentBatteryLevel <= batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
             Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
-            BatteryStatus.setBatteryStatus(BatteryState.BATTERY_LOW);
-        }else if(currentBatteryLevel > batteryRestrictionLimit && batteryStatus == BatteryStatus.getBatteryStatus()){
+            SystemStatus.setBatteryStatus(SystemState.BATTERY_LOW);
+        }else if(currentBatteryLevel > batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
             Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
-            BatteryStatus.setBatteryStatus(BatteryState.BATTERY_OKAY);
+            SystemStatus.setBatteryStatus(SystemState.BATTERY_OKAY);
         }
     }
 

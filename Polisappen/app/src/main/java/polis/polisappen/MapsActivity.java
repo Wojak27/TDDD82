@@ -67,7 +67,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 ///////////////
 
 
-        deleteMarkerFromDatabase();
+        //deleteMarkerFromDatabase();
         //adding new marker to the database
 //        addMarkerToDatabase(new LatLng(2.1,3.2),"new Marker");
 
@@ -98,6 +98,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     public void notifyAboutResponse(HashMap<String, String> response) {
         System.out.println("Server sa:" + "\n");
+        Toast.makeText(this, "response from server 1", Toast.LENGTH_LONG).show();
         for(String key: response.keySet()){
             System.out.println(key + " : " + response.get(key));
         }
@@ -106,6 +107,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
         System.out.println("databasen svarade 2");
+        Toast.makeText(this, "response from server 2", Toast.LENGTH_LONG).show();
         for(String key : response.keySet()){
             addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"), response.get(key).get("type"));
         }
@@ -247,8 +249,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if(BatteryState.BATTERY_OKAY == BatteryStatus.getBatteryStatus()){
-            Toast.makeText(this, "BatteryStatus works", Toast.LENGTH_SHORT).show();
+        if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
+            Toast.makeText(this, "SystemStatus works", Toast.LENGTH_SHORT).show();
         }
         Log.w("mMap", mMap.toString());
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
@@ -356,7 +358,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText, String type){
         Log.w("latitude", Double.toString(latLng.latitude));
         Log.w("longitude", Double.toString(latLng.longitude));
-        RESTApiServer.setCoord(this,this, createHashMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
+        RESTApiServer.setCoord(this,this, createHashMapWithCoordinates(latLng.latitude,latLng.longitude,type,reportText));
     }
     @SuppressLint("StaticFieldLeak")
     private void addMarkerToLocalDB(LatLng latLng, String title, String reportText, String type){
@@ -367,8 +369,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         location.title = title;
         Log.v("text to databse: ", reportText);
         location.reportText = reportText;
-        if (type == "2")
+        if (type.equals("2"))
             location.type = 2;
+        else
+            location.type = 1;
         //put the location we've created previously into the local database
         //everything needs to be done on a separate thread due to android constraints
         new AsyncTask<Void, Void, Integer>() {
@@ -435,7 +439,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     @Override
     public void onClick(View v) {
-        deleteMarkerFromDatabase();
+        //deleteMarkerFromDatabase();
         RESTApiServer.getCoord(this,this);
         setMarkersFromDatabaseOnMap(mMap);
     }
