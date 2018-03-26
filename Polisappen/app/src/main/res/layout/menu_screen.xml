@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/reportButton"
         android:layout_below="@+id/reportButton"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="15dp"
         android:minWidth="200dp"
         android:text="Search" />
 
@@ -58,7 +58,16 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/searchButton"
         android:layout_below="@+id/searchButton"
-        android:layout_marginTop="40dp"
         android:minWidth="200dp"
         android:text="@string/logOutButton" />
+
+    <Button
+        android:id="@+id/startQoS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/logOutButton"
+        android:layout_below="@+id/logOutButton"
+        android:layout_marginTop="11dp"
+        android:minWidth="200dp"
+        android:text="Start Service" />
 </RelativeLayout>
