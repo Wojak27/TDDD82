@@ -2,6 +2,7 @@ package polis.polisappen;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.*;
@@ -33,6 +34,7 @@ public class RESTApiServer {
     private static AsyncHttpResponseHandler lastUsedAsyncHttpResponseHandler;
     private static boolean lastUsedIsGetRequest;
     private static AsyncHttpClient client = new AsyncHttpClient();
+    private static final String TAG = "RESTApiServer";
 
     private static void get(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler, boolean sendToBackupServer) {
         StringEntity entity = new StringEntity(params.toString(), "UTF-8");
@@ -43,8 +45,10 @@ public class RESTApiServer {
 
     private static void resendRequestToBackupServer(){
         if (lastUsedIsGetRequest){
+            Log.w(TAG, "resending GET Request");
             get(lastUsedContext, lastUsedSubURL, lastUsedJSONObject, lastUsedAsyncHttpResponseHandler, true);
         }else {
+            Log.w(TAG, "resending POST Request");
             post(lastUsedContext, lastUsedSubURL, lastUsedJSONObject, lastUsedAsyncHttpResponseHandler, true);
         }
     }
@@ -228,8 +232,10 @@ public class RESTApiServer {
 
     private static String getAbsoluteUrl(String relativeUrl, boolean isBackupserver) {
         if(isBackupserver){
+            Log.w(TAG, "Using Backup Server");
             return API_URL_SERVER_2 + relativeUrl;
         }else {
+            Log.w(TAG, "Using Primary Server");
             return API_URL_SERVER_1 + relativeUrl;
         }
 
