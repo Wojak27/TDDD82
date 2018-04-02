@@ -126,6 +126,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                     // Update UI with location data
                     // ...
                     Log.w("Location", "update");
+                    if(mMap != null) {
+                        updateMap();
+                    }
+
 //                    laying markers for debugging
 //                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),location.getLongitude())));
                 }
@@ -231,16 +235,16 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     public void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10);
-        mLocationRequest.setFastestInterval(1);
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(10000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         batteryStatusText.setText("Battery OKAY");
     }
 
     public void createLocationRequestBestForBattery() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(300000);
+        mLocationRequest.setFastestInterval(300000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         batteryStatusText.setText("Battery LOW");
     }
@@ -385,7 +389,6 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                     for(Location location : locations){
                         String type = Integer.toString(location.type);
                         addMarkerToMap(location, type);
-
                     }
                 }
             }
