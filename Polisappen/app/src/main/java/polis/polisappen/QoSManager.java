@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 
@@ -31,9 +30,10 @@ public class QoSManager extends Service {
     private ApplicationDatabase db;
     private String LOCAL_TAG = "QoSManager";
     public static final String UPDATE_MAP= "polis.polisappen.UPDATE_MAP";
+    public static final String BATTERY_LOW= "polis.polisappen.BATTERY_LOW";
 
 
-    private boolean isOnline(){
+    private boolean isOffline(){
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -49,12 +49,12 @@ public class QoSManager extends Service {
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 Process.THREAD_PRIORITY_FOREGROUND);
         thread.start();
-        if(isOnline()){
+        if(isOffline()){
             SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
-            Toast.makeText(this, "Network available changing state", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "Network available changing state", Toast.LENGTH_LONG).show();
         }else {
             SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
-            Toast.makeText(this, "Network down changing state", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "Network down changing state", Toast.LENGTH_LONG).show();
         }
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
@@ -84,13 +84,13 @@ public class QoSManager extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(isOnline()){
-                Toast.makeText(getApplicationContext(), "deletes data", Toast.LENGTH_LONG).show();
+            if(isOffline()){
+//                Toast.makeText(getApplicationContext(), "deletes data", Toast.LENGTH_LONG).show();
                 Log.w(LOCAL_TAG, "delete data");
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
                 deleteSensitiveData();
-            }else if(!isOnline()){
-                Toast.makeText(getApplicationContext(), "Network back online", Toast.LENGTH_LONG).show();
+            }else if(!isOffline()){
+//                Toast.makeText(getApplicationContext(), "Network back online", Toast.LENGTH_LONG).show();
                 sendBroadcastToMapsActivity();
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
             }
@@ -98,8 +98,11 @@ public class QoSManager extends Service {
     }
 
     private void sendBroadcastToMapsActivity(){
-        LocalBroadcastManager.getInstance(this)
-                .sendBroadcast(new Intent(UPDATE_MAP));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(UPDATE_MAP));
+    }
+
+    private void sendBroadcastBatteryStatusChanged(){
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BATTERY_LOW));
     }
     @SuppressLint("StaticFieldLeak")
     private void deleteSensitiveData(){
@@ -112,7 +115,7 @@ public class QoSManager extends Service {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                Toast.makeText(getApplicationContext(),"sendBroadcast", Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(),"sendBroadcast", Toast.LENGTH_LONG).show();
                 sendBroadcastToMapsActivity();
             }
         }.execute();
@@ -121,9 +124,11 @@ public class QoSManager extends Service {
         if(currentBatteryLevel <= batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
 //            Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
             SystemStatus.setBatteryStatus(SystemState.BATTERY_LOW);
+            sendBroadcastBatteryStatusChanged();
         }else if(currentBatteryLevel > batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
 //            Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
             SystemStatus.setBatteryStatus(SystemState.BATTERY_OKAY);
+            sendBroadcastBatteryStatusChanged();
         }
     }
 

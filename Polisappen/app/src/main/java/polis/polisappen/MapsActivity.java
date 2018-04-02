@@ -53,6 +53,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private LocationCallback mLocationCallback;
     private LocationRequest mLocationRequest;
     private BroadcastReceiver mMapUpdateBroadcastReciever;
+    private BroadcastReceiver mBatteryLowBroadcastReciever;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,15 +76,30 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         createLocationRequest();
         setupLocationCallback();
         mMapUpdateBroadcastReciever = new MapUpdateBroadcastReciever();
+        mBatteryLowBroadcastReciever = new BatteryLowReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMapUpdateBroadcastReciever,new IntentFilter(QoSManager.UPDATE_MAP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowBroadcastReciever,new IntentFilter(QoSManager.BATTERY_LOW));
     }
 
     private class MapUpdateBroadcastReciever extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(getApplicationContext(), "Time to update the map", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), "Time to update the map", Toast.LENGTH_SHORT).show();
             updateMap();
+        }
+    }
+
+    private class BatteryLowReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+//            Toast.makeText(getApplicationContext(), "Time to update the map", Toast.LENGTH_SHORT).show();
+            if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
+                createLocationRequest();
+            }else if(SystemState.BATTERY_LOW == SystemStatus.getBatteryStatus()){
+                createLocationRequestBestForBattery();
+            }
         }
     }
     private void setupLocationCallback(){
@@ -169,6 +185,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMapUpdateBroadcastReciever,new IntentFilter(QoSManager.UPDATE_MAP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowBroadcastReciever,new IntentFilter(QoSManager.BATTERY_LOW));
 
     }
 
@@ -186,6 +204,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     protected void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBatteryLowBroadcastReciever);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMapUpdateBroadcastReciever);
 //        stopLocationUpdates();
     }
 
@@ -260,7 +280,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
-            Toast.makeText(this, "BatteryStatus works", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "BatteryStatus works", Toast.LENGTH_SHORT).show();
         }
         Log.w("mMap", mMap.toString());
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
@@ -409,7 +429,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 //        final double lat = marker.getPosition().latitude;
 //        final double lon = marker.getPosition().longitude;
         if(SystemState.NETWORK_DOWN == SystemStatus.getNetworkStatus()) {
-            Toast.makeText(this,"Maps Network down, not deleting all info", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this,"Maps Network down, not deleting all info", Toast.LENGTH_LONG).show();
             return;
         }
         new AsyncTask<Void, Void, Integer>() {
