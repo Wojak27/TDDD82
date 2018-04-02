@@ -58,6 +58,9 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private BroadcastReceiver mMapUpdateBroadcastReciever;
     private BroadcastReceiver mBatteryLowBroadcastReciever;
     private TextView batteryStatusText;
+    private final int NONSENSITIVE_DATA = 1;
+    private final int SENSITIVE_DATA = 2;
+    private final int POLIS = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -390,7 +393,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     }
     private void addMarkerToMap(Location location, String type){
         LatLng latLng = new LatLng(location.latitude,location.longitude);
-        if(type.equals("1"))
+        if(type.equals(Integer.toString(NONSENSITIVE_DATA)))
             mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
         else
             mMap.addMarker(new MarkerOptions().position(latLng).title(location.title)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
@@ -418,8 +421,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         location.latitude = latLng.latitude;
         location.longitude = latLng.longitude;
         location.title = title;
-        if(Integer.parseInt(type) == 2){
-            location.type = 2;
+        if(Integer.parseInt(type) == SENSITIVE_DATA){
+            location.type = SENSITIVE_DATA;
         }
         Log.v("text to databse: ", reportText);
         location.reportText = reportText;
