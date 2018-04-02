@@ -61,32 +61,30 @@
         android:minWidth="200dp"
         android:text="@string/logOutButton" />
 
-    <Button
-        android:id="@+id/startQoS"
+    <TextView
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/logOutButton"
         android:layout_below="@+id/logOutButton"
-        android:layout_marginTop="11dp"
-        android:minWidth="200dp"
-        android:text="Start Service" />
+        android:text="Byt låg batteri gråns:" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/batteryLimitEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
+        android:layout_below="@+id/textView3"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
         android:ems="10"
-        android:inputType="number"
-        android:text="80" />
+        android:inputType="number" />
 
-    <TextView
-        android:id="@+id/textView2"
+    <Button
+        android:id="@+id/changeLowBatteryLevelLimitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/contactsButton"
-        android:text="Battery är låg för:" />
+        android:layout_alignTop="@+id/batteryLimitEditText"
+        android:layout_toEndOf="@+id/batteryLimitEditText"
+        android:text="Byt" />
+
+
 </RelativeLayout>

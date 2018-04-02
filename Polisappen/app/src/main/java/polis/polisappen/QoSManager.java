@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 
@@ -25,7 +26,9 @@ import polis.polisappen.LocalDatabase.ApplicationDatabase;
 public class QoSManager extends Service {
     private BroadcastReceiver mBatteryBroadcastReciever;
     private BroadcastReceiver mNetworkBroadcastReciever;
-    private final int batteryRestrictionLimit = 80;
+    private BroadcastReceiver mBatteryLowLevelChangeBroadcastReceiver;
+    private int batteryRestrictionLimit = 80;
+    private int currentBatteryLevel = 50;
     private SystemState batteryStatus = SystemState.BATTERY_OKAY;
     private ApplicationDatabase db;
     private String LOCAL_TAG = "QoSManager";
@@ -78,8 +81,10 @@ public class QoSManager extends Service {
     private void registerBroadcastRecievers(){
         mBatteryBroadcastReciever = new BatteryBroadcastReceiver();
         mNetworkBroadcastReciever = new NetworkBroadcastReceiver();
+        mBatteryLowLevelChangeBroadcastReceiver = new BatteryLowLevelChangeBroadcastReceiver();
         registerReceiver(mBatteryBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerReceiver(mNetworkBroadcastReciever, new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowLevelChangeBroadcastReceiver,new IntentFilter(MainActivity.BATTERY_LOW_LEVEL_CHANGED));
     }
 
     /**
@@ -89,8 +94,8 @@ public class QoSManager extends Service {
         private final static String BATTERY_LEVEL = "level";
         @Override
         public void onReceive(Context context, Intent intent) {
-            int level = intent.getIntExtra(BATTERY_LEVEL, 0);
-            localBatteryManager(context, level);
+            currentBatteryLevel = intent.getIntExtra(BATTERY_LEVEL, 0);
+            localBatteryManager(currentBatteryLevel);
         }
 
     }
@@ -110,6 +115,19 @@ public class QoSManager extends Service {
                 sendBroadcastToMapsActivity();
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
             }
+        }
+    }
+
+    /**
+     * Just for debugging
+     * The method enables to change the limit for low battery
+     */
+    private class BatteryLowLevelChangeBroadcastReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            batteryRestrictionLimit = intent.getIntExtra("LowBatteryIndicator", 80);
+            localBatteryManager(currentBatteryLevel);
+            Toast.makeText(getApplicationContext(),"BatteryLimitChanged "+ batteryRestrictionLimit, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -142,12 +160,12 @@ public class QoSManager extends Service {
             }
         }.execute();
     }
-    private void localBatteryManager(Context context, int currentBatteryLevel){
-        if(currentBatteryLevel <= batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
+    private void localBatteryManager(int currentBatteryLevel){
+        if(currentBatteryLevel <= batteryRestrictionLimit && SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
 //            Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
             SystemStatus.setBatteryStatus(SystemState.BATTERY_LOW);
             sendBroadcastBatteryStatusChanged();
-        }else if(currentBatteryLevel > batteryRestrictionLimit && batteryStatus == SystemStatus.getBatteryStatus()){
+        }else if(currentBatteryLevel > batteryRestrictionLimit && SystemState.BATTERY_LOW == SystemStatus.getBatteryStatus()){
 //            Toast.makeText(context,"battery over 20 procent",Toast.LENGTH_SHORT).show();
             SystemStatus.setBatteryStatus(SystemState.BATTERY_OKAY);
             sendBroadcastBatteryStatusChanged();
