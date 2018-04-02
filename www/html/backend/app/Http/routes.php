@@ -23,6 +23,8 @@ Route::group(['prefix' => '', 'middleware' => 'jwt.auth'], function(){
     Route::get('/receivedMessages','MessageController@getAllReceivedMessages');
     Route::get('/chatMessages','MessageController@getChatMessages');
     Route::post('/sendMessage','MessageController@sendMessage');
+    Route::post('/sendMessageDefaultOnly','MessageController@sendMessageDefaultOnly');
+    Route::post('/sendMessageBackupOnly','MessageController@sendMessageBackupOnly');
     Route::get('/users', 'UserController@users');
 });
 

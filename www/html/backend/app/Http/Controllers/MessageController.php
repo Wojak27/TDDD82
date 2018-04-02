@@ -8,9 +8,22 @@ use Illuminate\Http\Request;
 use DB;
 use App\User;
 use App\Message;
+use App\BackupMessage;
+use Artisan;
 
 class MessageController extends Controller
 {
+     public function testBackup(){
+	//$this->incrementDefaultTime();
+	$this->incrementBackupTime();
+	//$this->dumpBackupDB();
+	//$this->dumpDefaultDB();
+	//$this->restoreDefaultDB();
+	//$this->switchToBackupDB();
+	//$this->loadDBBackup();
+	//return Artisan::output();
+     }
+
      public function getAllSentMessages(Request $request){
 	$token = JWTAuth::getToken();
 	$user_id = strtoupper(JWTAuth::toUser($token)->id);
@@ -36,12 +49,40 @@ class MessageController extends Controller
 	
 
      public function sendMessage(Request $request){
+	$this->restoreDatabaseConstiency();
 	$token = JWTAuth::getToken();
 	$user_id = strtoupper(JWTAuth::toUser($token)->id);
-	return Message::create([
+	$message = Message::create([
        'sender_id' => $user_id,
        'receiver_id' => $request->get('receiver_id'),
        'message' => $request->get('message')
     	]);
+	$this->incrementDefaultTime();
+	$this->dumpDefaultDB();
+	$this->restoreBackupDB();
+    }
+
+    public function sendMessageDefaultOnly(Request $request){
+	$token = JWTAuth::getToken();
+	$user_id = strtoupper(JWTAuth::toUser($token)->id);
+	$message = Message::create([
+       'sender_id' => $user_id,
+       'receiver_id' => $request->get('receiver_id'),
+       'message' => $request->get('message')
+    	]);
+	$this->incrementDefaultTime();
+	$this->dumpDefaultDB();
+    }
+
+    public function sendMessageBackupOnly(Request $request){
+	$token = JWTAuth::getToken();
+	$user_id = strtoupper(JWTAuth::toUser($token)->id);
+	BackupMessage::create([
+	'sender_id' => $user_id,
+       'receiver_id' => $request->get('receiver_id'),
+       'message' => $request->get('message')
+    	]);
+	$this->incrementBackupTime();
+	$this->dumpBackupDB();
     }
 }

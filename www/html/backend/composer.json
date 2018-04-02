@@ -6,7 +6,9 @@
     "type": "project",
     "require": {
         "php": ">=5.5.9",
-        "laravel/framework": "5.2.*"
+        "laravel/framework": "5.2.*",
+	"tymon/jwt-auth": "0.5.*",
+	"paulvl/backup": "3.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
@@ -15,9 +17,6 @@
         "symfony/css-selector": "2.8.*|3.0.*",
         "symfony/dom-crawler": "2.8.*|3.0.*"
     },
-	"require": {
-		"tymon/jwt-auth": "0.5.*"
-	},
     "autoload": {
         "classmap": [
             "database"

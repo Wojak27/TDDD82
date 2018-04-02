@@ -63,6 +63,18 @@ return [
         	'prefix'    => '',
         	'strict'    => false,
     	],
+	
+	'mysql_backup' => [
+        	'driver'    => 'mysql',
+        	'host'      => 'db-und.ida.liu.se',
+        	'database'  => 'itkand_2018_1_2',
+        	'username'  => 'itkand_2018_1_2',
+        	'password'  => 'itkand_2018_1_2_1f48',
+        	'charset'   => 'utf8',
+        	'collation' => 'utf8_unicode_ci',
+        	'prefix'    => '',
+        	'strict'    => false,
+    	],
 
         'pgsql' => [
             'driver' => 'pgsql',
