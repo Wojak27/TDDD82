@@ -33,6 +33,7 @@ public class RESTApiServer {
     private static AsyncHttpResponseHandler lastUsedAsyncHttpResponseHandler;
     private static boolean lastUsedIsGetRequest;
     private static AsyncHttpClient client = new AsyncHttpClient();
+    private static long timeSinceLastRequest = 0;
 
     private static void get(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler, boolean sendToBackupServer) {
         StringEntity entity = new StringEntity(params.toString(), "UTF-8");
@@ -71,6 +72,8 @@ public class RESTApiServer {
 
     public static void login(Context context, HttpResponseNotifyable listener,String nfcCardNumber, String pin){
         try {
+            timeSinceLastRequest = System.currentTimeMillis();
+            client.setMaxRetriesAndTimeout(0,500);
             JSONObject jsonParams = new JSONObject();
             jsonParams.put("id", nfcCardNumber);
             jsonParams.put("password", pin);
@@ -240,7 +243,7 @@ public class RESTApiServer {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // Called if JSONObject was successfully returned
-
+                System.out.println("ELLAPSED TIME: " + (System.currentTimeMillis() - timeSinceLastRequest));
                 listener.notifyAboutResponse(RESTApiServer.parseJSON(response));
             }
             @Override
