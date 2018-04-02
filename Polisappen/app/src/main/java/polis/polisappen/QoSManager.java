@@ -25,82 +25,104 @@ import polis.polisappen.LocalDatabase.ApplicationDatabase;
 public class QoSManager extends Service {
     private BroadcastReceiver mBatteryBroadcastReciever;
     private BroadcastReceiver mNetworkBroadcastReciever;
-    private final int batteryRestrictionLimit = 20;
+    private final int batteryRestrictionLimit = 80;
     private SystemState batteryStatus = SystemState.BATTERY_OKAY;
     private ApplicationDatabase db;
     private String LOCAL_TAG = "QoSManager";
     public static final String UPDATE_MAP= "polis.polisappen.UPDATE_MAP";
     public static final String BATTERY_LOW= "polis.polisappen.BATTERY_LOW";
 
+    @Override
+    public void onCreate() {
+        createThreadForService();
+        createDataBaseInstance();
+        setNetworkStatus();
+        registerBroadcastRecievers();
+    }
 
+    /**
+     * the method checks the network status
+     * @return
+     */
     private boolean isOffline(){
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager)  getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
     }
 
-    @Override
-    public void onCreate() {
+    /**
+     * The method checks current network status and sets the Enum value accordingly
+     */
+    private void setNetworkStatus(){
+        if(isOffline()){
+            SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
+        }else {
+            SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
+        }
+    }
+
+    /**
+     * The method creates a new thread for the service to not block the main thread
+     */
+    private void createThreadForService(){
         // Start up the thread running the service.  Note that we create a
         // separate thread because the service normally runs in the process's
         // main thread, which we don't want to block.  We also make it
         // background priority so CPU-intensive work will not disrupt our UI.
-        HandlerThread thread = new HandlerThread("ServiceStartArguments",
-                Process.THREAD_PRIORITY_FOREGROUND);
+        HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_FOREGROUND);
         thread.start();
-        if(isOffline()){
-            SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
-//            Toast.makeText(this, "Network available changing state", Toast.LENGTH_LONG).show();
-        }else {
-            SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
-//            Toast.makeText(this, "Network down changing state", Toast.LENGTH_LONG).show();
-        }
-        db = Room.databaseBuilder(getApplicationContext(),
-                ApplicationDatabase.class, "database-name").build();
-        // Get the HandlerThread's Looper and use it for our Handler
-//        Toast.makeText(getApplicationContext(),"Service Started", Toast.LENGTH_LONG);
-
-//        Toast.makeText(this, "service starting", Toast.LENGTH_SHORT).show();
+    }
+    private void createDataBaseInstance(){
+        db = Room.databaseBuilder(getApplicationContext(), ApplicationDatabase.class, "database-name").build();
+    }
+    private void registerBroadcastRecievers(){
         mBatteryBroadcastReciever = new BatteryBroadcastReceiver();
         mNetworkBroadcastReciever = new NetworkBroadcastReceiver();
         registerReceiver(mBatteryBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         registerReceiver(mNetworkBroadcastReciever, new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED));
     }
 
-    // checks for changes in battery
+    /**
+     * The method monitors the battery state and calls localBatteryManager
+     */
     private class BatteryBroadcastReceiver extends BroadcastReceiver {
         private final static String BATTERY_LEVEL = "level";
         @Override
         public void onReceive(Context context, Intent intent) {
             int level = intent.getIntExtra(BATTERY_LEVEL, 0);
-//            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
             localBatteryManager(context, level);
         }
 
     }
 
+    /**
+     * The method monitors the network status and deletes all sensitive data in case of internet connection is lost
+     */
     private class NetworkBroadcastReceiver extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if(isOffline()){
-//                Toast.makeText(getApplicationContext(), "deletes data", Toast.LENGTH_LONG).show();
                 Log.w(LOCAL_TAG, "delete data");
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
                 deleteSensitiveData();
             }else if(!isOffline()){
-//                Toast.makeText(getApplicationContext(), "Network back online", Toast.LENGTH_LONG).show();
                 sendBroadcastToMapsActivity();
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
             }
         }
     }
 
+    /**
+     * the method sends broadcast to mapsactivity to delete all sensitive pins
+     */
     private void sendBroadcastToMapsActivity(){
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(UPDATE_MAP));
     }
 
+    /**
+     * the method sends broadcast to mapsactivity to change
+     */
     private void sendBroadcastBatteryStatusChanged(){
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BATTERY_LOW));
     }

@@ -18,7 +18,9 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
@@ -55,6 +57,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private LocationRequest mLocationRequest;
     private BroadcastReceiver mMapUpdateBroadcastReciever;
     private BroadcastReceiver mBatteryLowBroadcastReciever;
+    private TextView batteryStatusText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         setContentView(R.layout.activity_maps);
         RESTApiServer.getCoord(this,this);
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
+        batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
         updateButton.setOnClickListener(this);
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
@@ -74,12 +78,20 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        createLocationRequest();
+        makeLocationRequest();
         setupLocationCallback();
         mMapUpdateBroadcastReciever = new MapUpdateBroadcastReciever();
         mBatteryLowBroadcastReciever = new BatteryLowReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMapUpdateBroadcastReciever,new IntentFilter(QoSManager.UPDATE_MAP));
         LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowBroadcastReciever,new IntentFilter(QoSManager.BATTERY_LOW));
+    }
+
+    private void makeLocationRequest(){
+        if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
+            createLocationRequest();
+        }else {
+            createLocationRequestBestForBattery();
+        }
     }
 
     private class MapUpdateBroadcastReciever extends BroadcastReceiver{
@@ -95,7 +107,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
         @Override
         public void onReceive(Context context, Intent intent) {
-//            Toast.makeText(getApplicationContext(), "Time to update the map", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Time to update the battery", Toast.LENGTH_SHORT).show();
             if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
                 createLocationRequest();
             }else if(SystemState.BATTERY_LOW == SystemStatus.getBatteryStatus()){
@@ -167,12 +179,11 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             // for ActivityCompat#requestPermissions for more details.
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
         }
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Log.w("mMap", mMap.toString());
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getLastKnownLocation();
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(getLastKnownLocation()));
     }
@@ -186,6 +197,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
+        makeLocationRequest();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMapUpdateBroadcastReciever,new IntentFilter(QoSManager.UPDATE_MAP));
         LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowBroadcastReciever,new IntentFilter(QoSManager.BATTERY_LOW));
 
@@ -219,6 +231,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         mLocationRequest.setInterval(10);
         mLocationRequest.setFastestInterval(1);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        batteryStatusText.setText("Battery OKAY");
     }
 
     public void createLocationRequestBestForBattery() {
@@ -226,6 +239,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         mLocationRequest.setInterval(10000);
         mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        batteryStatusText.setText("Battery LOW");
     }
 
     private void moveCameraToCurrentPostition(LatLng location){

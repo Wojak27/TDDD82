@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * For making voice or video calls between users.
  */
-public class VideoAndVoiceChat extends AuthAppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback{
+public class VideoAndVoiceChat extends AuthAppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener{
     private static final String APP_KEY = "955e2079-38f0-43d5-af9e-80e4f3ade26d";
     private static final String APP_SECRET = "TZOvC9lH6k2wmJzWHEXh2Q==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
@@ -44,6 +44,7 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
     private String userName="me";
     private String recipient="recipient";
     private boolean loggedIn = false;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,15 +90,7 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
             }
         });
 
-        videoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                call = mSinchClient.getCallClient().callUserVideo(recipient);
-                Intent intent = new Intent(VideoAndVoiceChat.this, VideoActivity.class);
-                intent.putExtra("CALL_ID", call.getCallId());
-                startActivity(intent);
-            }
-        });
+        videoButton.setOnClickListener(this);
     }
 
     /**
@@ -155,6 +148,21 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
         //do nothing, its intended.
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.videoButton){
+            if(SystemStatus.getBatteryStatus() == SystemState.BATTERY_LOW){
+                Toast.makeText(getApplicationContext(), "Batterin är för låg, ladda telefonen över 10 procent", Toast.LENGTH_SHORT).show();
+            }else{
+                call = mSinchClient.getCallClient().callUserVideo(recipient);
+                Intent intent = new Intent(VideoAndVoiceChat.this, VideoActivity.class);
+                intent.putExtra("CALL_ID", call.getCallId());
+                startActivity(intent);
+            }
+
+        }
     }
 
     /**

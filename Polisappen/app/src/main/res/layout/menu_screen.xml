@@ -6,9 +6,9 @@
         android:id="@+id/contactsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/editText"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="23dp"
         android:minWidth="200dp"
         android:text="@string/contactsButton" />
 
@@ -70,4 +70,23 @@
         android:layout_marginTop="11dp"
         android:minWidth="200dp"
         android:text="Start Service" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="number"
+        android:text="80" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/contactsButton"
+        android:text="Battery är låg för:" />
 </RelativeLayout>
