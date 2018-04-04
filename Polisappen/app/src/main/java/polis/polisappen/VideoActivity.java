@@ -29,7 +29,7 @@ public class VideoActivity extends VideoAndVoiceChat {
         setContentView(R.layout.videoscreen);
         Bundle bundle = getIntent().getExtras();
         callId = bundle.getString("CALL_ID");
-        call=mSinchClient.getCallClient().getCall(callId);
+        call = mSinchClient.getCallClient().getCall(callId);
         recipient = call.getRemoteUserId();
         call.addCallListener(new SinchVideoListener());
 

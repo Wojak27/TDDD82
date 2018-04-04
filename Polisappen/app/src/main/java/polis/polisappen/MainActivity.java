@@ -19,6 +19,7 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        QoSManager.auth = this;
         setContentView(R.layout.menu_screen);
         Button logout = (Button)findViewById(R.id.logOutButton);
         logout.setOnClickListener(this);

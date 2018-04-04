@@ -20,10 +20,13 @@ import polis.polisappen.LocalDatabase.Location;
 
 public abstract class AuthAppCompatActivity extends AppCompatActivity implements HttpResponseNotifyable {
 
+    private BroadcastReceiver receiver;
+    private IntentFilter regFilter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        BroadcastReceiver receiver = new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             public void onReceive(final Context context, final Intent intent) {
                 //check if the broadcast is our desired one
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
@@ -31,10 +34,10 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
                 }
 
             }};
-        IntentFilter regFilter = new IntentFilter();
+        regFilter = new IntentFilter();
         // get device sleep evernt
         regFilter .addAction(Intent.ACTION_SCREEN_OFF);
-        registerReceiver(receiver, regFilter );
+
         if(!validAuth()){
             Toast.makeText(this,"You need to be authenticated", Toast.LENGTH_SHORT).show();
             forceLogin();
@@ -51,6 +54,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         if(!validAuth()){
             forceLogin();
         }
+        registerReceiver(receiver, regFilter );
     }
 
     protected String getUsername(){
@@ -61,6 +65,12 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
     protected String getUserID(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         return preferences.getString(AccountManager.USER_AUTH_NAME,null);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
     }
 
     protected void invalidateAuth(){

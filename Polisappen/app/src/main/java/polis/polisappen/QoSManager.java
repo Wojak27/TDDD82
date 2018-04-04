@@ -29,11 +29,11 @@ public class QoSManager extends Service {
     private BroadcastReceiver mBatteryLowLevelChangeBroadcastReceiver;
     private int batteryRestrictionLimit = 80;
     private int currentBatteryLevel = 50;
-    private SystemState batteryStatus = SystemState.BATTERY_OKAY;
     private ApplicationDatabase db;
     private String LOCAL_TAG = "QoSManager";
     public static final String UPDATE_MAP= "polis.polisappen.UPDATE_MAP";
     public static final String BATTERY_LOW= "polis.polisappen.BATTERY_LOW";
+    public static AuthAppCompatActivity auth;
 
     @Override
     public void onCreate() {
@@ -95,6 +95,7 @@ public class QoSManager extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             currentBatteryLevel = intent.getIntExtra(BATTERY_LEVEL, 0);
+            Toast.makeText(getApplicationContext(), "Battery level is: " + currentBatteryLevel, Toast.LENGTH_SHORT).show();
             localBatteryManager(currentBatteryLevel);
         }
 
@@ -111,6 +112,7 @@ public class QoSManager extends Service {
                 Log.w(LOCAL_TAG, "delete data");
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
                 deleteSensitiveData();
+                auth.invalidateAuth();
             }else if(!isOffline()){
                 sendBroadcastToMapsActivity();
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);

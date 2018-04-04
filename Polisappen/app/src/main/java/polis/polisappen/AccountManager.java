@@ -85,7 +85,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             validateRequest(tmpNfcCardNumber, pin);
         }
         else if(view.getId() == R.id.startCallActivity){
-            Intent intent = new Intent(this, VideoAndVoiceChat.class);
+            Intent intent = new Intent(this, MapsActivity.class);
             startActivity(intent);
         }
     }

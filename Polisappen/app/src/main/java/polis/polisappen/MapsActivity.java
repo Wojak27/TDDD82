@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
@@ -45,7 +46,7 @@ import java.util.List;
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 import polis.polisappen.LocalDatabase.Location;
 
-public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable, View.OnClickListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable, View.OnClickListener {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -159,6 +160,11 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         for(String key : response.keySet()){
             addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"), response.get(key).get("type"));
         }
+    }
+
+    @Override
+    public void notifyAboutFailedRequest() {
+
     }
 
     private boolean isPermissionGranted() {

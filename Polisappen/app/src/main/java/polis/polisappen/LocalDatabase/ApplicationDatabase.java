@@ -9,5 +9,5 @@ import android.arch.persistence.room.RoomDatabase;
 
 @Database(entities = {Location.class}, version = 1)
 public abstract class ApplicationDatabase extends RoomDatabase {
-    public abstract UserDao userDao();
+    public abstract LocationDao userDao();
 }

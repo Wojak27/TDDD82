@@ -1,32 +1,26 @@
 package polis.polisappen;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.Sinch;
 import com.sinch.android.rtc.SinchClient;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallClient;
 import com.sinch.android.rtc.calling.CallClientListener;
 import com.sinch.android.rtc.calling.CallDetails;
-import com.sinch.android.rtc.calling.CallListener;
-import com.sinch.android.rtc.video.VideoCallListener;
-import com.sinch.android.rtc.video.VideoController;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * For making voice or video calls between users.
@@ -44,57 +38,45 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
     private String userName="me";
     private String recipient="recipient";
     private boolean loggedIn = false;
+    private Button loginButton;
+    private EditText deviceNameForCall;
+    private EditText remoteNameToCall;
+    private Button voiceButton;
+    private Button videoButton;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestPermissions();
         setContentView(R.layout.call);
-        final EditText myName = (EditText) findViewById(R.id.myName);
-        final EditText remoteName = (EditText) findViewById(R.id.remoteName);
-        final Button login = (Button) findViewById(R.id.login);
-        final Button voiceButton = (Button) findViewById(R.id.voiceButton);
-        final Button videoButton = (Button) findViewById(R.id.videoButton);
+        deviceNameForCall = (EditText) findViewById(R.id.myName);
+        remoteNameToCall = (EditText) findViewById(R.id.remoteName);
+        loginButton = (Button) findViewById(R.id.login);
+        voiceButton = (Button) findViewById(R.id.voiceButton);
+        videoButton = (Button) findViewById(R.id.videoButton);
         voiceButton.setVisibility(View.INVISIBLE);
         videoButton.setVisibility(View.INVISIBLE);
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
-            remoteName.setText(bundle.getString("calling_to_name"));
+            remoteNameToCall.setText(bundle.getString("calling_to_name"));
         }
-
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(!loggedIn) {
-                    userName = myName.getText().toString();
-                    recipient = remoteName.getText().toString();
-                    init(userName);
-                    loggedIn = true;
-                    login.setText("Log out");
-                    voiceButton.setVisibility(View.VISIBLE);
-                    videoButton.setVisibility(View.VISIBLE);
-                }else{
-                    loggedIn = false;
-                    login.setText("Log in");
-                    voiceButton.setVisibility(View.INVISIBLE);
-                    videoButton.setVisibility(View.INVISIBLE);
-                    mSinchClient.stopListeningOnActiveConnection();
-                    mSinchClient.terminate();
-                    mSinchClient = null;
-                }
-            }
-        });
-
-        voiceButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                call = mSinchClient.getCallClient().callUser(recipient);
-                Intent intent = new Intent(VideoAndVoiceChat.this, CallActivity.class);
-                intent.putExtra("CALL_ID",call.getCallId());
-                startActivity(intent);
-            }
-        });
-
+        loginButton.setOnClickListener(this);
+        voiceButton.setOnClickListener(this);
         videoButton.setOnClickListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+                if(mSinchClient != null) {
+            try {
+                mSinchClient.terminate();
+                mSinchClient = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -132,6 +114,7 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, OPEN_CAMERA_CODE);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -166,7 +149,53 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
                 startActivity(intent);
             }
 
+        }else if(v.getId() == R.id.login){
+            if(!loggedIn) {
+                logInUser();
+            }else if(loggedIn){
+                logOutUser();
+            }
+        }else if (v.getId() == R.id.voiceButton){
+            call = mSinchClient.getCallClient().callUser(recipient);
+            Intent intent = new Intent(VideoAndVoiceChat.this, CallActivity.class);
+            intent.putExtra("CALL_ID",call.getCallId());
+            startActivity(intent);
         }
+    }
+
+    private void logInUser(){
+        userName = deviceNameForCall.getText().toString();
+        recipient = remoteNameToCall.getText().toString();
+        if(loggedIn != true){
+            init(userName);
+        }
+        loggedIn = true;
+        switchButtonsToLogOut();
+    }
+
+    private void switchButtonsToLogOut(){
+        loginButton.setText("Log out");
+        voiceButton.setVisibility(View.VISIBLE);
+        videoButton.setVisibility(View.VISIBLE);
+    }
+
+    private void switchButtonsToLogIn(){
+        loginButton.setText("Log in");
+        voiceButton.setVisibility(View.INVISIBLE);
+        videoButton.setVisibility(View.INVISIBLE);
+    }
+
+    private void logOutUser(){
+        loggedIn = false;
+        switchButtonsToLogIn();
+        mSinchClient.stopListeningOnActiveConnection();
+        try{
+            mSinchClient.terminate();
+            mSinchClient = null;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /**
