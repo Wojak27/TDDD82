@@ -72,8 +72,10 @@ public class RESTApiServer {
 
     public static void login(Context context, HttpResponseNotifyable listener,String nfcCardNumber, String pin){
         try {
+            System.out.println("ATTEMPTING TO LOGIN");
             timeSinceLastRequest = System.currentTimeMillis();
-            client.setMaxRetriesAndTimeout(0,500);
+            client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
+            client.setMaxRetriesAndTimeout(0,0);
             JSONObject jsonParams = new JSONObject();
             jsonParams.put("id", nfcCardNumber);
             jsonParams.put("password", pin);
@@ -243,6 +245,7 @@ public class RESTApiServer {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // Called if JSONObject was successfully returned
+                System.out.println("REQUEST SUCCESSFULL!");
                 System.out.println("ELLAPSED TIME: " + (System.currentTimeMillis() - timeSinceLastRequest));
                 listener.notifyAboutResponse(RESTApiServer.parseJSON(response));
             }
@@ -267,7 +270,11 @@ public class RESTApiServer {
             @Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
                 // Called if statuscode was 40x
                 //throws exception if internet not available
-                resendRequestToBackupServer();
+                if(errorResponse == null){
+                    System.out.println("onFailure called, attempting backupserver");
+                    resendRequestToBackupServer();
+                    return;
+                }
                 try {
                     listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
                 }catch (NullPointerException e){
