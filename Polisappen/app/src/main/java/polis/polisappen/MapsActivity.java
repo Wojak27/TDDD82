@@ -15,12 +15,15 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -29,6 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -51,8 +55,12 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private ApplicationDatabase db;
     private LocationCallback mLocationCallback;
     private LocationRequest mLocationRequest;
-    private BroadcastReceiver mBroadcastReciever;
-    private boolean isBatteryLow = false;
+    private BroadcastReceiver mMapUpdateBroadcastReciever;
+    private BroadcastReceiver mBatteryLowBroadcastReciever;
+    private TextView batteryStatusText;
+    private final int NONSENSITIVE_DATA = 1;
+    private final int SENSITIVE_DATA = 2;
+    private final int POLIS = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,12 +68,11 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         setContentView(R.layout.activity_maps);
         RESTApiServer.getCoord(this,this);
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
+        batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
         updateButton.setOnClickListener(this);
-//Debugging
-        mBroadcastReciever = new BatteryBroadcastReceiver();
-///////////////
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
+
         deleteMarkerFromDatabase();
         //adding new marker to the database
 //        addMarkerToDatabase(new LatLng(2.1,3.2),"new Marker");
@@ -74,10 +81,43 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        makeLocationRequest();
         setupLocationCallback();
-        createLocationRequest();
+        mMapUpdateBroadcastReciever = new MapUpdateBroadcastReciever();
+        mBatteryLowBroadcastReciever = new BatteryLowReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMapUpdateBroadcastReciever,new IntentFilter(QoSManager.UPDATE_MAP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowBroadcastReciever,new IntentFilter(QoSManager.BATTERY_LOW));
     }
 
+    private void makeLocationRequest(){
+        if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
+            createLocationRequest();
+        }else {
+            createLocationRequestBestForBattery();
+        }
+    }
+
+    private class MapUpdateBroadcastReciever extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+//            Toast.makeText(getApplicationContext(), "Time to update the map", Toast.LENGTH_SHORT).show();
+            updateMap();
+        }
+    }
+
+    private class BatteryLowReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(getApplicationContext(), "Time to update the battery", Toast.LENGTH_SHORT).show();
+            if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
+                createLocationRequest();
+            }else if(SystemState.BATTERY_LOW == SystemStatus.getBatteryStatus()){
+                createLocationRequestBestForBattery();
+            }
+        }
+    }
     private void setupLocationCallback(){
         mLocationCallback = new LocationCallback() {
             @Override
@@ -86,11 +126,16 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                     // Update UI with location data
                     // ...
                     Log.w("Location", "update");
+                    if(mMap != null) {
+                        updateMap();
+                    }
+
 //                    laying markers for debugging
 //                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),location.getLongitude())));
                 }
 
             }
+
         };
     }
 
@@ -106,7 +151,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
         System.out.println("databasen svarade 2");
         for(String key : response.keySet()){
-            addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"));
+            addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"), response.get(key).get("type"));
         }
     }
 
@@ -141,12 +186,11 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             // for ActivityCompat#requestPermissions for more details.
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
         }
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Log.w("mMap", mMap.toString());
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationButtonClickListener(this);
         mMap.setOnMyLocationClickListener(this);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         getLastKnownLocation();
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(getLastKnownLocation()));
     }
@@ -154,9 +198,15 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     protected void onResume() {
         super.onResume();
+        if(mMap != null) {
+            updateMap();
+        }
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
+        makeLocationRequest();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMapUpdateBroadcastReciever,new IntentFilter(QoSManager.UPDATE_MAP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowBroadcastReciever,new IntentFilter(QoSManager.BATTERY_LOW));
 
     }
 
@@ -174,6 +224,8 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     protected void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBatteryLowBroadcastReciever);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMapUpdateBroadcastReciever);
 //        stopLocationUpdates();
     }
 
@@ -183,16 +235,18 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     public void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(100);
-        mLocationRequest.setFastestInterval(10);
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(10000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        batteryStatusText.setText("Battery OKAY");
     }
 
     public void createLocationRequestBestForBattery() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setInterval(300000);
+        mLocationRequest.setFastestInterval(300000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        batteryStatusText.setText("Battery LOW");
     }
 
     private void moveCameraToCurrentPostition(LatLng location){
@@ -217,6 +271,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
                         Log.w("success", "successful");
                         setMyCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
                         moveCameraToCurrentPostition(new LatLng(location.getLatitude(), location.getLongitude()));
+
                     }
                 });
         mRequestingLocationUpdates = true;
@@ -246,6 +301,9 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
+//            Toast.makeText(this, "BatteryStatus works", Toast.LENGTH_SHORT).show();
+        }
         Log.w("mMap", mMap.toString());
         if (Build.VERSION.SDK_INT >= 23 && !isPermissionGranted()) {
             requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE);
@@ -329,15 +387,23 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             protected void onPostExecute(Integer numOfLocations) {
                 if(numOfLocations > 0){ // loops through all of the locations in the database (if locations.size > 0)
                     for(Location location : locations){
-                        LatLng latLng = new LatLng(location.latitude,location.longitude);
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
+                        String type = Integer.toString(location.type);
+                        addMarkerToMap(location, type);
                     }
                 }
             }
         }.execute();
     }
+    private void addMarkerToMap(Location location, String type){
+        LatLng latLng = new LatLng(location.latitude,location.longitude);
+        if(type.equals(Integer.toString(NONSENSITIVE_DATA)))
+            mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
+        else
+            mMap.addMarker(new MarkerOptions().position(latLng).title(location.title)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
 
-    private HashMap<String, String> createMapWithCoordinates(double latitude, double longitude, String type, String reportText){
+    }
+
+    private HashMap<String, String> createHashMapWithCoordinates(double latitude, double longitude, String type, String reportText){
         HashMap<String,String> hashMapCoordinates = new HashMap<>();
         hashMapCoordinates.put("latitude", Double.toString(latitude));
         hashMapCoordinates.put("longitude", Double.toString(longitude));
@@ -347,25 +413,30 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     }
 
     @SuppressLint("StaticFieldLeak")
-    private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText){
+    private void addMarkerToOnlineDB(LatLng latLng, String title, String reportText, String type){
         Log.w("latitude", Double.toString(latLng.latitude));
         Log.w("longitude", Double.toString(latLng.longitude));
-        RESTApiServer.setCoord(this,this,createMapWithCoordinates(latLng.latitude,latLng.longitude,"1",reportText));
+        RESTApiServer.setCoord(this,this, createHashMapWithCoordinates(latLng.latitude,latLng.longitude,type,reportText));
     }
-    private void addMarkerToLocalDB(LatLng latLng, String title, String reportText){
-        mMap.addMarker(new MarkerOptions().position(latLng).title(title));
+    @SuppressLint("StaticFieldLeak")
+    private void addMarkerToLocalDB(LatLng latLng, String title, String reportText, String type){
         final Location location = new Location();
         location.latitude = latLng.latitude;
         location.longitude = latLng.longitude;
         location.title = title;
+        if(Integer.parseInt(type) == SENSITIVE_DATA){
+            location.type = SENSITIVE_DATA;
+        }
         Log.v("text to databse: ", reportText);
         location.reportText = reportText;
+        addMarkerToMap(location, type);
         //put the location we've created previously into the local database
         //everything needs to be done on a separate thread due to android constraints
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                db.userDao().insert(location);  //using query I created in UserDau.java
+                if(db.userDao().selectSpecificMarker(location.latitude, location.longitude) == null) //safety check for uniqueness
+                    db.userDao().insert(location);  //using query I created in UserDau.java
 
                 return db.userDao().getAll().size();
             }
@@ -378,9 +449,9 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
             }
         }.execute();
     }
-    public void addMarkerToDatabase(LatLng latLng, String title, String reportText){ // uid for debugging
-        addMarkerToLocalDB(latLng,title,reportText);
-        addMarkerToOnlineDB(latLng,title,reportText);
+    public void addMarkerToDatabase(LatLng latLng, String title, String reportText, String type){ // uid for debugging
+        addMarkerToLocalDB(latLng,title,reportText, type);
+        addMarkerToOnlineDB(latLng,title,reportText, type);
 
     }
 
@@ -388,6 +459,10 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
     private void deleteMarkerFromDatabase(){ // location for debugging, needs fixing
 //        final double lat = marker.getPosition().latitude;
 //        final double lon = marker.getPosition().longitude;
+        if(SystemState.NETWORK_DOWN == SystemStatus.getNetworkStatus()) {
+//            Toast.makeText(this,"Maps Network down, not deleting all info", Toast.LENGTH_LONG).show();
+            return;
+        }
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
@@ -416,39 +491,22 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
 
     @Override
     protected void onStart() {
-        registerReceiver(mBroadcastReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         super.onStart();
     }
     @Override
     protected void onStop() {
-        unregisterReceiver(mBroadcastReciever);
         super.onStop();
     }
 
     @Override
     public void onClick(View v) {
+        updateMap();
+    }
+
+    private void updateMap(){
         deleteMarkerFromDatabase();
         RESTApiServer.getCoord(this,this);
         setMarkersFromDatabaseOnMap(mMap);
-    }
-
-    // checks for changes in battery
-    private class BatteryBroadcastReceiver extends BroadcastReceiver {
-        private final static String BATTERY_LEVEL = "level";
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int level = intent.getIntExtra(BATTERY_LEVEL, 0);
-            Toast.makeText(context,Integer.toString(level),Toast.LENGTH_SHORT).show();
-
-            if(level < 21 && !isBatteryLow){
-                createLocationRequestBestForBattery();
-                isBatteryLow = true;
-            }else if(level > 20 && isBatteryLow){
-                createLocationRequest();
-                isBatteryLow = false;
-            }
-        }
-
     }
 
 }

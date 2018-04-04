@@ -61,4 +61,31 @@
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
         android:text="@string/logOutButton" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/logOutButton"
+        android:layout_below="@+id/logOutButton"
+        android:text="Byt låg batteri gråns:" />
+
+    <EditText
+        android:id="@+id/batteryLimitEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/changeLowBatteryLevelLimitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/batteryLimitEditText"
+        android:layout_toEndOf="@+id/batteryLimitEditText"
+        android:text="Byt" />
+
+
 </RelativeLayout>
