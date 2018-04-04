@@ -462,7 +462,7 @@ public class MapsActivity extends AuthAppCompatActivity implements OnMapReadyCal
         }
         else{
             System.out.println("MANIPULATED");
-            RESTApiServer.setManipluatedCoord(this, this, createMapWithCoordinates(latLng.latitude, latLng.longitude, "1", reportText));
+            RESTApiServer.setManipluatedCoord(this, this, createHashMapWithCoordinates(latLng.latitude, latLng.longitude, "1", reportText));
         }
 
     }

@@ -46,6 +46,7 @@ public class ReportFormFragment extends Fragment {
         final EditText editText = (EditText) getActivity().findViewById(R.id.reportText);
         final CheckBox sensitiveCheckBox = (CheckBox) getActivity().findViewById(R.id.sensitiveBox);
         Button commitButton = (Button) this.getActivity().findViewById(R.id.commitButton);
+        String type = "1";
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,7 +65,11 @@ public class ReportFormFragment extends Fragment {
         manipluatedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"manipulated",editText.getText().toString());
+                String type = "1";
+                if(sensitiveCheckBox.isChecked()){
+                    type = "2";
+                }
+                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"manipulated",editText.getText().toString(),type);
                 getActivity().getFragmentManager().beginTransaction().remove(myFragment).commit();
             }
         });

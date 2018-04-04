@@ -142,7 +142,7 @@ public class RESTApiServer {
             System.out.println("longitude: " + coordData.get("longitude"));
             System.out.println("type: " + coordData.get("type"));
             System.out.println("report_text: " + reportText);
-            post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener));
+            post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener),false);
         }
         catch (Exception e){
             Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
