@@ -107,6 +107,8 @@ public class RESTApiServer {
     }
 
     public static void getCoord(Context context, HttpResponseNotifyable listener){
+        client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
+        client.setMaxRetriesAndTimeout(0,0);
         System.out.println("ATTEMPTING TO GET COORD");
         JSONObject params = getAuthParams(context);
         get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener), false);
