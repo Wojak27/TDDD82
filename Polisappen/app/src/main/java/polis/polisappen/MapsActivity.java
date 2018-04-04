@@ -255,8 +255,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void createLocationRequestBestForBattery() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(300000);
-        mLocationRequest.setFastestInterval(300000);
+        mLocationRequest.setInterval(30000);
+        mLocationRequest.setFastestInterval(30000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         batteryStatusText.setText("Battery LOW");
     }
