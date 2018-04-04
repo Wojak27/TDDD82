@@ -76,9 +76,19 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
     protected void invalidateAuth(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
+        //editor.putString(AccountManager.USER_AUTH_TOKEN, null);
         editor.putString(AccountManager.USER_AUTH_STATUS,AccountManager.USER_NOT_AUTHENTICATED);
         editor.putString(AccountManager.USER_AUTH_TIMESTAMP, null);
         invalidateTokenAtServer();
+        editor.apply();
+    }
+    protected void invalidateAuthWithoutInternet(){
+        System.out.println("INVALIDATE WITHOUT INTERNET CALLED");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AccountManager.USER_AUTH_TOKEN, null);
+        editor.putString(AccountManager.USER_AUTH_STATUS,AccountManager.USER_NOT_AUTHENTICATED);
+        editor.putString(AccountManager.USER_AUTH_TIMESTAMP, null);
         editor.apply();
     }
 
@@ -89,6 +99,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
     public void notifyAboutResponse(HashMap<String,String> response){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = preferences.edit();
+        System.out.println("TOKEN IS NOW NULL");
         editor.putString(AccountManager.USER_AUTH_TOKEN, null);
         editor.apply();
         System.out.println("server responded from logout");
