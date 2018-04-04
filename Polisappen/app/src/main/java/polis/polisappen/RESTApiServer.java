@@ -1,6 +1,5 @@
 package polis.polisappen;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -19,23 +18,48 @@ import javax.crypto.spec.SecretKeySpec;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
-import cz.msebera.android.httpclient.message.BasicHeader;
-import cz.msebera.android.httpclient.protocol.HTTP;
 
 public class RESTApiServer {
-    private static final String API_URL = "http://itkand-1-1.tddd82-2018.ida.liu.se/";
+    private static final String API_URL_SERVER_1 = "http://itkand-1-1.tddd82-2018.ida.liu.se/";
+    private static final String API_URL_SERVER_2 = "http://itkand-1-2.tddd82-2018.ida.liu.se/";
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_URL = "/logout";
     private static final String SECRET_URL = "/secret";
     private static final String COORD_URL = "/coord";
     private static final String SETCOORD_URL = "/setCoord";
+    private static String lastUsedSubURL;
+    private static JSONObject lastUsedJSONObject;
+    private static Context lastUsedContext;
+    private static AsyncHttpResponseHandler lastUsedAsyncHttpResponseHandler;
+    private static boolean lastUsedIsGetRequest;
+    private static final String GET_CONTACTS_URL = "/users";
+    private static final String GET_MESSAGES_URL = "/chatMessages";
+    private static final String SEND_CHAT_MSG_URL = "/sendMessage";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
+    private static long timeSinceLastRequest = 0;
 
-    private static void get(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler) {
+    private static void get(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler, boolean sendToBackupServer) {
         StringEntity entity = new StringEntity(params.toString(), "UTF-8");
         addAuthHeadersToClient(params);
-        client.get(context, getAbsoluteUrl(url), entity, "application/json", responseHandler);
+        setLastUsedParameters(url, params, context,responseHandler, true);
+        client.get(context, getAbsoluteUrl(url, sendToBackupServer), entity, "application/json", responseHandler);
+    }
+
+    private static void resendRequestToBackupServer(){
+        if (lastUsedIsGetRequest){
+            get(lastUsedContext, lastUsedSubURL, lastUsedJSONObject, lastUsedAsyncHttpResponseHandler, true);
+        }else {
+            post(lastUsedContext, lastUsedSubURL, lastUsedJSONObject, lastUsedAsyncHttpResponseHandler, true);
+        }
+    }
+
+    private static void setLastUsedParameters(String url, JSONObject jsonObject, Context context, AsyncHttpResponseHandler asyncHttpResponseHandler, boolean isGetRequest){
+        lastUsedSubURL = url;
+        lastUsedJSONObject = jsonObject;
+        lastUsedContext = context;
+        lastUsedAsyncHttpResponseHandler = asyncHttpResponseHandler;
+        lastUsedIsGetRequest = isGetRequest;
     }
 
     private static void addAuthHeadersToClient(JSONObject params){
@@ -50,12 +74,27 @@ public class RESTApiServer {
         }
     }
 
+    public static void sendChatMsg(Context context, HttpResponseNotifyable listener,String msg, String receiver_id){
+        JSONObject params = new JSONObject();
+        try {
+            params.put("receiver_id",receiver_id);
+            params.put("message",msg);
+            post(context,SEND_CHAT_MSG_URL,params,RESTApiServer.getDefaultHandler(listener),false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void login(Context context, HttpResponseNotifyable listener,String nfcCardNumber, String pin){
         try {
+            System.out.println("ATTEMPTING TO LOGIN");
+            timeSinceLastRequest = System.currentTimeMillis();
+            client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
+            client.setMaxRetriesAndTimeout(0,0);
             JSONObject jsonParams = new JSONObject();
             jsonParams.put("id", nfcCardNumber);
             jsonParams.put("password", pin);
-            post(context,LOGIN_URL,jsonParams, RESTApiServer.getDefaultHandler(listener));
+            post(context,LOGIN_URL,jsonParams, RESTApiServer.getDefaultHandler(listener), false);
         }
         catch (Exception e){
             Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
@@ -64,14 +103,27 @@ public class RESTApiServer {
     }
     public static void logout(Context context, HttpResponseNotifyable listener){
         JSONObject params = getAuthParams(context);
-        post(context,LOGOUT_URL,params, RESTApiServer.getDefaultHandler(listener));
+        post(context,LOGOUT_URL,params, RESTApiServer.getDefaultHandler(listener), false);
     }
 
     public static void getCoord(Context context, HttpResponseNotifyable listener){
         JSONObject params = getAuthParams(context);
-        get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener));
+        get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener), false);
     }
 
+    public static void getContacts(Context context, HttpResponseNotifyable listener){
+        JSONObject params = getAuthParams(context);
+        get(context,GET_CONTACTS_URL,params, RESTApiServer.getDefaultHandler(listener),false);
+    }
+    public static void getMessages(Context context, HttpResponseNotifyable listener, Contact chatbuddy) {
+        JSONObject params = new JSONObject();
+        try {
+            params.put("chat_partner_id",chatbuddy.getId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        get(context, GET_MESSAGES_URL, params, RESTApiServer.getDefaultHandler(listener),false);
+    }
 
     public static void setManipluatedCoord(Context context, HttpResponseNotifyable listener, HashMap<String, String> coordData){
         String reportText = coordData.get("report_text");
@@ -113,7 +165,7 @@ public class RESTApiServer {
             System.out.println("longitude: " + coordData.get("longitude"));
             System.out.println("type: " + coordData.get("type"));
             System.out.println("report_text: " + reportText);
-            post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener));
+            post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener), false);
         }
         catch (Exception e){
             Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
@@ -188,7 +240,7 @@ public class RESTApiServer {
 
     public static void getSecret(Context context, HttpResponseNotifyable listener){
         JSONObject params = getAuthParams(context);
-        get(context,SECRET_URL,params, RESTApiServer.getDefaultHandler(listener));
+        get(context,SECRET_URL,params, RESTApiServer.getDefaultHandler(listener), false);
     }
 
     private static JSONObject addAuthParams(Context context, JSONObject params){
@@ -221,14 +273,20 @@ public class RESTApiServer {
     }
 
 
-    private static void post(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler) {
+    private static void post(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler, boolean sendToBackupServer) {
         StringEntity entity = new StringEntity(params.toString(), "UTF-8");
         addAuthHeadersToClient(params);
-        client.post(context, getAbsoluteUrl(url), entity, "application/json", responseHandler);
+        setLastUsedParameters(url, params,context,responseHandler, false);
+        client.post(context, getAbsoluteUrl(url, sendToBackupServer), entity, "application/json", responseHandler);
     }
 
-    private static String getAbsoluteUrl(String relativeUrl) {
-        return API_URL + relativeUrl;
+    private static String getAbsoluteUrl(String relativeUrl, boolean isBackupserver) {
+        if(isBackupserver){
+            return API_URL_SERVER_2 + relativeUrl;
+        }else {
+            return API_URL_SERVER_1 + relativeUrl;
+        }
+
     }
 
     private static AsyncHttpResponseHandler getDefaultHandler(final HttpResponseNotifyable listener){
@@ -236,7 +294,8 @@ public class RESTApiServer {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 // Called if JSONObject was successfully returned
-
+                System.out.println("REQUEST SUCCESSFULL!");
+                System.out.println("ELLAPSED TIME: " + (System.currentTimeMillis() - timeSinceLastRequest));
                 listener.notifyAboutResponse(RESTApiServer.parseJSON(response));
             }
             @Override
@@ -259,7 +318,17 @@ public class RESTApiServer {
 
             @Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse){
                 // Called if statuscode was 40x
-                listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
+                //throws exception if internet not available
+                if(errorResponse == null){
+                    System.out.println("onFailure called, attempting backupserver");
+                    resendRequestToBackupServer();
+                    return;
+                }
+                try {
+                    listener.notifyAboutResponse(RESTApiServer.parseJSON(errorResponse));
+                }catch (NullPointerException e){
+                    e.printStackTrace();
+                }
             }
             /*@Override public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse){
 

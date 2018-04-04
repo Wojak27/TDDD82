@@ -9,11 +9,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
+
+import polis.polisappen.LocalDatabase.Location;
 
 public abstract class AuthAppCompatActivity extends AppCompatActivity implements HttpResponseNotifyable {
 
@@ -37,6 +40,10 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
             forceLogin();
         }
     }
+    @Override
+    public void notifyAboutFailedRequest(){
+       //default is to do nothing, override to handle yourself...
+    }
 
     @Override
     protected void onResume(){
@@ -44,6 +51,16 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         if(!validAuth()){
             forceLogin();
         }
+    }
+
+    protected String getUsername(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return preferences.getString(AccountManager.USER_AUTH_REAL_NAME,null);
+    }
+
+    protected String getUserID(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return preferences.getString(AccountManager.USER_AUTH_NAME,null);
     }
 
     protected void invalidateAuth(){
@@ -67,7 +84,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         System.out.println("server responded from logout");
     }
 
-    private boolean validAuth(){
+    protected boolean validAuth(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String userAuthStatus = preferences.getString(AccountManager.USER_AUTH_STATUS,null);
         if(userAuthStatus != null){
@@ -103,5 +120,11 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         Intent intent = new Intent(this,AccountManager.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
+        try{
+            stopService(new Intent(AuthAppCompatActivity.this,QoSManager.class));
+        }catch (Exception e){
+            Log.w("No started ", "service");
+        }
+
     }
 }

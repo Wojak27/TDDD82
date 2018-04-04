@@ -41,6 +41,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     public static String USER_NOT_AUTHENTICATED = "USER_NOT_AUTHENTICATED";
     public static String USER_AUTH_TOKEN = "USER_AUTH_TOKEN";
     public static String USER_AUTH_NAME = "USER_AUTH_NAME";
+    public static String USER_AUTH_REAL_NAME = "USER_AUTH_REAL_NAME";
     private String tmpNfcCardNumber;
 
     @Override
@@ -107,6 +108,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             editor.putString(AccountManager.USER_AUTH_TIMESTAMP, getAuthTokenExpiry());
             editor.putString(AccountManager.USER_AUTH_TOKEN, response.get("token"));
             editor.putString(AccountManager.USER_AUTH_NAME, tmpNfcCardNumber);
+            editor.putString(AccountManager.USER_AUTH_REAL_NAME,response.get("user_name"));
             System.out.println(response.get("token"));
             editor.apply();
             finish();
@@ -119,6 +121,11 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
 
+    }
+
+    @Override
+    public void notifyAboutFailedRequest() {
+        //do nothing xD
     }
 
 

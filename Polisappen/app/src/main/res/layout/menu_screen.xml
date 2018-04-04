@@ -3,22 +3,22 @@
     android:layout_width="match_parent" android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/contactsButton"
+        android:id="@+id/callButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_alignStart="@+id/newsfeedButton"
+        android:layout_below="@+id/newsfeedButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="@string/contactsButton" />
+        android:text="@string/callButton" />
 
     <Button
         android:id="@+id/mapsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/contactsButton"
+        android:layout_alignEnd="@+id/contactsButton"
         android:layout_below="@+id/contactsButton"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="34dp"
         android:minWidth="200dp"
         android:text="@string/mapsButton" />
 
@@ -33,24 +33,24 @@
         android:text="@string/newsfeedButton" />
 
     <Button
-        android:id="@+id/reportButton"
+        android:id="@+id/contactsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/newsfeedButton"
-        android:layout_below="@+id/newsfeedButton"
-        android:layout_marginTop="40dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="41dp"
         android:minWidth="200dp"
-        android:text="@string/reportButton" />
+        android:text="@string/contactsAndMessagesButton" />
 
     <Button
         android:id="@+id/searchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/reportButton"
-        android:layout_below="@+id/reportButton"
+        android:layout_alignStart="@+id/callButton"
+        android:layout_below="@+id/callButton"
         android:layout_marginTop="40dp"
         android:minWidth="200dp"
-        android:text="Search" />
+        android:text="@string/reportButton" />
 
     <Button
         android:id="@+id/logOutButton"
@@ -58,7 +58,33 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/searchButton"
         android:layout_below="@+id/searchButton"
-        android:layout_marginTop="40dp"
         android:minWidth="200dp"
         android:text="@string/logOutButton" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/logOutButton"
+        android:layout_below="@+id/logOutButton"
+        android:text="Byt låg batteri gråns:" />
+
+    <EditText
+        android:id="@+id/batteryLimitEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/changeLowBatteryLevelLimitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/batteryLimitEditText"
+        android:layout_toEndOf="@+id/batteryLimitEditText"
+        android:text="Byt" />
+
+
 </RelativeLayout>

@@ -26,6 +26,15 @@
             android:layout_alignParentTop="true"
             android:layout_marginEnd="127dp"
             android:text="@string/updateButton" />
+
+        <TextView
+            android:id="@+id/battery_status_textbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/updateButtonMaps"
+            android:layout_marginEnd="12dp"
+            android:text="TextView" />
     </RelativeLayout>
 
 </RelativeLayout>
