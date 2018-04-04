@@ -108,14 +108,18 @@ public class QoSManager extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             if(isOffline()){
                 Log.w(LOCAL_TAG, "delete data");
+                System.out.println("NetworksBroadcast");
                 SystemStatus.setNetworkStatus(SystemState.NETWORK_DOWN);
                 deleteSensitiveData();
-                auth.invalidateAuth();
+                auth.invalidateAuthWithoutInternet();
             }else if(!isOffline()){
-                sendBroadcastToMapsActivity();
-                SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
+                    sendBroadcastToMapsActivity();
+                    SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
+                //auth.invalidateAuthWithoutInternet();
+
             }
         }
     }

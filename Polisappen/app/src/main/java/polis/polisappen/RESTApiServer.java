@@ -107,6 +107,7 @@ public class RESTApiServer {
     }
 
     public static void getCoord(Context context, HttpResponseNotifyable listener){
+        System.out.println("ATTEMPTING TO GET COORD");
         JSONObject params = getAuthParams(context);
         get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener), false);
     }
@@ -263,8 +264,12 @@ public class RESTApiServer {
         String token = preferences.getString(AccountManager.USER_AUTH_TOKEN, null);
         JSONObject jsonParams = new JSONObject();
         try {
+            if (token == null){
+                token = "";
+            }
             jsonParams.put("token", token);
             System.out.println("token: " + token);
+
             return jsonParams;
         }
         catch (Exception e){
