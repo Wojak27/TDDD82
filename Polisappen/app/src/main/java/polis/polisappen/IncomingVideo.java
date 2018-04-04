@@ -51,6 +51,7 @@ public class IncomingVideo extends VideoAndVoiceChat {
         public void onVideoTrackAdded(Call call) {
             videoWindow = (LinearLayout) findViewById(R.id.remoteView);
             VideoController videoController = mSinchClient.getVideoController();
+            videoController.setCaptureDevicePosition(android.hardware.Camera.CameraInfo.CAMERA_FACING_BACK);
             remoteView = videoController.getRemoteView();
             videoWindow.addView(remoteView);
         }
