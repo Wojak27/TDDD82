@@ -126,6 +126,8 @@ public class RESTApiServer {
     }
     public static void getMessages(Context context, HttpResponseNotifyable listener, Contact chatbuddy) {
         JSONObject params = new JSONObject();
+        client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
+        client.setMaxRetriesAndTimeout(0,0);
         try {
             params.put("chat_partner_id",chatbuddy.getId());
         } catch (JSONException e) {
