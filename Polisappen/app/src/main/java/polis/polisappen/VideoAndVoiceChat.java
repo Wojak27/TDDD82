@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +26,7 @@ import java.util.HashMap;
 /**
  * For making voice or video calls between users.
  */
-public class VideoAndVoiceChat extends AuthAppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener{
+public class VideoAndVoiceChat extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, HttpResponseNotifyable{
     private static final String APP_KEY = "955e2079-38f0-43d5-af9e-80e4f3ade26d";
     private static final String APP_SECRET = "TZOvC9lH6k2wmJzWHEXh2Q==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
@@ -133,20 +134,12 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
     }
 
     @Override
-    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
-        //do nothing, its intended.
-    }
-
-    @Override
     public void onClick(View v) {
         if(v.getId() == R.id.videoButton){
             if(SystemStatus.getBatteryStatus() == SystemState.BATTERY_LOW){
                 Toast.makeText(getApplicationContext(), "Batterin är för låg, ladda telefonen över 10 procent", Toast.LENGTH_SHORT).show();
             }else{
-                call = mSinchClient.getCallClient().callUserVideo(recipient);
-                Intent intent = new Intent(VideoAndVoiceChat.this, VideoActivity.class);
-                intent.putExtra("CALL_ID", call.getCallId());
-                startActivity(intent);
+                RESTApiServer.validateToken(this,this);
             }
 
         }else if(v.getId() == R.id.login){
@@ -196,6 +189,28 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void notifyAboutResponse(HashMap<String, String> response) {
+        //nu undrar ju ni varför vi inte gör nått med response
+        //men det är ju för att vi skiter i resultatet, vi ville bara att
+        //det skulle loggas i serverns log!
+        //String result = response.get("valid_token");
+            call = mSinchClient.getCallClient().callUserVideo(recipient);
+            Intent intent = new Intent(VideoAndVoiceChat.this, VideoActivity.class);
+            intent.putExtra("CALL_ID", call.getCallId());
+            startActivity(intent);
+    }
+
+    @Override
+    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
+        //not used in this class
+    }
+
+    @Override
+    public void notifyAboutFailedRequest() {
+        //not used in this class (yet)
     }
 
     /**

@@ -27,6 +27,7 @@ public class RESTApiServer {
     private static final String SECRET_URL = "/secret";
     private static final String COORD_URL = "/coord";
     private static final String SETCOORD_URL = "/setCoord";
+    private static final String VERIFY_TOKEN = "/verifyToken";
     private static String lastUsedSubURL;
     private static JSONObject lastUsedJSONObject;
     private static Context lastUsedContext;
@@ -83,6 +84,11 @@ public class RESTApiServer {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void validateToken(Context context, HttpResponseNotifyable listener){
+        JSONObject params = new JSONObject();
+        post(context,VERIFY_TOKEN,params,RESTApiServer.getDefaultHandler(listener),false);
     }
 
     public static void login(Context context, HttpResponseNotifyable listener,String nfcCardNumber, String pin){
