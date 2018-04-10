@@ -29,7 +29,7 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         setContentView(R.layout.menu_screen);
         logout = (Button)findViewById(R.id.logOutButton);
         if(!validAuth()){
-            logout.setText("Logga in");
+            logout.setText("Log in");
         }
         logout.setOnClickListener(this);
         Button mapButton = (Button)findViewById(R.id.mapsButton);
