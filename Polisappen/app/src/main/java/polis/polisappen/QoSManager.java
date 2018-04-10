@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
@@ -33,10 +34,12 @@ public class QoSManager extends Service {
     private String LOCAL_TAG = "QoSManager";
     public static final String UPDATE_MAP= "polis.polisappen.UPDATE_MAP";
     public static final String BATTERY_LOW= "polis.polisappen.BATTERY_LOW";
+    public static final String BATTERY_CHANGE= "polis.polisappen.BATTERY_CHANGE";
     public static AuthAppCompatActivity auth;
 
     @Override
     public void onCreate() {
+//        Toast.makeText(getApplicationContext(), "Service started", Toast.LENGTH_LONG).show();
         createThreadForService();
         createDataBaseInstance();
         setNetworkStatus();
@@ -97,6 +100,7 @@ public class QoSManager extends Service {
             currentBatteryLevel = intent.getIntExtra(BATTERY_LEVEL, 0);
             //Toast.makeText(getApplicationContext(), "Battery level is: " + currentBatteryLevel, Toast.LENGTH_SHORT).show();
             localBatteryManager(currentBatteryLevel);
+            sendBroadcastBatteryChange();
         }
 
     }
@@ -134,6 +138,7 @@ public class QoSManager extends Service {
             batteryRestrictionLimit = intent.getIntExtra("LowBatteryIndicator", 80);
             localBatteryManager(currentBatteryLevel);
             //Toast.makeText(getApplicationContext(),"BatteryLimitChanged "+ batteryRestrictionLimit, Toast.LENGTH_SHORT).show();
+            sendBroadcastBatteryStatusChanged();
         }
     }
 
@@ -144,11 +149,20 @@ public class QoSManager extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(UPDATE_MAP));
     }
 
+    private void sendBroadcastBatteryChange(){
+        Intent intent = new Intent(BATTERY_CHANGE);
+        intent.putExtra("level", currentBatteryLevel);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//        Toast.makeText(getApplicationContext(), "battery change", Toast.LENGTH_SHORT).show();
+    }
     /**
      * the method sends broadcast to mapsactivity to change
      */
     private void sendBroadcastBatteryStatusChanged(){
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BATTERY_LOW));
+        Intent intent = new Intent(BATTERY_LOW);
+        intent.putExtra("level", batteryRestrictionLimit);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//        Toast.makeText(getApplicationContext(), "battery limit change", Toast.LENGTH_SHORT).show();
     }
     @SuppressLint("StaticFieldLeak")
     private void deleteSensitiveData(){
