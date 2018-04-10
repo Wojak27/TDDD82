@@ -38,6 +38,11 @@ public class ContactsActivity extends AuthAppCompatActivity implements View.OnCl
     public void onClick(View view){
 
     }
+    @Override
+    public void onResume(){
+        super.onResume();
+        getContactsFromServer();
+    }
 
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
