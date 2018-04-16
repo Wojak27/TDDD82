@@ -62,6 +62,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final int NONSENSITIVE_DATA = 1;
     private final int SENSITIVE_DATA = 2;
     private final int POLIS = 3;
+    private TextView textViewServerResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         RESTApiServer.getCoord(this,this);
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
+        TextView textViewServerResponse = (TextView) findViewById(R.id.text_view_maps);
         batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
         updateButton.setOnClickListener(this);
         db = Room.databaseBuilder(getApplicationContext(),
@@ -150,7 +152,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         else{
-            Toast.makeText(this, "Meddelande blev manipulerat, inget lades till i databasen", Toast.LENGTH_SHORT).show();
+            textViewServerResponse.setText("Meddelandet blev manipulerat");
         }
     }
 

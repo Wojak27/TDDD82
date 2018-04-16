@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     private EditText msgText;
     private Button updateButton;
     private Button sendManipulatedMsgButton;
+    private TextView textView;
     private boolean sendOrUpdate = false; //true = send, update=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         updateButton.setOnClickListener(this);
         sendManipulatedMsgButton = (Button) findViewById(R.id.send_mani_msg_Button);
         sendManipulatedMsgButton.setOnClickListener(this);
+        textView = (TextView) findViewById(R.id.text_view_message);
 
         getMessagesFromServer();
     }
@@ -117,8 +120,14 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     //used when sending msges is successfully transmitted and received...
     public void notifyAboutResponse(HashMap<String,String> response){
         Toast.makeText(this,"Msg received by server",Toast.LENGTH_SHORT).show();
-        if(wasSending()) {
-            getMessagesFromServer();
+        if (response.containsKey("receiver_id")){
+            System.out.print("Receiver_id fanns");
+            if(wasSending()) {
+                getMessagesFromServer();
+            }
+        }
+        else{
+            textView.setText("Meddelandet manipulerades");
         }
         msgText.setText("");
     }
