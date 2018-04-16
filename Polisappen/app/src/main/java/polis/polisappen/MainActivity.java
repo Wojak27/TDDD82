@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,12 +17,20 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
     Intent qoSIntent;
     private EditText changeBatteryLevelLimitEditText;
     public static final String BATTERY_LOW_LEVEL_CHANGED= "polis.polisappen.BATTERY_LOW_LEVEL_CHANGED";
+    private Button logout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(savedInstanceState == null){
+            savedInstanceState = new Bundle();
+        }
+        savedInstanceState.putString("CALLER","MAINACTIVITY");
         super.onCreate(savedInstanceState);
         QoSManager.auth = this;
         setContentView(R.layout.menu_screen);
-        Button logout = (Button)findViewById(R.id.logOutButton);
+        logout = (Button)findViewById(R.id.logOutButton);
+        if(!validAuth()){
+            logout.setText("Log in");
+        }
         logout.setOnClickListener(this);
         Button mapButton = (Button)findViewById(R.id.mapsButton);
         mapButton.setOnClickListener(this);
@@ -37,6 +46,9 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
     @Override
     protected void onResume() {
         super.onResume();
+        if(validAuth()){
+            logout.setText("Log out");
+        }
         if(!isServiceRunning(QoSManager.class)){
             if(validAuth()){
                 if (qoSIntent == null){

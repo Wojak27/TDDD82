@@ -27,6 +27,7 @@ public class RESTApiServer {
     private static final String SECRET_URL = "/secret";
     private static final String COORD_URL = "/coord";
     private static final String SETCOORD_URL = "/setCoord";
+    private static final String VERIFY_TOKEN = "/verifyToken";
     private static String lastUsedSubURL;
     private static JSONObject lastUsedJSONObject;
     private static Context lastUsedContext;
@@ -85,6 +86,11 @@ public class RESTApiServer {
         }
     }
 
+    public static void validateToken(Context context, HttpResponseNotifyable listener){
+        JSONObject params = new JSONObject();
+        post(context,VERIFY_TOKEN,params,RESTApiServer.getDefaultHandler(listener),false);
+    }
+
     public static void login(Context context, HttpResponseNotifyable listener,String nfcCardNumber, String pin){
         try {
             System.out.println("ATTEMPTING TO LOGIN");
@@ -120,6 +126,8 @@ public class RESTApiServer {
     }
     public static void getMessages(Context context, HttpResponseNotifyable listener, Contact chatbuddy) {
         JSONObject params = new JSONObject();
+        client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
+        client.setMaxRetriesAndTimeout(0,0);
         try {
             params.put("chat_partner_id",chatbuddy.getId());
         } catch (JSONException e) {

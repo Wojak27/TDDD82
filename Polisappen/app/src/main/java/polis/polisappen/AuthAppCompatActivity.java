@@ -25,6 +25,13 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String caller = null;
+        if(savedInstanceState != null) {
+            if (savedInstanceState.getString("CALLER") != null) {
+                caller = savedInstanceState.getString("CALLER");
+                savedInstanceState = null;
+            }
+        }
         super.onCreate(savedInstanceState);
         receiver = new BroadcastReceiver() {
             public void onReceive(final Context context, final Intent intent) {
@@ -38,10 +45,20 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         // get device sleep evernt
         regFilter .addAction(Intent.ACTION_SCREEN_OFF);
 
+        if(caller != null){
+            if(caller.equals("MAINACTIVITY")){ //Mainactivity needs no auth
+                System.out.println("Upptäckte att det var mainactivity");
+                invalidateAuthWithoutInternet();
+                return;
+            }
+        }
+        System.out.println("uppräckte inte att det var mainactivity");
         if(!validAuth()){
+            System.out.println("hade ingen valid auth");
             Toast.makeText(this,"You need to be authenticated", Toast.LENGTH_SHORT).show();
             forceLogin();
         }
+        System.out.println("Vi hade valid auth!");
     }
     @Override
     public void notifyAboutFailedRequest(){
@@ -50,11 +67,15 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
 
     @Override
     protected void onResume(){
+        System.out.println("onResume called!!");
         super.onResume();
+        /*
         if(!validAuth()){
             forceLogin();
         }
+        */
         registerReceiver(receiver, regFilter );
+
     }
 
     protected String getUsername(){
@@ -138,8 +159,10 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
 
     private void forceLogin(){
         invalidateAuth();
+        System.out.println("forceLogin called, have invalidatedAuth");
         Intent intent = new Intent(this,AccountManager.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        System.out.println("Starting login activity....");
         startActivity(intent);
         try{
             stopService(new Intent(AuthAppCompatActivity.this,QoSManager.class));

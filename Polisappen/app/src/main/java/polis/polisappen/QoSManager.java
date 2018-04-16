@@ -95,7 +95,7 @@ public class QoSManager extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             currentBatteryLevel = intent.getIntExtra(BATTERY_LEVEL, 0);
-            Toast.makeText(getApplicationContext(), "Battery level is: " + currentBatteryLevel, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Battery level is: " + currentBatteryLevel, Toast.LENGTH_SHORT).show();
             localBatteryManager(currentBatteryLevel);
         }
 
@@ -133,7 +133,7 @@ public class QoSManager extends Service {
         public void onReceive(Context context, Intent intent) {
             batteryRestrictionLimit = intent.getIntExtra("LowBatteryIndicator", 80);
             localBatteryManager(currentBatteryLevel);
-            Toast.makeText(getApplicationContext(),"BatteryLimitChanged "+ batteryRestrictionLimit, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"BatteryLimitChanged "+ batteryRestrictionLimit, Toast.LENGTH_SHORT).show();
         }
     }
 
