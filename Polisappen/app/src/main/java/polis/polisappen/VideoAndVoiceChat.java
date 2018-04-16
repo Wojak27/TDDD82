@@ -65,6 +65,8 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
             remoteNameToCall.setText(bundle.getString("calling_to_name"));
         }
         swapNames.setOnClickListener(this);
+        voiceButton.setOnClickListener(this);
+        videoButton.setOnClickListener(this);
     }
 
     private void setTextView(){
