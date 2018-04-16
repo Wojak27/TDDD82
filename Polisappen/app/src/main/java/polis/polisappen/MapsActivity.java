@@ -61,7 +61,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView batteryStatusText;
     private final int NONSENSITIVE_DATA = 1;
     private final int SENSITIVE_DATA = 2;
-    private final int SUPER_USER = 3;
+    private final int SUPER_TOP_SECRET = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -411,8 +411,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng latLng = new LatLng(location.latitude,location.longitude);
         if(type.equals(Integer.toString(NONSENSITIVE_DATA)))
             mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
-        else
+        else if(type.equals(Integer.toString(SENSITIVE_DATA)))
             mMap.addMarker(new MarkerOptions().position(latLng).title(location.title)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        else if(type.equals(Integer.toString(SUPER_TOP_SECRET)))
+            mMap.addMarker(new MarkerOptions().position(latLng).title(location.title)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
     }
 
@@ -485,7 +487,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
-                db.userDao().deleteAll();
+                db.userDao().removeSensitiveData();
 //                Location location = db.userDao().selectSpecificMarker(lat, lon);
 //                if(location != null) db.userDao().delete(location);
                 return null;
