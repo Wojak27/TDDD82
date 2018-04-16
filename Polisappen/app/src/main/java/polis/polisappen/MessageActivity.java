@@ -107,7 +107,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
         messageList.clear();
-        System.out.println("kom vi hit kanske?");
+        System.out.println("NotifyAboutResponseJSONArray");
         for(String key: response.keySet()){
             HashMap<String,String> message = response.get(key);
             Message messageClass = new Message(message.get("message"),message.get("timestamp"),message.get("sender_id"));
@@ -119,14 +119,16 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     }
     //used when sending msges is successfully transmitted and received...
     public void notifyAboutResponse(HashMap<String,String> response){
-        Toast.makeText(this,"Msg received by server",Toast.LENGTH_SHORT).show();
+        System.out.println("NotifyAboutResponse");
         if (response.containsKey("receiver_id")){
             System.out.print("Receiver_id fanns");
+            textView.setText("");
             if(wasSending()) {
                 getMessagesFromServer();
             }
         }
         else{
+            System.out.println("Meddelandet manipulderas");
             textView.setText("Meddelandet manipulerades");
         }
         msgText.setText("");

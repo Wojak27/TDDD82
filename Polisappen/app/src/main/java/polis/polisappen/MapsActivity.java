@@ -62,7 +62,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final int NONSENSITIVE_DATA = 1;
     private final int SENSITIVE_DATA = 2;
     private final int POLIS = 3;
-    private TextView textViewServerResponse;
+    public TextView textViewServerResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         RESTApiServer.getCoord(this,this);
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
-        TextView textViewServerResponse = (TextView) findViewById(R.id.text_view_maps);
+        textViewServerResponse = (TextView) findViewById(R.id.text_view_maps);
         batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
         updateButton.setOnClickListener(this);
         db = Room.databaseBuilder(getApplicationContext(),
@@ -144,9 +144,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void notifyAboutResponse(HashMap<String, String> response) {
-        System.out.println("Server sa:" + "\n");
         if (response.containsKey("latitude")){
-            System.out.println("Latitide fanns");
+            textViewServerResponse.setText("");
             for(String key: response.keySet()){
                 System.out.println(key + " : " + response.get(key));
             }
