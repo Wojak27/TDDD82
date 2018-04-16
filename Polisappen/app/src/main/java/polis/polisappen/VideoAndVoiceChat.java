@@ -60,15 +60,11 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
         voiceButton = (Button) findViewById(R.id.voiceButton);
         videoButton = (Button) findViewById(R.id.videoButton);
         noVideoTextView = (TextView) findViewById(R.id.no_video_textview);
-        voiceButton.setVisibility(View.INVISIBLE);
-        videoButton.setVisibility(View.INVISIBLE);
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
             remoteNameToCall.setText(bundle.getString("calling_to_name"));
         }
         swapNames.setOnClickListener(this);
-        voiceButton.setOnClickListener(this);
-        videoButton.setOnClickListener(this);
     }
 
     private void setTextView(){
