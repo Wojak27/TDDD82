@@ -19,10 +19,11 @@ import java.util.List;
  */
 public class VideoActivity extends VideoAndVoiceChat {
     private Call call;
-    private String callId;
-    private String recipient;
+    private String callId, recipient;
     LinearLayout videoWindow;
     View remoteView;
+    private Button endVideoCall;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -34,7 +35,7 @@ public class VideoActivity extends VideoAndVoiceChat {
         recipient = call.getRemoteUserId();
         call.addCallListener(new SinchVideoListener());
 
-        Button endVideoCall = (Button) findViewById(R.id.endvideocall);
+        endVideoCall = (Button) findViewById(R.id.endvideocall);
         endVideoCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,7 +71,8 @@ public class VideoActivity extends VideoAndVoiceChat {
 
         @Override
         public void onCallProgressing(Call call) {
-            progress.setText("Calling "+recipient);
+            progress.setText("Calling "+recipient+"...");
+            endVideoCall.setText("End call");
         }
 
         @Override

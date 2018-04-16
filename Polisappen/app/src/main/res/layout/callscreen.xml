@@ -8,6 +8,7 @@
         android:id="@+id/progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Recipient not found yet..."
         android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
     <Button

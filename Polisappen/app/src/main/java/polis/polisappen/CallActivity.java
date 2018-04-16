@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.calling.Call;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class CallActivity extends VideoAndVoiceChat{
     private Call call;
-    private String recipient;
+    private String recipient, callId;
     private Button endCall;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +33,7 @@ public class CallActivity extends VideoAndVoiceChat{
             }
         });
         Bundle bundle = getIntent().getExtras();
-        String callId = bundle.getString("CALL_ID");
-
+        callId = bundle.getString("CALL_ID");
         call = mSinchClient.getCallClient().getCall(callId);
         call.addCallListener(new SinchCallListener());
         recipient = call.getRemoteUserId();
