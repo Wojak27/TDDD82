@@ -13,11 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class ReportFormFragment extends Fragment {
+public class ReportFormFragment extends Fragment implements CompoundButton.OnCheckedChangeListener{
+
+    String sensitivityType = "1";
+    CheckBox sensitiveCheckBox;
+    CheckBox superTopSecretCheckBox;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -44,17 +49,20 @@ public class ReportFormFragment extends Fragment {
         });
 
         final EditText editText = (EditText) getActivity().findViewById(R.id.reportText);
-        final CheckBox sensitiveCheckBox = (CheckBox) getActivity().findViewById(R.id.sensitiveBox);
+         sensitiveCheckBox = (CheckBox) getActivity().findViewById(R.id.sensitiveCheckBox);
+        superTopSecretCheckBox = (CheckBox) getActivity().findViewById(R.id.top_secret_checkbox);
+        sensitiveCheckBox.setOnCheckedChangeListener(this);
+        superTopSecretCheckBox.setOnCheckedChangeListener(this);
         Button commitButton = (Button) this.getActivity().findViewById(R.id.commitButton);
-        String type = "1";
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String type = "1";
-                if(sensitiveCheckBox.isChecked()){
-                    type = "2";
+                if(!sensitiveCheckBox.isChecked() && !superTopSecretCheckBox.isChecked()){
+                    sensitivityType = "1";
+                    Log.w("skickar type", sensitivityType);
                 }
-                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"my marker",editText.getText().toString(), type);
+                Log.w("skickar type", sensitivityType);
+                ((MapsActivity) getActivity()).addMarkerToDatabase(latLng,"my marker",editText.getText().toString(), sensitivityType);
                 Log.v("edittext", editText.getText().toString());
                 Log.v("edittext", "text");
                 getActivity().getFragmentManager().beginTransaction().remove(myFragment).commit();
@@ -73,5 +81,28 @@ public class ReportFormFragment extends Fragment {
                 getActivity().getFragmentManager().beginTransaction().remove(myFragment).commit();
             }
         });
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView.getId() == R.id.sensitiveCheckBox){
+            if(isChecked){
+                sensitivityType = "2";
+                superTopSecretCheckBox.setChecked(false);
+                sensitiveCheckBox.setChecked(true);
+            }else {
+                sensitiveCheckBox.setChecked(false);
+            }
+
+        }else if (buttonView.getId() == R.id.top_secret_checkbox){
+            if(isChecked){
+                sensitivityType = "3";
+                sensitiveCheckBox.setChecked(false);
+                superTopSecretCheckBox.setChecked(true);
+            }else {
+                superTopSecretCheckBox.setChecked(false);
+            }
+
+        }
     }
 }

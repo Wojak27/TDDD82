@@ -61,7 +61,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView batteryStatusText;
     private final int NONSENSITIVE_DATA = 1;
     private final int SENSITIVE_DATA = 2;
-    private final int POLIS = 3;
+    private final int SUPER_TOP_SECRET = 3;
+    public TextView textViewServerResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         RESTApiServer.getCoord(this,this);
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
+        textViewServerResponse = (TextView) findViewById(R.id.text_view_maps);
         batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
         updateButton.setOnClickListener(this);
         db = Room.databaseBuilder(getApplicationContext(),
@@ -142,15 +144,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void notifyAboutResponse(HashMap<String, String> response) {
-        System.out.println("Server sa:" + "\n");
         if (response.containsKey("latitude")){
-            System.out.println("Latitide fanns");
+            textViewServerResponse.setText("");
             for(String key: response.keySet()){
                 System.out.println(key + " : " + response.get(key));
             }
         }
         else{
-            Toast.makeText(this, "Meddelande blev manipulerat, inget lades till i databasen", Toast.LENGTH_SHORT).show();
+            textViewServerResponse.setText("Meddelandet blev manipulerat");
         }
     }
 
@@ -411,8 +412,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLng latLng = new LatLng(location.latitude,location.longitude);
         if(type.equals(Integer.toString(NONSENSITIVE_DATA)))
             mMap.addMarker(new MarkerOptions().position(latLng).title(location.title));
-        else
+        else if(type.equals(Integer.toString(SENSITIVE_DATA)))
             mMap.addMarker(new MarkerOptions().position(latLng).title(location.title)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        else if(type.equals(Integer.toString(SUPER_TOP_SECRET)))
+            mMap.addMarker(new MarkerOptions().position(latLng).title(location.title)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
     }
 
@@ -485,7 +488,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
-                db.userDao().deleteAll();
+                db.userDao().removeSensitiveData();
 //                Location location = db.userDao().selectSpecificMarker(lat, lon);
 //                if(location != null) db.userDao().delete(location);
                 return null;

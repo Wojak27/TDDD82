@@ -2,6 +2,7 @@ package polis.polisappen;
 
 import android.graphics.Camera;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -12,12 +13,15 @@ import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.video.VideoCallListener;
 import com.sinch.android.rtc.video.VideoController;
 
+import java.util.HashMap;
 import java.util.List;
+
+import static polis.polisappen.VideoAndVoiceChat.mSinchClient;
 
 /**
  * Handles making a video call, processing it and ending it.
  */
-public class VideoActivity extends VideoAndVoiceChat {
+public class VideoActivity extends AuthAppCompatActivity {
     private Call call;
     private String callId, recipient;
     LinearLayout videoWindow;
@@ -26,12 +30,11 @@ public class VideoActivity extends VideoAndVoiceChat {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.videoscreen);
         Bundle bundle = getIntent().getExtras();
         callId = bundle.getString("CALL_ID");
-        call = mSinchClient.getCallClient().getCall(callId);
+        call = VideoAndVoiceChat.mSinchClient.getCallClient().getCall(callId);
         recipient = call.getRemoteUserId();
         call.addCallListener(new SinchVideoListener());
 
@@ -42,6 +45,11 @@ public class VideoActivity extends VideoAndVoiceChat {
                 call.hangup();
             }
         });
+
+    }
+
+    @Override
+    public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
 
     }
 

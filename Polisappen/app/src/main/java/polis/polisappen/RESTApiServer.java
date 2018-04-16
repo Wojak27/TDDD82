@@ -27,6 +27,7 @@ public class RESTApiServer {
     private static final String SECRET_URL = "/secret";
     private static final String COORD_URL = "/coord";
     private static final String SETCOORD_URL = "/setCoord";
+    private static final String VERIFY_TOKEN = "/verifyToken";
     private static String lastUsedSubURL;
     private static JSONObject lastUsedJSONObject;
     private static Context lastUsedContext;
@@ -76,13 +77,38 @@ public class RESTApiServer {
 
     public static void sendChatMsg(Context context, HttpResponseNotifyable listener,String msg, String receiver_id){
         JSONObject params = new JSONObject();
+        String sign_key = getUsername(context) + getUserAuthToken(context);
+        try {
+            params.put("receiver_id",receiver_id);
+            System.out.println(receiver_id);
+            params.put("message",msg);
+            System.out.println(msg);
+            params.put("checksum", hashSHA256(getJSONToStringSendMsg(params),sign_key));
+            System.out.println("Checksum" + hashSHA256(getJSONToStringSendMsg(params),sign_key));
+            post(context,SEND_CHAT_MSG_URL,params,RESTApiServer.getDefaultHandler(listener),false);
+        } catch (JSONException e) {
+            //TODO gör en textview
+            //e.printStackTrace();
+        }
+    }
+    public static void sendManipulatedChatMsg(Context context, HttpResponseNotifyable listener,String msg, String receiver_id){
+        JSONObject params = new JSONObject();
+        String sign_key = getUsername(context) + getUserAuthToken(context);
         try {
             params.put("receiver_id",receiver_id);
             params.put("message",msg);
+            params.put("checksum", hashSHA256(getJSONToStringSendMsg(params),sign_key));
+            params.put("message", msg + "manipulated");
             post(context,SEND_CHAT_MSG_URL,params,RESTApiServer.getDefaultHandler(listener),false);
         } catch (JSONException e) {
-            e.printStackTrace();
+            //TODO gör en textview
+            //e.printStackTrace();
         }
+    }
+
+    public static void validateToken(Context context, HttpResponseNotifyable listener){
+        JSONObject params = new JSONObject();
+        post(context,VERIFY_TOKEN,params,RESTApiServer.getDefaultHandler(listener),false);
     }
 
     public static void login(Context context, HttpResponseNotifyable listener,String nfcCardNumber, String pin){
@@ -120,6 +146,8 @@ public class RESTApiServer {
     }
     public static void getMessages(Context context, HttpResponseNotifyable listener, Contact chatbuddy) {
         JSONObject params = new JSONObject();
+        client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
+        client.setMaxRetriesAndTimeout(0,0);
         try {
             params.put("chat_partner_id",chatbuddy.getId());
         } catch (JSONException e) {
@@ -148,7 +176,8 @@ public class RESTApiServer {
             post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener),false);
         }
         catch (Exception e){
-            Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
+            //TODO gör om till en textview
+            //Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
             return;
         }
     }
@@ -171,7 +200,8 @@ public class RESTApiServer {
             post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener), false);
         }
         catch (Exception e){
-            Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
+            //TODO gör om till en textview
+            //Toast.makeText(context, "Exception..", Toast.LENGTH_LONG).show();
             return;
         }
     }
@@ -225,6 +255,17 @@ public class RESTApiServer {
             }
         }
         return finalString;
+    }
+    private static String getJSONToStringSendMsg(JSONObject object){
+        String resultat = "";
+        try{
+            resultat += object.getString("receiver_id");
+            resultat += object.getString("message");
+            return resultat;
+        }
+        catch (Exception e){
+            return null;
+        }
     }
     //This method sucks, we need another way....
     private static String getJSONToStringSetCoord(JSONObject object){
