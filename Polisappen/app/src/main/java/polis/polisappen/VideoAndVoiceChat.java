@@ -39,7 +39,6 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
     private String recipient="recipient";
     private EditText deviceNameForCall, remoteNameToCall;
     private Button voiceButton, videoButton, swapNames;
-    private boolean hasEnteredNames = false;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -152,7 +151,7 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
     }
 
     private void setCredentials(){
-        if (hasEnteredNames && mSinchClient != null) {
+        if (mSinchClient != null) {
             mSinchClient.stopListeningOnActiveConnection();
             mSinchClient.terminate();
             mSinchClient = null;
@@ -160,12 +159,13 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
         userName = deviceNameForCall.getText().toString();
         recipient = remoteNameToCall.getText().toString();
         init(userName);
-        hasEnteredNames = true;
     }
 
     private void startVoiceCall(){
         if (!mSinchClient.isStarted())
             init(userName);
+        System.out.println("Recipient: "+recipient);
+        System.out.println("Username: "+userName);
         call = mSinchClient.getCallClient().callUser(recipient);
         Intent intent = new Intent(VideoAndVoiceChat.this, CallActivity.class);
         intent.putExtra("CALL_ID",call.getCallId());
