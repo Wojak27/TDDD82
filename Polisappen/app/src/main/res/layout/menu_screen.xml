@@ -43,31 +43,49 @@
         android:text="@string/logOutButton" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/currentBatteryTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_below="@+id/logOutButton"
-        android:layout_marginStart="45dp"
-        android:layout_marginTop="50dp"
-        android:text="Byt låg batteri gråns:" />
-
-    <EditText
-        android:id="@+id/batteryLimitEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/textView3"
-        android:layout_below="@+id/textView3"
-        android:ems="10"
-        android:inputType="number" />
+        android:layout_marginEnd="11dp"
+        android:layout_marginTop="11dp"
+        android:layout_toStartOf="@+id/changeBatterytoGoodButton"
+        android:text="Nuvarande batteri: 50%" />
 
     <Button
-        android:id="@+id/changeLowBatteryLevelLimitButton"
+        android:id="@+id/changeBatterytoGoodButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/batteryLimitEditText"
-        android:layout_toEndOf="@+id/batteryLimitEditText"
-        android:text="Byt" />
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/eftersomTV"
+        android:layout_marginEnd="74dp"
+        android:layout_marginTop="31dp"
+        android:text="Bra batteri" />
+
+    <Button
+        android:id="@+id/changeBatterytoLowButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/changeBatterytoGoodButton"
+        android:layout_alignBottom="@+id/changeBatterytoGoodButton"
+        android:layout_alignEnd="@+id/currentBatteryTV"
+        android:text="Låg Batteri" />
+
+    <TextView
+        android:id="@+id/currentbatteryLimitTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/currentBatteryTV"
+        android:layout_below="@+id/currentBatteryTV"
+        android:text="Låg Batteri gräns: 10%" />
+
+    <TextView
+        android:id="@+id/eftersomTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/currentbatteryLimitTV"
+        android:layout_below="@+id/currentbatteryLimitTV"
+        android:text="Batteri är bra eftersom 50% > 10%" />
 
 
 </RelativeLayout>

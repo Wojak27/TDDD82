@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sinch.android.rtc.Sinch;
@@ -44,6 +45,13 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
     private EditText remoteNameToCall;
     private Button voiceButton;
     private Button videoButton;
+    private TextView noVideoTextView;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setTextView();
+    }
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -55,6 +63,7 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
         loginButton = (Button) findViewById(R.id.login);
         voiceButton = (Button) findViewById(R.id.voiceButton);
         videoButton = (Button) findViewById(R.id.videoButton);
+        noVideoTextView = (TextView) findViewById(R.id.no_video_textview);
         voiceButton.setVisibility(View.INVISIBLE);
         videoButton.setVisibility(View.INVISIBLE);
         Bundle bundle = getIntent().getExtras();
@@ -66,6 +75,13 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
         videoButton.setOnClickListener(this);
     }
 
+    private void setTextView(){
+        if (SystemStatus.getBatteryStatus() == SystemState.BATTERY_LOW){
+            noVideoTextView.setVisibility(View.VISIBLE);
+        }else {
+            noVideoTextView.setVisibility(View.INVISIBLE);
+        }
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -138,6 +154,7 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
         if(v.getId() == R.id.videoButton){
             if(SystemStatus.getBatteryStatus() == SystemState.BATTERY_LOW){
                 Toast.makeText(getApplicationContext(), "Batterin är för låg, ladda telefonen över 10 procent", Toast.LENGTH_SHORT).show();
+                setTextView();
             }else{
                 RESTApiServer.validateToken(this,this);
             }

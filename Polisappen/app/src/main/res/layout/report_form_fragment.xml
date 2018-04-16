@@ -13,8 +13,14 @@
     <CheckBox
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/sensitiveBox"
+        android:id="@+id/sensitiveCheckBox"
         android:text="Sensisive Information" />
+
+    <CheckBox
+        android:id="@+id/top_secret_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Super top secret" />
 
     <Button
         android:layout_width="match_parent"

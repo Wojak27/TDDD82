@@ -35,6 +35,12 @@
         android:text="Make voice call"
         android:visibility="visible" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_video_textview"
+        android:text="Oooooops! Du har ingen batteri. Videosamtal inaktiv" />
+
     <Button
         android:id="@+id/videoButton"
         android:layout_width="match_parent"
