@@ -201,10 +201,7 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
         //men det är ju för att vi skiter i resultatet, vi ville bara att
         //det skulle loggas i serverns log!
         //String result = response.get("valid_token");
-            call = mSinchClient.getCallClient().callUserVideo(recipient);
-            Intent intent = new Intent(VideoAndVoiceChat.this, VideoActivity.class);
-            intent.putExtra("CALL_ID", call.getCallId());
-            startActivity(intent);
+            startVideoCall();
     }
 
     @Override
