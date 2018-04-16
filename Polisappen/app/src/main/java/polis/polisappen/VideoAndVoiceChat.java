@@ -38,7 +38,6 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
     private String recipient="recipient";
     private EditText deviceNameForCall, remoteNameToCall;
     private Button voiceButton, videoButton, swapNames;
-    private boolean hasEnteredNames = false;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -155,7 +154,7 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
     }
 
     private void setCredentials(){
-        if (hasEnteredNames && mSinchClient != null) {
+        if (mSinchClient != null) {
             mSinchClient.stopListeningOnActiveConnection();
             mSinchClient.terminate();
             mSinchClient = null;
@@ -163,7 +162,6 @@ public class VideoAndVoiceChat extends AuthAppCompatActivity implements Activity
         userName = deviceNameForCall.getText().toString();
         recipient = remoteNameToCall.getText().toString();
         init(userName);
-        hasEnteredNames = true;
     }
 
     private void startVoiceCall(){
