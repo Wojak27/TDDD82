@@ -61,7 +61,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView batteryStatusText;
     private final int NONSENSITIVE_DATA = 1;
     private final int SENSITIVE_DATA = 2;
-    private final int POLIS = 3;
+    private final int SUPER_USER = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
