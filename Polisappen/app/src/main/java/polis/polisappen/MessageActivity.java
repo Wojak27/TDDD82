@@ -17,10 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by jespercrimefighter on 3/19/18.
- */
-
 public class MessageActivity extends AuthAppCompatActivity implements View.OnClickListener{
     private List<Message> messageList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -29,6 +25,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
     private Button sendButton;
     private EditText msgText;
     private Button updateButton;
+    private Button sendManipulatedMsgButton;
     private boolean sendOrUpdate = false; //true = send, update=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +47,9 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         msgText = (EditText) findViewById(R.id.send_msg_text);
         updateButton = (Button) findViewById(R.id.updateButton);
         updateButton.setOnClickListener(this);
+        sendManipulatedMsgButton = (Button) findViewById(R.id.send_mani_msg_Button);
+        sendManipulatedMsgButton.setOnClickListener(this);
+
         getMessagesFromServer();
     }
 
@@ -80,18 +80,25 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         if(view.getId() == sendButton.getId()){
             sendMessageToServer();
         }
+        if (view.getId() == sendManipulatedMsgButton.getId()){
+            sendManipulatedMsgToServer();
+        }
         if(view.getId() == updateButton.getId()){
             getMessagesFromServer();
             System.out.println("update");
         }
     }
-
+    private void sendManipulatedMsgToServer(){
+        String msg = msgText.getText().toString();
+        String reciever_id = chatBuddy.getId();
+        setSending();
+        RESTApiServer.sendManipulatedChatMsg(this, this, msg, reciever_id);
+    }
     private void sendMessageToServer(){
         String msg = msgText.getText().toString();
         String reciever_id = chatBuddy.getId();
         setSending();
         RESTApiServer.sendChatMsg(this, this, msg,reciever_id);
-
     }
     //used when getting msges
     @Override
@@ -106,7 +113,6 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         Collections.sort(messageList);
         messageAdapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(messageList.size()-1);
-
     }
     //used when sending msges is successfully transmitted and received...
     public void notifyAboutResponse(HashMap<String,String> response){

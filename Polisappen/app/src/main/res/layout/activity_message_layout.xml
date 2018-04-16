@@ -14,12 +14,13 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
         android:scrollbars="vertical" />
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="110dp"
         android:layout_alignParentBottom="true"
-        android:paddingLeft="10dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:paddingLeft="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,6 +55,13 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.3"
                     android:text="Update" />
+
+                <Button
+                    android:id="@+id/send_mani_msg_Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:text="Send mani msg" />
             </LinearLayout>
         </LinearLayout>
 
