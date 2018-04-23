@@ -2,8 +2,10 @@ package polis.polisappen;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.*;
 
 import org.json.JSONArray;
@@ -20,12 +22,13 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class RESTApiServer {
-    private static final String API_URL_SERVER_1 = "http://itkand-1-1.tddd82-2018.ida.liu.se/";
-    private static final String API_URL_SERVER_2 = "http://itkand-1-2.tddd82-2018.ida.liu.se/";
+    private static final String API_URL_SERVER_1 = "https://itkand-1-1.tddd82-2018.ida.liu.se/";
+    private static final String API_URL_SERVER_2 = "https://itkand-1-2.tddd82-2018.ida.liu.se/";
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_URL = "/logout";
     private static final String SECRET_URL = "/secret";
     private static final String COORD_URL = "/coord";
+    private static final String COORD_NOPOS_URL = "/coordNoPos";
     private static final String SETCOORD_URL = "/setCoord";
     private static final String VERIFY_TOKEN = "/verifyToken";
     private static String lastUsedSubURL;
@@ -132,12 +135,27 @@ public class RESTApiServer {
         post(context,LOGOUT_URL,params, RESTApiServer.getDefaultHandler(listener), false);
     }
 
-    public static void getCoord(Context context, HttpResponseNotifyable listener){
+    public static void getCoord(Context context, HttpResponseNotifyable listener, LatLng position){
         client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
         client.setMaxRetriesAndTimeout(0,0);
         System.out.println("ATTEMPTING TO GET COORD");
         JSONObject params = getAuthParams(context);
-        get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener), false);
+        Log.w("position", position.toString());
+        if(position != null){
+            Log.w("RESTApi", "Has position");
+            try{
+                double latitude = position.latitude;
+                double longitude = position.longitude;
+                params.put("latitude", latitude);
+                params.put("longitude", longitude);
+                get(context,COORD_URL,params, RESTApiServer.getDefaultHandler(listener), false);
+            }catch (JSONException e){
+                e.printStackTrace();
+            }
+        }else{ // no position given
+            get(context,COORD_NOPOS_URL,params, RESTApiServer.getDefaultHandler(listener), false);
+        }
+
     }
 
     public static void getContacts(Context context, HttpResponseNotifyable listener){
@@ -369,6 +387,7 @@ public class RESTApiServer {
                 //throws exception if internet not available
                 if(errorResponse == null){
                     System.out.println("onFailure called, attempting backupserver");
+                    System.out.println(statusCode);
                     resendRequestToBackupServer();
                     return;
                 }
