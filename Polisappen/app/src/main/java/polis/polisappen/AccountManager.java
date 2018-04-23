@@ -33,6 +33,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     private PendingIntent pendingIntent;
     private boolean isScanned = false;
     private Button LogInButton;
+    private Button FastLoginSuperButton;
+    private Button FastLoginButton;
     private EditText passwordEditText;
     private TextView textView;
     private final int AUTH_EXPIRY_TIME = 1000000; //In seconds
@@ -52,6 +54,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
 
         passwordEditText = (EditText) findViewById(R.id.passwordEditText);
         LogInButton = (Button)findViewById(R.id.logInButton);
+        FastLoginSuperButton = (Button)findViewById(R.id.fastloginsuperbutton);
+        FastLoginButton = (Button)findViewById(R.id.fastloginbutton);
         textView = (TextView)(this).findViewById(R.id.logInText);
         Button startCallActivity = (Button)findViewById(R.id.startCallActivity);
         startCallActivity.setOnClickListener(this);
@@ -75,6 +79,8 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             Toast.makeText(this, "Den här enheten har inte NFC", Toast.LENGTH_SHORT).show();
         else if(!adapter.isEnabled())
            Toast.makeText(this, "Du måste aktivera NFC", Toast.LENGTH_SHORT).show();
+        FastLoginSuperButton.setOnClickListener(this);
+        FastLoginButton.setOnClickListener(this);
     }
 
 
@@ -88,6 +94,16 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
         else if(view.getId() == R.id.startCallActivity){
             Intent intent = new Intent(this, MapsActivity.class);
             startActivity(intent);
+        }
+        else if(view.getId() == R.id.fastloginbutton){
+            tmpNfcCardNumber = "2CE9C808"; //JESPER
+            String pin = "1234";
+            validateRequest(tmpNfcCardNumber, pin);
+        }
+        else if(view.getId() == R.id.fastloginsuperbutton){
+            tmpNfcCardNumber = "9CE3AE08"; //ROBIN
+            String pin = "1111";
+            validateRequest(tmpNfcCardNumber, pin);
         }
     }
 
