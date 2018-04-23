@@ -210,6 +210,11 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
         getLastKnownLocation();
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(getLastKnownLocation()));
     }
+    @Override
+    public void onBackPressed(){
+
+        this.finish();
+    }
 
     @Override
     protected void onResume() {

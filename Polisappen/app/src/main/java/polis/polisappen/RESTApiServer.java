@@ -83,11 +83,11 @@ public class RESTApiServer {
         String sign_key = getUsername(context) + getUserAuthToken(context);
         try {
             params.put("receiver_id",receiver_id);
-            System.out.println(receiver_id);
+            System.out.println("reciever_id " +receiver_id);
             params.put("message",msg);
-            System.out.println(msg);
+            System.out.println("message "+msg);
             params.put("checksum", hashSHA256(getJSONToStringSendMsg(params),sign_key));
-            System.out.println("Checksum" + hashSHA256(getJSONToStringSendMsg(params),sign_key));
+            System.out.println("Checksum " + hashSHA256(getJSONToStringSendMsg(params),sign_key));
             post(context,SEND_CHAT_MSG_URL,params,RESTApiServer.getDefaultHandler(listener),false);
         } catch (JSONException e) {
             //TODO gör en textview
