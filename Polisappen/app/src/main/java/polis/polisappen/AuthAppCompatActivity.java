@@ -161,7 +161,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         //else it was a valid auth token
     }
 
-    private void forceLogin(){
+    public void forceLogin(){
         invalidateAuth();
         System.out.println("forceLogin called, have invalidatedAuth");
         Intent intent = new Intent(this,AccountManager.class);

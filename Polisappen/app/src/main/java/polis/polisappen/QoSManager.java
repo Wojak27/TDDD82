@@ -122,6 +122,9 @@ public class QoSManager extends Service {
             }else if(!isOffline()){
                     sendBroadcastToMapsActivity();
                     SystemStatus.setNetworkStatus(SystemState.NETWORK_AVAILABLE);
+                    if(!auth.validAuth()){
+                        auth.forceLogin();
+                    }
                 //auth.invalidateAuthWithoutInternet();
 
             }

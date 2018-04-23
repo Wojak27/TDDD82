@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -86,6 +87,7 @@ public class RESTApiServer {
             System.out.println("reciever_id " +receiver_id);
             params.put("message",msg);
             System.out.println("message "+msg);
+            System.out.println("token " + getUserAuthToken(context));
             params.put("checksum", hashSHA256(getJSONToStringSendMsg(params),sign_key));
             System.out.println("Checksum " + hashSHA256(getJSONToStringSendMsg(params),sign_key));
             post(context,SEND_CHAT_MSG_URL,params,RESTApiServer.getDefaultHandler(listener),false);
