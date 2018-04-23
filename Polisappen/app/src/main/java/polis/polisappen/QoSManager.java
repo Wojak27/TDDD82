@@ -181,6 +181,7 @@ public class QoSManager extends Service {
         }.execute();
     }
     private void localBatteryManager(int currentBatteryLevel){
+        SystemStatus.setBatteryRestriction(batteryRestrictionLimit);
         if(currentBatteryLevel <= batteryRestrictionLimit && SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
 //            Toast.makeText(context,"battery under 21 procent",Toast.LENGTH_SHORT).show();
             SystemStatus.setBatteryStatus(SystemState.BATTERY_LOW);

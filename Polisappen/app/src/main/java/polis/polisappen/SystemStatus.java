@@ -4,12 +4,14 @@ package polis.polisappen;
  * Created by karolwojtulewicz on 2018-03-19.
  */
 
+
  enum SystemState {
     BATTERY_LOW, BATTERY_OKAY, NETWORK_DOWN, NETWORK_AVAILABLE
 }
 public class SystemStatus {
     private static SystemState batteryState = SystemState.BATTERY_OKAY;
     private static SystemState networkState = SystemState.NETWORK_AVAILABLE;
+    private static int batteryRestriction = 0;
     public static void setBatteryStatus(SystemState currentBatteryStatus){
         batteryState = currentBatteryStatus;
     }
@@ -23,6 +25,14 @@ public class SystemStatus {
 
     public static SystemState getNetworkStatus(){
         return networkState;
+    }
+
+    public static void setBatteryRestriction(int restriction){
+        batteryRestriction = restriction;
+    }
+
+    public static int getBatteryRestriction(){
+        return batteryRestriction;
     }
 }
 

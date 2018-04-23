@@ -62,13 +62,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final int NONSENSITIVE_DATA = 1;
     private final int SENSITIVE_DATA = 2;
     private final int SUPER_TOP_SECRET = 3;
+    private LatLng currentPosition = null;
     public TextView textViewServerResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        RESTApiServer.getCoord(this,this);
+//        RESTApiServer.getCoord(this,this, currentPosition);
         Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
         textViewServerResponse = (TextView) findViewById(R.id.text_view_maps);
         batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
@@ -130,6 +131,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     // ...
                     Log.w("Location", "update");
                     if(mMap != null) {
+                        currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                         updateMap();
                     }
 
@@ -488,7 +490,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... voids) {
-                db.userDao().removeSensitiveData();
+//                db.userDao().removeSensitiveData();
+                db.userDao().deleteAll();
 //                Location location = db.userDao().selectSpecificMarker(lat, lon);
 //                if(location != null) db.userDao().delete(location);
                 return null;
@@ -527,7 +530,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void updateMap(){
         deleteMarkerFromDatabase();
-        RESTApiServer.getCoord(this,this);
+        RESTApiServer.getCoord(this,this, currentPosition);
         setMarkersFromDatabaseOnMap(mMap);
     }
 

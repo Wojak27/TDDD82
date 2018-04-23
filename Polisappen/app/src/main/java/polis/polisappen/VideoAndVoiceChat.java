@@ -154,7 +154,7 @@ public class VideoAndVoiceChat extends AppCompatActivity implements ActivityComp
 
         if(v.getId() == R.id.videoButton){
             if(SystemStatus.getBatteryStatus() == SystemState.BATTERY_LOW){
-                Toast.makeText(getApplicationContext(), "Batterin är för låg, ladda telefonen över "  + " procent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Batterin är för låg, ladda telefonen över "+ SystemStatus.getBatteryRestriction()+" procent", Toast.LENGTH_SHORT).show();
                 setTextView();
             }else{
                 RESTApiServer.validateToken(this,this);
