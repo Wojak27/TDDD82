@@ -242,7 +242,7 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBatteryLowBroadcastReciever);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMapUpdateBroadcastReciever);
-//        stopLocationUpdates();
+        stopLocationUpdates();
     }
 
     private void stopLocationUpdates() {
