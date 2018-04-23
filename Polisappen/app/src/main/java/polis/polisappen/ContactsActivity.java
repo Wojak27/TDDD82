@@ -41,12 +41,15 @@ public class ContactsActivity extends AuthAppCompatActivity implements View.OnCl
     @Override
     public void onResume(){
         super.onResume();
-        getContactsFromServer();
+            getContactsFromServer();
+
     }
 
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
-        System.out.println("kom vi hit kanske?");
+        if(!contactList.isEmpty()){
+            return;
+        }
         for(String key: response.keySet()){
             HashMap<String,String> contact = response.get(key);
             Contact con = new Contact(contact.get("name"),contact.get("id"));

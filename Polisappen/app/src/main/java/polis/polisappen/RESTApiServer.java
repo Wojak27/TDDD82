@@ -369,7 +369,6 @@ public class RESTApiServer {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 // Do something with the response
-                System.out.println("databas");
                 try{
                     HashMap<String, HashMap<String, String>> yttreHashMap = new HashMap<>();
                     for (int i = 0; i < response.length(); i++) {

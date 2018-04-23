@@ -81,7 +81,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                                 context.startActivity(intent);
                                 break;
                             case R.id.message:
-                                System.out.println("klickade skiten ur message");
                                 Bundle bundle1 = new Bundle();
                                 bundle1.putString("buddy_name",contact.getName());
                                 bundle1.putString("buddy_id",contact.getId());
