@@ -37,6 +37,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
             public void onReceive(final Context context, final Intent intent) {
                 //check if the broadcast is our desired one
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+
                     invalidateAuth();
                 }
 
@@ -92,9 +93,16 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         return preferences.getString(AccountManager.USER_AUTH_NAME,null);
     }
 
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        unregisterReceiver(receiver);
+//    }
+
+
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(receiver);
     }
 
