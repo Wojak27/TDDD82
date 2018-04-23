@@ -20,8 +20,8 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class RESTApiServer {
-    private static final String API_URL_SERVER_1 = "http://itkand-1-1.tddd82-2018.ida.liu.se/";
-    private static final String API_URL_SERVER_2 = "http://itkand-1-2.tddd82-2018.ida.liu.se/";
+    private static final String API_URL_SERVER_1 = "https://itkand-1-1.tddd82-2018.ida.liu.se/";
+    private static final String API_URL_SERVER_2 = "https://itkand-1-2.tddd82-2018.ida.liu.se/";
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_URL = "/logout";
     private static final String SECRET_URL = "/secret";

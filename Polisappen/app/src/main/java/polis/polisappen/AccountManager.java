@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
@@ -89,6 +90,7 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
             startActivity(intent);
         }
     }
+
 
     private String getAuthTokenExpiry(){
         long currentTime = System.currentTimeMillis(); //the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
@@ -193,7 +195,13 @@ public class AccountManager extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onBackPressed(){}
+    public void onBackPressed(){
+        Intent intent = new Intent(this,MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        this.finish();
+        startActivity(intent);
+        //NavUtils.navigateUpFromSameTask(this);
+    }
 
     public void checkLoginStatus(){//Kolla vilken info som matats in
         if(passwordEditText.getText().length()==4 && isScanned){
