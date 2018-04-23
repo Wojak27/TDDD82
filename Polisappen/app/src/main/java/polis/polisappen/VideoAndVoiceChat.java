@@ -27,7 +27,7 @@ import java.util.HashMap;
 /**
  * For making voice or video calls between users.
  */
-public class VideoAndVoiceChat extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, HttpResponseNotifyable{
+public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback, View.OnClickListener, HttpResponseNotifyable{
     private static final String APP_KEY = "955e2079-38f0-43d5-af9e-80e4f3ade26d";
     private static final String APP_SECRET = "TZOvC9lH6k2wmJzWHEXh2Q==";
     private static final String ENVIRONMENT = "sandbox.sinch.com";
