@@ -251,7 +251,7 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
     }
 
     private void stopLocationUpdates() {
-//        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 
     public void createLocationRequest() {
