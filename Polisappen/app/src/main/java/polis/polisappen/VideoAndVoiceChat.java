@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -157,11 +158,19 @@ public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements
                 Toast.makeText(getApplicationContext(), "Batterin är för låg, ladda telefonen över "+ SystemStatus.getBatteryRestriction()+" procent", Toast.LENGTH_SHORT).show();
                 setTextView();
             }else{
-                RESTApiServer.validateToken(this,this);
+                if(validAuth()){
+                    RESTApiServer.validateToken(this,this);
+                }else {
+                    Toast.makeText(getApplicationContext(), "Du maste vara inloggad", Toast.LENGTH_SHORT).show();
+                }
             }
 
         }else if (v.getId() == R.id.voiceButton){
-            startVoiceCall();
+            if(validAuth()){
+                startVoiceCall();
+            }else {
+                Toast.makeText(getApplicationContext(), "Du maste vara inloggad", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -199,6 +208,7 @@ public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements
         //men det är ju för att vi skiter i resultatet, vi ville bara att
         //det skulle loggas i serverns log!
         //String result = response.get("valid_token");
+        Log.w("VideoAndRost", "notifyAboutResponse");
             startVideoCall();
     }
 
