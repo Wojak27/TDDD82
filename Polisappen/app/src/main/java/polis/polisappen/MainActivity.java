@@ -41,6 +41,15 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         if(!validAuth()){
             logout.setText("Log in");
         }
+        if(!isServiceRunning(QoSManager.class)){
+            if (qoSIntent == null){
+                qoSIntent = new Intent(this, QoSManager.class);
+                startService(qoSIntent);
+            }else{
+                startService(qoSIntent);
+            }
+
+        }
         logout.setOnClickListener(this);
         Button mapButton = (Button)findViewById(R.id.mapsButton);
         mapButton.setOnClickListener(this);
@@ -98,17 +107,6 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
         registerReceivers();
         if(validAuth()){
             logout.setText("Log out");
-        }
-        if(!isServiceRunning(QoSManager.class)){
-            if (qoSIntent == null){
-                qoSIntent = new Intent(this, QoSManager.class);
-                startService(qoSIntent);
-            }else{
-                startService(qoSIntent);
-            }
-            if(validAuth()){
-
-            }
         }
 
     }

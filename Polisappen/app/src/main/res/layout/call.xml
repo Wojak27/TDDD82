@@ -78,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/no_video_textview"
-        android:text="Oooooops! Du har ingen batteri. Videosamtal inaktiv" />
+        android:text="Battery is too low, please charge to make videocall" />
 
     <Button
         android:id="@+id/videoButton"
