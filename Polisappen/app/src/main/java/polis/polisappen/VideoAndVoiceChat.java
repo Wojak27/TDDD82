@@ -168,7 +168,8 @@ public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements
                 if(validAuth()){
                     RESTApiServer.validateToken(this,this);
                 }else {
-                    Toast.makeText(getApplicationContext(), "Du maste vara inloggad", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this,AccountManager.class);
+                    startActivity(intent);
                 }
             }
 

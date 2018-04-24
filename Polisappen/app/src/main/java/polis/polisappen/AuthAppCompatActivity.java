@@ -170,11 +170,13 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         System.out.println("Starting login activity....");
         startActivity(intent);
+        /*
         try{
             stopService(new Intent(AuthAppCompatActivity.this,QoSManager.class));
         }catch (Exception e){
             Log.w("No started ", "service");
         }
+        */
 
     }
 }

@@ -42,6 +42,7 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             logout.setText("Log in");
         }
         if(!isServiceRunning(QoSManager.class)){
+            System.out.println("starting service...");
             if (qoSIntent == null){
                 qoSIntent = new Intent(this, QoSManager.class);
                 startService(qoSIntent);
@@ -123,9 +124,9 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
             super.invalidateAuth();
             Intent intent = new Intent(this,AccountManager.class);
             startActivity(intent);
-            if(qoSIntent != null){
-                stopService(qoSIntent);
-            }
+            //if(qoSIntent != null){
+             //   stopService(qoSIntent);
+            //}
         }
         else if(view.getId() == R.id.mapsButton){
             Intent intent = new Intent(this,MapsActivity.class);
@@ -169,6 +170,7 @@ public class MainActivity extends AuthAppCompatActivity implements View.OnClickL
     protected void onDestroy() {
         super.onDestroy();
         if(qoSIntent != null){
+            System.out.println("Stopping service");
             stopService(qoSIntent);
         }
     }
