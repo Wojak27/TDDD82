@@ -76,6 +76,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                                 Bundle bundle = new Bundle();
                                 bundle.putString("calling_to_name",contact.getName());
                                 bundle.putString("calling_to_id",contact.getId());
+                                ContactsActivity act = (ContactsActivity) context;
+                                bundle.putString("my_name",act.getUsername());
                                 Intent intent =  new Intent(context,VideoAndVoiceChat.class);
                                 intent.putExtras(bundle);
                                 context.startActivity(intent);

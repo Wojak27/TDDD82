@@ -61,13 +61,20 @@ public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements
         voiceButton = (Button) findViewById(R.id.voiceButton);
         videoButton = (Button) findViewById(R.id.videoButton);
         noVideoTextView = (TextView) findViewById(R.id.no_video_textview);
-        Bundle bundle = getIntent().getExtras();
-        if(bundle != null){
-            remoteNameToCall.setText(bundle.getString("calling_to_name"));
-        }
         swapNames.setOnClickListener(this);
         voiceButton.setOnClickListener(this);
         videoButton.setOnClickListener(this);
+        Bundle bundle = getIntent().getExtras();
+        if(bundle != null){
+            if(bundle.getString("calling_to_name") != null) { //då kom vi från contact
+                remoteNameToCall.setText(bundle.getString("calling_to_name"));
+                deviceNameForCall.setText(bundle.getString("my_name"));
+                setCredentials();
+            }
+        }
+        if(bundle == null){ //då kommer vi från mainactivity
+            setCredentials();
+        }
     }
 
     private void setTextView(){
