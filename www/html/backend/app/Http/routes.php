@@ -30,7 +30,9 @@ Route::group(['prefix' => '', 'middleware' => 'jwt.auth'], function(){
 
 Route::post('/login', 'AuthenticateController@authenticate');
 Route::post('/register', 'AuthenticateController@register');
-Route::get('/coord', 'MapsController@getCoord');
+Route::get('/coord', 'MapsController@getNearestCoord');
+Route::get('/coordNoPos', 'MapsController@getCoord');
+Route::post('verifyToken', 'AuthenticateController@verifyToken');
 
 /*
 |--------------------------------------------------------------------------
