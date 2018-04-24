@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use DB;
+use App\Coordinate;
+use JWTAuth;
+
+class MapsController extends Controller
+{
+      public function getCoord3() {
+	try {
+		if (! $user = JWTAuth::parseToken()->authenticate()) {
+			\Log::info('Unknown person tried to make access restricted maps pins, NOT approved.');
+			return Coordinate::where('type', '=', 1)->get(); //return unrestricted pins
+		}
+		\Log::info($user->name . ' tried to make a call, APPROVED!.');
+		return response()->json(['valid_token' => true]);
+	}catch(\Exception $e){
+		\Log::info('Unknown person tried to make a call, NOT approved.');
+		return response()->json(['valid_token' => false]);
+	}
+
+
+	// the token is valid and we have found the user via the sub claim
+   
+
+     public function getCoord()
+    {
+	if(JWTAuth::getToken()){
+	return Coordinate::all();
+	}
+	else{
+	return Coordinate::where('type', '=', 1)->get();
+	}
+    }
+
+    public function setCoord(Request $request){
+	$checksum = $request->get('checksum');
+	$token = JWTAuth::getToken();
+	$user_id = strtoupper(JWTAuth::toUser($token)->id);
+        $secret_key = $user_id.$token;
+	$all_data_string = "";
+	$all_data_string .= $request->get('latitude');
+	$all_data_string .= $request->get('longitude');
+	$all_data_string .= $request->get('type');
+	$all_data_string .= $request->get('report_text');
+	$hashValue = strtoupper(hash_hmac("sha256",$all_data_string,$secret_key));
+	if(!($checksum===$hashValue)){
+		\Log::error('Server 1: Corrupt/manipulated data, not put in DB');
+		return response()->json([
+		'message'=>'Server 1: Corrput/Manipulated data, not put in DB'
+		]);
+	}
+	$testing = $request->get('test');
+	if($testing === 'true'){
+	\Log::info('Server 1: Testing mode on, not put in DB');
+	return response()->json([
+	'message'=> 'Server 1: Testing mode on, not put in DB'
+	]);
+	}
+    // grab coordinates from the request
+	\Log::info('Server 1: Coordinate was put in DB');
+        return Coordinate::create([
+       'latitude' => $request->get('latitude'),
+       'longitude' => $request->get('longitude'),
+       'type' => $request->get('type'),
+       'report_text' => $request->get('report_text')
+    ]);
+    }
+    
+    public function delCoords(){
+    DB::table('coordinates')->delete();
+    }
+}

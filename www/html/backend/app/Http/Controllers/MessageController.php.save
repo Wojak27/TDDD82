@@ -39,7 +39,7 @@ class MessageController extends Controller
     }
 
      public function getChatMessages(Request $request){
-	\Log::info('Server 1: All messages returned to client');
+	//\Log::info('Server 1: All messages returned to client');
 	$token = JWTAuth::getToken();
 	$requester_user_id = strtoupper(JWTAuth::toUser($token)->id);
 	$chat_partner_user_id = $request->get('chat_partner_id');
@@ -48,33 +48,35 @@ class MessageController extends Controller
               ->whereIn('sender_id', $valid_ids)
               ->whereIn('receiver_id', $valid_ids)
               ->get();
-	}
+	}	
 
      public function sendMessage(Request $request){
+	\Log::info('in sendMessage');
 	$checksum = $request->get('checksum');
+	$secret_key = $user_id.$token;
 	$this->restoreDatabaseConstiency();
 	$token = JWTAuth::getToken();
 	$user_id = strtoupper(JWTAuth::toUser($token)->id);
-	$secret_key = $user_id.$token;
 	$all_data_string = "";
 	$all_data_string .= $request->get('receiver_id');
 	$all_data_string .= $request->get('message');
 	$hashValue = strtoupper(hash_hmac("sha256", $all_data_string,$secret_key));
-	if(!($checksum==$hashValue)){
-		\Log::info('Message: Corrupt/Manipulated data, not put in DB');
-		return response()->json([
-		'message'=>'Server1: Message: Corrupt/Manipulated data, not put in DB', $hashValue, $checksum
-		]);
-	}
-	\Log::info('Server 1: Message added to DB and backup');
-	$message = Message::create(['sender_id' => $user_id,
+	if(!($checksum===$hashValue)){
+		\Log::info('Corrupt/Manipulated data, not put in DB');
+		//return response()->json([
+		//'messsage'=>'Server1: Corrupt/Manipulated data, not put in DB'
+		//]);
+	\Log::info('Message received and added to DB');
+	$message = Message::create([
+       'sender_id' => $user_id,
        'receiver_id' => $request->get('receiver_id'),
        'message' => $request->get('message')
     	]);
 	$this->incrementDefaultTime();
 	$this->dumpDefaultDB();
 	$this->restoreBackupDB();
-	return $message;
+	//returnÂ$message;
+	//Gor om unktionen att returnera ett varde i android
     }
 
     public function sendMessageDefaultOnly(Request $request){

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
@@ -26,6 +28,7 @@ class AuthenticateController extends Controller
         }
 
         // all good so return the token
+	\Log::info('Server 1: Return user_authenticated');
 	$USER_AUTH_STATUS = "USER_AUTHENTICATED";
 	$user_name = strtoupper(JWTAuth::toUser($token)->name);
         return response()->json(compact('token', 'USER_AUTH_STATUS','user_name'));
@@ -50,4 +53,22 @@ class AuthenticateController extends Controller
         ]);
         return response()->json(['status'=>true, 'message' => 'created user']);
     }
+
+public function verifyToken() {
+	try {
+		if (! $user = JWTAuth::parseToken()->authenticate()) {
+			\Log::info('Unknown person tried to make a call, NOT approved.');
+			return response()->json(['valid_token' => false]);
+		}
+		\Log::info($user->name . ' tried to make a call, APPROVED!.');
+		return response()->json(['valid_token' => true]);
+	}catch(\Exception $e){
+		\Log::info('Unknown person tried to make a call, NOT approved.');
+		return response()->json(['valid_token' => false]);
+	}
+
+
+	// the token is valid and we have found the user via the sub claim
+   }
+
 }

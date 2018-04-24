@@ -27,6 +27,7 @@ class Controller extends BaseController
    }
 
    public function restoreDatabaseConstiency(){
+	\Log::info('Server 1: DB consistency restored');
 	$default_time = $this->readDefaultTime();
 	$backup_time = $this->readBackupTime();
 	if($default_time > $backup_time){
