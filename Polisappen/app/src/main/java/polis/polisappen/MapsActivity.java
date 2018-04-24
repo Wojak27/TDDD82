@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -21,6 +22,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,6 +40,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
@@ -46,7 +51,7 @@ import java.util.List;
 import polis.polisappen.LocalDatabase.ApplicationDatabase;
 import polis.polisappen.LocalDatabase.Location;
 
-public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable, View.OnClickListener {
+public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, HttpResponseNotifyable, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -64,16 +69,15 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
     private final int SUPER_TOP_SECRET = 3;
     private LatLng currentPosition = null;
     public TextView textViewServerResponse;
-
+    private boolean showArea = false;
+    private CheckBox showAreaCheckBox;
+    private Button updateButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 //        RESTApiServer.getCoord(this,this, currentPosition);
-        Button updateButton = (Button) findViewById(R.id.updateButtonMaps);
-        textViewServerResponse = (TextView) findViewById(R.id.text_view_maps);
-        batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
-        updateButton.setOnClickListener(this);
+        initViews();
         db = Room.databaseBuilder(getApplicationContext(),
                 ApplicationDatabase.class, "database-name").build();
 
@@ -93,11 +97,33 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
         LocalBroadcastManager.getInstance(this).registerReceiver(mBatteryLowBroadcastReciever,new IntentFilter(QoSManager.BATTERY_LOW));
     }
 
+    private void initViews(){
+        textViewServerResponse = (TextView) findViewById(R.id.text_view_maps);
+        batteryStatusText = (TextView) findViewById(R.id.battery_status_textbox);
+        updateButton = (Button) findViewById(R.id.updateButtonMaps);
+        showAreaCheckBox = (CheckBox)findViewById(R.id.showAreaCheckBox);
+        showAreaCheckBox.setOnCheckedChangeListener(this);
+        updateButton.setOnClickListener(this);
+    }
+
     private void makeLocationRequest(){
         if(SystemState.BATTERY_OKAY == SystemStatus.getBatteryStatus()){
             createLocationRequest();
         }else {
             createLocationRequestBestForBattery();
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (buttonView.getId() == showAreaCheckBox.getId()){
+            if (isChecked){
+                showArea = true;
+                showAreaBox();
+            }else {
+                showArea = false;
+                updateMap();
+            }
         }
     }
 
@@ -134,7 +160,11 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
                         currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                         updateMap();
                     }
-
+                    //Latitude: 1 deg = 110.574 km => 0.0904372 deg = 10 km => 0.0452186 deg = 5 km
+                    //Longitude: 1 deg = 111.320*cos(latitude) km => 1/(2*11.132*cos(latitide)) deg = 5 km
+                    if(showArea == true){
+                        showAreaBox();
+                    }
 //                    laying markers for debugging
 //                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(),location.getLongitude())));
                 }
@@ -142,6 +172,19 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
             }
 
         };
+    }
+
+    private void showAreaBox(){
+        PolylineOptions rectOptions = new PolylineOptions()
+                .add(new LatLng(currentPosition.latitude +0.0452186, currentPosition.longitude+1/(2*11.132*Math.abs(Math.cos(currentPosition.latitude)))))
+                .add(new LatLng(currentPosition.latitude -0.0452186, currentPosition.longitude+1/(2*11.132*Math.abs(Math.cos(currentPosition.latitude)))))  // North of the previous point, but at the same longitude
+                .add(new LatLng(currentPosition.latitude -0.0452186, currentPosition.longitude-1/(2*11.132*Math.abs(Math.cos(currentPosition.latitude)))))  // Same latitude, and 30km to the west
+                .add(new LatLng(currentPosition.latitude +0.0452186, currentPosition.longitude-1/(2*11.132*Math.abs(Math.cos(currentPosition.latitude)))))  // Same longitude, and 16km to the south
+                .add(new LatLng(currentPosition.latitude +0.0452186, currentPosition.longitude+1/(2*11.132*Math.abs(Math.cos(currentPosition.latitude)))))
+                .color(Color.RED); // Closes the polyline.
+
+        // Get back the mutable Polyline
+        mMap.addPolyline(rectOptions);
     }
 
     @Override
@@ -251,7 +294,9 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
     }
 
     private void stopLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        if(mFusedLocationClient != null){
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+        }
     }
 
     public void createLocationRequest() {
@@ -289,12 +334,13 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
                 .addOnSuccessListener(this, new OnSuccessListener<android.location.Location>() {
                     @Override
                     public void onSuccess(android.location.Location location) {
-                        Log.w("success", "successful");
-                        setMyCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
-                        moveCameraToCurrentPostition(new LatLng(location.getLatitude(), location.getLongitude()));
-
+                        if(location != null){
+                            setMyCoordinates(new LatLng(location.getLatitude(), location.getLongitude()));
+                            moveCameraToCurrentPostition(new LatLng(location.getLatitude(), location.getLongitude()));
+                        }
                     }
                 });
+
         mRequestingLocationUpdates = true;
         startLocationUpdates(); //fro debugging
     }

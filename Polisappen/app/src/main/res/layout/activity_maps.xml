@@ -45,6 +45,14 @@
             android:layout_marginEnd="19dp"
             android:layout_marginTop="16dp"
             android:text="" />
+
+        <CheckBox
+            android:id="@+id/showAreaCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/updateButtonMaps"
+            android:text="Show Area" />
     </RelativeLayout>
 
 </RelativeLayout>
