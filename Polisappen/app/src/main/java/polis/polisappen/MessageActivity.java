@@ -51,7 +51,7 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         updateButton.setOnClickListener(this);
         sendManipulatedMsgButton = (Button) findViewById(R.id.send_mani_msg_Button);
         sendManipulatedMsgButton.setOnClickListener(this);
-        textView = (TextView) findViewById(R.id.text_view_message);
+        //textView = (TextView) findViewById(R.id.text_view_message);
 
         getMessagesFromServer();
     }
@@ -91,6 +91,13 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
             System.out.println("update");
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getMessagesFromServer();
+    }
+
     private void sendManipulatedMsgToServer(){
         String msg = msgText.getText().toString();
         String reciever_id = chatBuddy.getId();
@@ -122,14 +129,15 @@ public class MessageActivity extends AuthAppCompatActivity implements View.OnCli
         System.out.println("NotifyAboutResponse");
         if (response.containsKey("receiver_id")){
             System.out.print("Receiver_id fanns");
-            textView.setText("");
+            //textView.setText("");
             if(wasSending()) {
                 getMessagesFromServer();
             }
         }
         else{
             System.out.println("Meddelandet manipulderas");
-            textView.setText("Meddelandet manipulerades");
+            getMessagesFromServer();
+            //textView.setText("Meddelandet manipulerades");
         }
         msgText.setText("");
     }

@@ -167,6 +167,7 @@ public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements
             }else{
                 if(validAuth()){
                     RESTApiServer.validateToken(this,this);
+
                 }else {
                     Intent intent = new Intent(this,AccountManager.class);
                     startActivity(intent);

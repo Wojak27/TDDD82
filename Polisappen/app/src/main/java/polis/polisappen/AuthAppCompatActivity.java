@@ -42,7 +42,7 @@ public abstract class AuthAppCompatActivity extends AppCompatActivity implements
 
         if(caller != null){
             if(caller.equals("MAINACTIVITY")){ //Mainactivity needs no auth
-                System.out.println("Upptäckte att det var mainactivity");
+                //System.out.println("Upptäckte att det var mainactivity");
                 invalidateAuthWithoutInternet();
                 return;
             }else if (caller.equals("NOAUTHACTIVITY")) { //MapsActivity needs no auth

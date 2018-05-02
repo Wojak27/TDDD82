@@ -113,6 +113,7 @@ public class RESTApiServer {
 
     public static void validateToken(Context context, HttpResponseNotifyable listener){
         JSONObject params = new JSONObject();
+        System.out.println(getUserAuthToken(context));
         post(context,VERIFY_TOKEN,params,RESTApiServer.getDefaultHandler(listener),false);
     }
 
@@ -140,7 +141,6 @@ public class RESTApiServer {
     public static void getCoord(Context context, HttpResponseNotifyable listener, LatLng position){
         client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
         client.setMaxRetriesAndTimeout(0,0);
-        System.out.println("ATTEMPTING TO GET COORD");
         JSONObject params = getAuthParams(context);
         Log.w("position", position.toString());
         if(position != null){
@@ -186,13 +186,14 @@ public class RESTApiServer {
             jsonParams.put("longitude", coordData.get("longitude"));
             jsonParams.put("type", coordData.get("type"));
             jsonParams.put("report_text", reportText);
-            System.out.println("checksum: " + hashSHA256(getJSONToStringSetCoord(jsonParams),sign_key));
             jsonParams.put("checksum",hashSHA256(getJSONToStringSetCoord(jsonParams),sign_key));
             jsonParams.put("type", coordData.get("type")+"manipulated");
             System.out.println("latitude: " + coordData.get("latitude"));
             System.out.println("longitude: " + coordData.get("longitude"));
             System.out.println("type: " + coordData.get("type"));
             System.out.println("report_text: " + reportText);
+            System.out.println("checksum: " + hashSHA256(getJSONToStringSetCoord(jsonParams),sign_key));
+            System.out.println("token: " +  getUserAuthToken(context));
             post(context,SETCOORD_URL,addAuthParams(context,jsonParams), RESTApiServer.getDefaultHandler(listener),false);
         }
         catch (Exception e){

@@ -202,9 +202,8 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
 
     @Override
     public void notifyAboutResponseJSONArray(HashMap<String, HashMap<String, String>> response) {
-        System.out.println("databasen svarade 2");
         for(String key : response.keySet()){
-            System.out.println("Type: " + response.get(key).get("type"));
+            //System.out.println("Type: " + response.get(key).get("type"));
             addMarkerToLocalDB(new LatLng(Double.parseDouble(response.get(key).get("latitude")),Double.parseDouble(response.get(key).get("longitude"))),"title",response.get(key).get("report_text"), response.get(key).get("type"));
         }
     }
