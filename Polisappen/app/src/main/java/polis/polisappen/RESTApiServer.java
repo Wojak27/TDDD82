@@ -46,6 +46,7 @@ public class RESTApiServer {
 
     private static void get(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler, boolean sendToBackupServer) {
         StringEntity entity = new StringEntity(params.toString(), "UTF-8");
+        params = addAuthParams(context,params);
         addAuthHeadersToClient(params);
         setLastUsedParameters(url, params, context,responseHandler, true);
         client.get(context, getAbsoluteUrl(url, sendToBackupServer), entity, "application/json", responseHandler);
@@ -73,6 +74,7 @@ public class RESTApiServer {
         try{
             if(params.get("token") != null){
                 client.addHeader("Authorization", "Bearer " + params.get("token"));
+                System.out.println("adding params, auth: " + params.get("token"));
             }
         }catch (Exception e){
             //do nothing
@@ -169,6 +171,7 @@ public class RESTApiServer {
         client.setConnectTimeout(1000);//1000 is the lowest possible value according to API
         client.setMaxRetriesAndTimeout(0,0);
         try {
+            System.out.println("catbuddy " + chatbuddy.getId());
             params.put("chat_partner_id",chatbuddy.getId());
         } catch (JSONException e) {
             e.printStackTrace();
