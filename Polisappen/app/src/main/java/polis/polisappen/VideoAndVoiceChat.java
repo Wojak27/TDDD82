@@ -169,6 +169,7 @@ public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements
                     RESTApiServer.validateToken(this,this);
 
                 }else {
+                    RESTApiServer.validateToken(this,this);
                     Intent intent = new Intent(this,AccountManager.class);
                     startActivity(intent);
                 }
@@ -216,9 +217,12 @@ public class VideoAndVoiceChat extends ExceptionAuthAppCompatActivity implements
         //nu undrar ju ni varför vi inte gör nått med response
         //men det är ju för att vi skiter i resultatet, vi ville bara att
         //det skulle loggas i serverns log!
-        //String result = response.get("valid_token");
+        String result = response.get("valid_token");
+        System.out.println("result " + result);
         Log.w("VideoAndRost", "notifyAboutResponse");
+        if(result.equals("true")) {
             startVideoCall();
+        }
     }
 
     @Override

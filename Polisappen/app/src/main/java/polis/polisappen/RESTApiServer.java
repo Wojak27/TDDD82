@@ -347,6 +347,7 @@ public class RESTApiServer {
 
     private static void post(Context context, String url, JSONObject params, AsyncHttpResponseHandler responseHandler, boolean sendToBackupServer) {
         StringEntity entity = new StringEntity(params.toString(), "UTF-8");
+        addAuthParams(context,params);
         addAuthHeadersToClient(params);
         setLastUsedParameters(url, params,context,responseHandler, false);
         client.post(context, getAbsoluteUrl(url, sendToBackupServer), entity, "application/json", responseHandler);
