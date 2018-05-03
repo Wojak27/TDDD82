@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -72,6 +73,9 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
     private boolean showArea = false;
     private CheckBox showAreaCheckBox;
     private Button updateButton;
+    private CountDownTimer countDownTimer;
+    private TextView countDownTextView;
+    private int countdownFrom;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +108,7 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
         showAreaCheckBox = (CheckBox)findViewById(R.id.showAreaCheckBox);
         showAreaCheckBox.setOnCheckedChangeListener(this);
         updateButton.setOnClickListener(this);
+        countDownTextView = (TextView) findViewById(R.id.countDownTextView);
     }
 
     private void makeLocationRequest(){
@@ -155,6 +160,8 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
                 for (android.location.Location location : locationResult.getLocations()) {
                     // Update UI with location data
                     // ...
+
+                    setupCountdown(countdownFrom, 1000);
                     Log.w("Location", "update");
                     if(mMap != null) {
                         currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
@@ -304,6 +311,8 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
         mLocationRequest.setFastestInterval(10000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         batteryStatusText.setText("Battery OKAY");
+        setupCountdown(10000, 1000);
+        countdownFrom = 11000;
     }
 
     public void createLocationRequestBestForBattery() {
@@ -312,6 +321,28 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
         mLocationRequest.setFastestInterval(30000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         batteryStatusText.setText("Battery LOW");
+        setupCountdown(30000, 1000);
+        countdownFrom = 31000;
+    }
+
+    private void setupCountdown(int from, final int interval){
+        if (countDownTimer != null){
+            countDownTimer.cancel();
+        }
+        countDownTimer = new CountDownTimer(from, interval) {
+
+            public void onTick(long millisUntilFinished) {
+                //mTextField.setText("seconds remaining: " + millisUntilFinished / 1000);
+                Log.w("seconds: ", Long.toString(millisUntilFinished / interval));
+                countDownTextView.setText(Long.toString(millisUntilFinished / 1000));
+
+            }
+
+            public void onFinish() {
+                //mTextField.setText("done!");
+                Log.w("Countdown ", "done");
+            }
+        }.start();
     }
 
     private void moveCameraToCurrentPostition(LatLng location){

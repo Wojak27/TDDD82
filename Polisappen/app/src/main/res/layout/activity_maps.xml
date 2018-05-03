@@ -53,6 +53,15 @@
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@+id/updateButtonMaps"
             android:text="Show Area" />
+
+        <TextView
+            android:id="@+id/countDownTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/updateButtonMaps"
+            android:layout_alignBottom="@+id/updateButtonMaps"
+            android:layout_alignStart="@+id/battery_status_textbox"
+            android:text="0" />
     </RelativeLayout>
 
 </RelativeLayout>
