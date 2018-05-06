@@ -74,7 +74,6 @@ public class RESTApiServer {
         try{
             if(params.get("token") != null){
                 client.addHeader("Authorization", "Bearer " + params.get("token"));
-                System.out.println("adding params, auth: " + params.get("token"));
             }
         }catch (Exception e){
             //do nothing

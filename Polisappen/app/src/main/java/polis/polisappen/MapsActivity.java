@@ -162,7 +162,6 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
                     // ...
 
                     setupCountdown(countdownFrom, 1000);
-                    Log.w("Location", "update");
                     if(mMap != null) {
                         currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                         updateMap();
@@ -196,15 +195,7 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
 
     @Override
     public void notifyAboutResponse(HashMap<String, String> response) {
-        if (response.containsKey("latitude")){
-            textViewServerResponse.setText("");
-            for(String key: response.keySet()){
-                System.out.println(key + " : " + response.get(key));
-            }
-        }
-        else{
-            textViewServerResponse.setText("Meddelandet blev manipulerat");
-        }
+
     }
 
     @Override
@@ -307,22 +298,22 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
 
     public void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(10000);
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(5000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         batteryStatusText.setText("Battery OKAY");
-        setupCountdown(10000, 1000);
-        countdownFrom = 11000;
+        setupCountdown(5000, 1000);
+        countdownFrom = 6000;
     }
 
     public void createLocationRequestBestForBattery() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(30000);
-        mLocationRequest.setFastestInterval(30000);
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(10000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         batteryStatusText.setText("Battery LOW");
-        setupCountdown(30000, 1000);
-        countdownFrom = 31000;
+        setupCountdown(10000, 1000);
+        countdownFrom = 11000;
     }
 
     private void setupCountdown(int from, final int interval){
@@ -333,14 +324,12 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
 
             public void onTick(long millisUntilFinished) {
                 //mTextField.setText("seconds remaining: " + millisUntilFinished / 1000);
-                Log.w("seconds: ", Long.toString(millisUntilFinished / interval));
-                countDownTextView.setText(Long.toString(millisUntilFinished / 1000));
+                countDownTextView.setText("Update freq: " + ((countdownFrom/1000) - 1) +" nextUpdate in: " +Long.toString(millisUntilFinished / 1000));
 
             }
 
             public void onFinish() {
                 //mTextField.setText("done!");
-                Log.w("Countdown ", "done");
             }
         }.start();
     }
@@ -543,7 +532,6 @@ public class MapsActivity extends ExceptionAuthAppCompatActivity implements OnMa
             @Override
             protected void onPostExecute(Integer locationCount) {
                 if (locationCount>0){
-                    Log.w("Location","successful");
                 }
             }
         }.execute();
