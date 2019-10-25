@@ -1,2 +1,3 @@
 # TDDD82
-# Hej Jesper!
+
+The batchelor project on Linköpings University IT engineering 
